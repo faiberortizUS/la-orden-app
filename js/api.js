@@ -37,44 +37,40 @@ function _showDebug(msg, color) {
 async function fetchUserData() {
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-  // ── Paso 1: detectar si estamos en Telegram
+  // Detectar si estamos en Telegram
   if (!tg) {
     _showDebug('Sin objeto Telegram.WebApp — abierto en navegador');
     return DEMO_DATA;
   }
 
-  // ── Paso 2: recopilar identificadores disponibles
-  const initData       = tg.initData       || '';
-  const initDataUnsafe = tg.initDataUnsafe || {};
-  const tgUser         = initDataUnsafe.user || null;
-  const telegramId     = tgUser ? String(tgUser.id) : '';
+  // Recopilar identificadores disponibles
+  const initData   = tg.initData || '';
+  const unsafe     = tg.initDataUnsafe || {};
+  const tgUser     = unsafe.user || null;
+  const tid        = tgUser ? String(tgUser.id) : '';
 
   _showDebug(
     'Telegram detectado<br>' +
     'initData: ' + (initData ? initData.substring(0,40)+'…' : '⚠️ VACÍO') + '<br>' +
-    'tgUser.id: ' + (telegramId || '⚠️ NO DISPONIBLE') + '<br>' +
-    'tgUser.first_name: ' + (tgUser ? tgUser.first_name : '—')
+    'tid: ' + (tid || '⚠️ NO DISPONIBLE') + '<br>' +
+    'nombre: ' + (tgUser ? tgUser.first_name : '—')
   );
 
-  if (!initData && !telegramId) {
-    _showDebug('❌ Sin initData ni telegramId — no se puede autenticar', '#700');
+  if (!initData && !tid) {
+    _showDebug('❌ Sin initData ni tid', '#700');
     return DEMO_DATA;
   }
 
-  // ── Paso 3: construir URL (preferimos initData; si está vacío usamos tid)
-  var url;
-  if (initData) {
-    url = GAS_API_URL + '?initData=' + encodeURIComponent(initData);
-  } else {
-    // Fallback: enviar telegramId directo (GAS acepta ?tid=)
-    url = GAS_API_URL + '?tid=' + telegramId;
-    _showDebug('⚠️ initData vacío — usando ?tid=' + telegramId + ' como fallback', '#550');
-  }
+  // Enviar SIEMPRE initData + tid como respaldo
+  // GAS usa tid si no puede parsear initData
+  var url = GAS_API_URL
+    + '?initData=' + encodeURIComponent(initData)
+    + (tid ? '&tid=' + tid : '');
 
   try {
-    // ── Paso 4: fetch SIN headers (prevenir preflight CORS)
-    _showDebug('Llamando GAS: ' + url.substring(0, 80) + '…');
+    _showDebug('Llamando GAS…');
     const resp = await fetch(url, { method: 'GET' });
+
 
     if (!resp.ok) {
       _showDebug('❌ HTTP ' + resp.status + ': ' + resp.statusText, '#700');
