@@ -3,110 +3,133 @@
  * Capa de comunicación con el backend GAS
  */
 
-// URL base del WebApp GAS
 const GAS_API_URL = window.GAS_API_URL || 'https://script.google.com/macros/s/AKfycbwoKZ_Rol4ZwncndruxX96syz7UDSG1C6L4B9H-UHVwkuTczL3B7YPZJBmjmxAcqNX1lQ/exec';
 
-// Datos demo para cuando no hay Telegram o falla la conexión
 const DEMO_DATA = {
   user: {
-    nombre: 'Carlos M.',
-    rango: '🛡️ Comprometido',
-    rangoId: 'COMPROMETIDO',
-    icd: 83,
-    lineaActiva: 14,
-    pcTotal: 2340,
-    diasActivos: 28,
-    escudos: 1,
-    tendencia: '↑ Subiendo',
-    celula: 'Célula Alfa',
-    estadoPago: 'ACTIVO',
+    nombre: 'DEMO — No conectado', rango: '🌱 Aspirante', rangoId: 'ASPIRANTE',
+    icd: 0, lineaActiva: 0, pcTotal: 0, diasActivos: 0, escudos: 0,
+    tendencia: '→', celula: 'Célula Demo', estadoPago: 'PENDIENTE',
   },
-  compromisos: [
-    { id: 'C1', nombre: 'Ejercicio cardiovascular', emoji: '🏃', area: 'SALUD_FISICA', meta: 45, unidad: 'min', pcBase: 30, hecho: false, valorHoy: 0 },
-    { id: 'C2', nombre: 'Lectura de libros',        emoji: '📚', area: 'CRECIMIENTO',  meta: 30, unidad: 'min', pcBase: 25, hecho: true,  valorHoy: 30 },
-    { id: 'C3', nombre: 'Ahorro diario',             emoji: '💰', area: 'FINANZAS',     meta: 50000, unidad: '$', pcBase: 30, hecho: false, valorHoy: 0 },
-  ],
-  contrato: {
-    numero: 2, inicio: '2026-02-22', fin: '2026-03-23',
-    diasTotales: 30, diasRestantes: 5, renovaciones: 1,
-  },
-  celula: [
-    { nombre: 'Diego V.',  icd: 91, yo: false },
-    { nombre: 'Carlos M.', icd: 83, yo: true  },
-    { nombre: 'Sofía R.',  icd: 79, yo: false },
-  ],
-  historial: [0,1,2,3,4,3,2, 4,4,3,2,4,4,3, 2,4,4,4,3,2,4, 4,4,3,0,4,4,4],
-  semana: [82, 90, 75, 95, 0, 88, 83],
+  compromisos: [],
+  contrato: { numero:1, inicio:'2026-03-23', fin:'2026-04-23', diasTotales:30, diasRestantes:30, renovaciones:0 },
+  celula: [],
+  historial: Array(28).fill(0),
+  semana: [0,0,0,0,0,0,0],
 };
 
-/**
- * Carga los datos del usuario desde GAS.
- * Usa DEMO_DATA solo si no hay Telegram abierto (prueba en navegador).
- */
-async function fetchUserData() {
-  const tg = window.Telegram?.WebApp;
+/* ─── DEBUG HELPER ─────────────────────────────────────── */
+function _showDebug(msg, color) {
+  var el = document.getElementById('debugBanner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'debugBanner';
+    el.style.cssText = 'position:fixed;bottom:80px;left:0;right:0;z-index:9999;padding:10px 14px;font-size:12px;font-family:monospace;word-break:break-all;line-height:1.4;max-height:220px;overflow-y:auto;';
+    document.body.appendChild(el);
+  }
+  el.style.background = color || '#1a0a0a';
+  el.style.color = color ? '#fff' : '#ff9';
+  el.style.borderTop = '2px solid ' + (color || '#ff0');
+  el.innerHTML = '🔍 DEBUG:<br>' + msg;
+}
 
-  // Sin Telegram: solo en browser directo → mostrar demo
-  if (!tg || !tg.initData) {
-    console.log('[LaOrden] Sin Telegram detectado — mostrando datos demo');
+/* ─── FETCH PRINCIPAL ───────────────────────────────────── */
+async function fetchUserData() {
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+  // ── Paso 1: detectar si estamos en Telegram
+  if (!tg) {
+    _showDebug('Sin objeto Telegram.WebApp — abierto en navegador');
     return DEMO_DATA;
   }
 
-  try {
-    const initData = tg.initData;
+  // ── Paso 2: recopilar identificadores disponibles
+  const initData       = tg.initData       || '';
+  const initDataUnsafe = tg.initDataUnsafe || {};
+  const tgUser         = initDataUnsafe.user || null;
+  const telegramId     = tgUser ? String(tgUser.id) : '';
 
-    // ⚠️ CRÍTICO: NO usar headers en GET — causa preflight CORS que GAS no maneja
-    const url  = `${GAS_API_URL}?initData=${encodeURIComponent(initData)}`;
+  _showDebug(
+    'Telegram detectado<br>' +
+    'initData: ' + (initData ? initData.substring(0,40)+'…' : '⚠️ VACÍO') + '<br>' +
+    'tgUser.id: ' + (telegramId || '⚠️ NO DISPONIBLE') + '<br>' +
+    'tgUser.first_name: ' + (tgUser ? tgUser.first_name : '—')
+  );
+
+  if (!initData && !telegramId) {
+    _showDebug('❌ Sin initData ni telegramId — no se puede autenticar', '#700');
+    return DEMO_DATA;
+  }
+
+  // ── Paso 3: construir URL (preferimos initData; si está vacío usamos tid)
+  var url;
+  if (initData) {
+    url = GAS_API_URL + '?initData=' + encodeURIComponent(initData);
+  } else {
+    // Fallback: enviar telegramId directo (GAS acepta ?tid=)
+    url = GAS_API_URL + '?tid=' + telegramId;
+    _showDebug('⚠️ initData vacío — usando ?tid=' + telegramId + ' como fallback', '#550');
+  }
+
+  try {
+    // ── Paso 4: fetch SIN headers (prevenir preflight CORS)
+    _showDebug('Llamando GAS: ' + url.substring(0, 80) + '…');
     const resp = await fetch(url, { method: 'GET' });
 
     if (!resp.ok) {
-      console.error('[LaOrden] HTTP error:', resp.status);
+      _showDebug('❌ HTTP ' + resp.status + ': ' + resp.statusText, '#700');
       return DEMO_DATA;
     }
 
-    const data = await resp.json();
+    const text = await resp.text();
+    _showDebug('GAS raw response: ' + text.substring(0, 200));
 
-    // Si GAS devuelve error explícito, loggear y caer a demo
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(pe) {
+      _showDebug('❌ No es JSON válido: ' + text.substring(0, 100), '#700');
+      return DEMO_DATA;
+    }
+
     if (data.error) {
-      console.error('[LaOrden] Error del backend:', data.error);
+      _showDebug('❌ Error del backend: ' + data.error, '#700');
       return DEMO_DATA;
     }
 
-    // Validar que al menos venga el usuario
     if (!data.user) {
-      console.error('[LaOrden] Respuesta sin datos de usuario');
+      _showDebug('❌ Respuesta sin campo user: ' + JSON.stringify(data).substring(0,100), '#700');
       return DEMO_DATA;
     }
 
-    console.log('[LaOrden] Datos reales cargados para:', data.user.nombre);
+    _showDebug('✅ OK — ' + data.user.nombre + ' | ICD: ' + data.user.icd, '#050');
     return data;
 
   } catch (e) {
-    console.error('[LaOrden] Fetch falló:', e.message);
+    _showDebug('❌ Fetch exception: ' + e.message, '#700');
     return DEMO_DATA;
   }
 }
 
-/**
- * Registra un reporte de compromiso en GAS
- */
+/* ─── POST REPORTE ──────────────────────────────────────── */
 async function postReport(compromisoId, valor) {
-  const tg = window.Telegram?.WebApp;
-
-  if (!tg || !tg.initData) {
-    // Demo: simular éxito
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  if (!tg || (!tg.initData && !(tg.initDataUnsafe && tg.initDataUnsafe.user))) {
     return { ok: true, pcGanados: 28, cumplimiento: 100, esCritico: false };
   }
-
   try {
-    // POST sí puede tener Content-Type porque GAS doPost lo espera
+    const body = { action: 'REPORT', compromisoId, valor };
+    if (tg.initData) {
+      body.initData = tg.initData;
+    } else {
+      body.tid = String(tg.initDataUnsafe.user.id);
+    }
     const resp = await fetch(GAS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'REPORT', initData: tg.initData, compromisoId, valor }),
+      body: JSON.stringify(body),
     });
-    const data = await resp.json();
-    return data || { ok: false };
+    return await resp.json();
   } catch (e) {
     console.error('[LaOrden] postReport falló:', e.message);
     return { ok: false };
