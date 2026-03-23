@@ -3,10 +3,10 @@
  * Capa de comunicación con el backend GAS
  */
 
-// URL base del WebApp GAS (actualizar con la URL de despliegue)
+// URL base del WebApp GAS
 const GAS_API_URL = window.GAS_API_URL || 'https://script.google.com/macros/s/AKfycbwoKZ_Rol4ZwncndruxX96syz7UDSG1C6L4B9H-UHVwkuTczL3B7YPZJBmjmxAcqNX1lQ/exec';
 
-// Datos demo para testing visual sin backend
+// Datos demo para cuando no hay Telegram o falla la conexión
 const DEMO_DATA = {
   user: {
     nombre: 'Carlos M.',
@@ -25,75 +25,90 @@ const DEMO_DATA = {
     { id: 'C1', nombre: 'Ejercicio cardiovascular', emoji: '🏃', area: 'SALUD_FISICA', meta: 45, unidad: 'min', pcBase: 30, hecho: false, valorHoy: 0 },
     { id: 'C2', nombre: 'Lectura de libros',        emoji: '📚', area: 'CRECIMIENTO',  meta: 30, unidad: 'min', pcBase: 25, hecho: true,  valorHoy: 30 },
     { id: 'C3', nombre: 'Ahorro diario',             emoji: '💰', area: 'FINANZAS',     meta: 50000, unidad: '$', pcBase: 30, hecho: false, valorHoy: 0 },
-    { id: 'C4', nombre: 'Meditación',                emoji: '🧠', area: 'SALUD_MENTAL', meta: 15, unidad: 'min', pcBase: 25, hecho: false, valorHoy: 0 },
-    { id: 'C5', nombre: 'Deep Work',                 emoji: '⚡', area: 'PRODUCTIVIDAD',meta: 90, unidad: 'min', pcBase: 35, hecho: true,  valorHoy: 95 },
   ],
   contrato: {
-    numero: 2,
-    inicio: '2026-02-22',
-    fin: '2026-03-23',
-    diasTotales: 30,
-    diasRestantes: 5,
-    renovaciones: 1,
+    numero: 2, inicio: '2026-02-22', fin: '2026-03-23',
+    diasTotales: 30, diasRestantes: 5, renovaciones: 1,
   },
   celula: [
     { nombre: 'Diego V.',  icd: 91, yo: false },
     { nombre: 'Carlos M.', icd: 83, yo: true  },
-    { nombre: 'Sofía R.', icd: 79, yo: false  },
-    { nombre: 'Andrés P.',icd: 71, yo: false  },
-    { nombre: 'Valeria C.',icd: 62, yo: false },
+    { nombre: 'Sofía R.',  icd: 79, yo: false },
   ],
-  historial: [
-    // últimos 28 días — nivel 0-4
-    0,1,2,3,4,3,2, 4,4,3,2,4,4,3, 2,4,4,4,3,2,4, 4,4,3,0,4,4,4
-  ],
-  semana: [82, 90, 75, 95, 0, 88, 83], // cumplimiento % últimos 7 días (0 = no programado)
+  historial: [0,1,2,3,4,3,2, 4,4,3,2,4,4,3, 2,4,4,4,3,2,4, 4,4,3,0,4,4,4],
+  semana: [82, 90, 75, 95, 0, 88, 83],
 };
 
 /**
- * Carga los datos del usuario desde GAS o devuelve demo si falla
+ * Carga los datos del usuario desde GAS.
+ * Usa DEMO_DATA solo si no hay Telegram abierto (prueba en navegador).
  */
 async function fetchUserData() {
-  // Si no hay Telegram WebApp o initData, usar demo
-  if (!window.Telegram?.WebApp?.initData) {
+  const tg = window.Telegram?.WebApp;
+
+  // Sin Telegram: solo en browser directo → mostrar demo
+  if (!tg || !tg.initData) {
+    console.log('[LaOrden] Sin Telegram detectado — mostrando datos demo');
     return DEMO_DATA;
   }
 
   try {
-    const initData = window.Telegram.WebApp.initData;
-    const resp = await fetch(`${GAS_API_URL}?initData=${encodeURIComponent(initData)}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const initData = tg.initData;
 
-    if (!resp.ok) throw new Error('GAS response not ok');
+    // ⚠️ CRÍTICO: NO usar headers en GET — causa preflight CORS que GAS no maneja
+    const url  = `${GAS_API_URL}?initData=${encodeURIComponent(initData)}`;
+    const resp = await fetch(url, { method: 'GET' });
+
+    if (!resp.ok) {
+      console.error('[LaOrden] HTTP error:', resp.status);
+      return DEMO_DATA;
+    }
+
     const data = await resp.json();
-    return data || DEMO_DATA;
+
+    // Si GAS devuelve error explícito, loggear y caer a demo
+    if (data.error) {
+      console.error('[LaOrden] Error del backend:', data.error);
+      return DEMO_DATA;
+    }
+
+    // Validar que al menos venga el usuario
+    if (!data.user) {
+      console.error('[LaOrden] Respuesta sin datos de usuario');
+      return DEMO_DATA;
+    }
+
+    console.log('[LaOrden] Datos reales cargados para:', data.user.nombre);
+    return data;
+
   } catch (e) {
-    console.warn('[LaOrden API] Usando datos demo:', e.message);
+    console.error('[LaOrden] Fetch falló:', e.message);
     return DEMO_DATA;
   }
 }
 
 /**
- * Registra un reporte de compromiso
+ * Registra un reporte de compromiso en GAS
  */
 async function postReport(compromisoId, valor) {
-  if (!window.Telegram?.WebApp?.initData) {
+  const tg = window.Telegram?.WebApp;
+
+  if (!tg || !tg.initData) {
     // Demo: simular éxito
-    return { ok: true, pcGanados: 28, cumplimiento: Math.round((valor / 45) * 100), esCritico: valor > 45 };
+    return { ok: true, pcGanados: 28, cumplimiento: 100, esCritico: false };
   }
 
   try {
-    const initData = window.Telegram.WebApp.initData;
-    const resp = await fetch(`${GAS_API_URL}`, {
+    // POST sí puede tener Content-Type porque GAS doPost lo espera
+    const resp = await fetch(GAS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'REPORT', initData, compromisoId, valor })
+      body: JSON.stringify({ action: 'REPORT', initData: tg.initData, compromisoId, valor }),
     });
-    return await resp.json();
+    const data = await resp.json();
+    return data || { ok: false };
   } catch (e) {
-    console.warn('[LaOrden API] Error en reporte:', e.message);
+    console.error('[LaOrden] postReport falló:', e.message);
     return { ok: false };
   }
 }
