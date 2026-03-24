@@ -47,10 +47,10 @@ function renderHome(data) {
           </div>
           <div class="text-sm text-muted" style="line-height:1.6;">
             Aún no tienes compromisos activos para hoy.<br>
-            Completa tu <strong>juramento en el bot</strong> de Telegram para activar el sistema.
+            Completa tu <strong>Juramento de Acero</strong> para activar el sistema.
           </div>
           <div style="margin-top:16px;">
-            <span class="badge-chip badge-chip--gold">Abre Telegram → /start</span>
+            <button onclick="startOnboarding()" class="badge-chip badge-chip--gold" style="border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;">🏛️ Iniciar Incorporación</button>
           </div>
         </div>
       ` : ''}
