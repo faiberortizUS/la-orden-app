@@ -64,15 +64,13 @@ function renderObOath() {
         <button id="oath-btn" onclick="signOath()"
           style="margin-top:24px;width:100%;max-width:360px;padding:20px 24px;
             border:none;border-radius:var(--r-lg);cursor:pointer;
-            font-family:var(--font-head);font-size:17px;font-weight:900;
+            font-family:var(--font-head);font-size:16px;font-weight:900;
             color:#0A0A0F;letter-spacing:0.06em;
-            background:linear-gradient(135deg,#FF6B35,#D4A843,#FF6B35);
-            background-size:200% 200%;
-            animation:fireGlow 2s ease-in-out infinite;
-            box-shadow:0 0 40px rgba(255,107,53,0.5);
+            background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+            box-shadow:0 0 30px rgba(212,168,67,0.2);
             opacity:0;transform:translateY(30px);
             transition:opacity 0.6s ease, transform 0.6s ease;">
-          🔥 FIRMO MI PACTO DE ACERO
+          🖋️ FIRMO MI PACTO DE ACERO
         </button>
 
         <div id="oath-legal" style="margin-top:12px;font-size:10px;color:var(--text-3);
@@ -82,12 +80,6 @@ function renderObOath() {
 
       </div>
     </div>
-    <style>
-      @keyframes fireGlow {
-        0%,100% { background-position:0% 50%; box-shadow:0 0 40px rgba(255,107,53,0.5); }
-        50%      { background-position:100% 50%; box-shadow:0 0 60px rgba(212,168,67,0.7); }
-      }
-    </style>
   `;
 }
 
@@ -155,9 +147,14 @@ async function signOath() {
     const tgUser = tg?.initDataUnsafe?.user;
     const nombre = OB.nombre || (tgUser ? tgUser.first_name : 'Aspirante');
 
-    await createUser(nombre);
-    await saveCompromisos(OB.compromisos);
-    await signUserOath();
+    const cu = await createUser(nombre);
+    if (!cu || !cu.ok) throw new Error(cu?.error || 'Falló al crear usuario');
+
+    const sc = await saveCompromisos(OB.compromisos);
+    if (!sc || !sc.ok) throw new Error(sc?.error || 'Falló al guardar compromisos');
+
+    const so = await signUserOath();
+    if (!so || !so.ok) throw new Error(so?.error || 'Falló al firmar juramento');
 
     // Animación de éxito
     const oathEl = document.getElementById('ob-oath');
@@ -174,7 +171,9 @@ async function signOath() {
     }, 2500);
 
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = '🔥 FIRMO MI PACTO DE ACERO'; }
+    if (btn) { btn.disabled = false; btn.textContent = '❌ ERROR: REINTENTAR FIRMA'; }
+    if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('No pudimos sellar el pacto en los servidores (Google Sheets). Error: ' + e.message);
+    else alert('Error: ' + e.message);
     console.error('[Oath] Error:', e.message);
   }
 }
