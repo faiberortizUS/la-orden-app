@@ -1,18 +1,63 @@
 /**
  * 🏛️ LA ORDEN — views/oath.js
  * Vista del Juramento activo y contrato vigente
+ *
+ * CORRECCIONES:
+ * - Si contrato === null → el usuario no ha firmado el juramento aún
+ * - Días ejecutados = reportes reales, NO diferencia de fechas
+ * - Progreso = 0 hasta que haya reportes registrados
  */
 
 function renderOath(data) {
-  const { user, contrato, compromisos } = data;
+  const { user, contrato, compromisos, historial } = data;
+
+  // ── Sin juramento firmado aún
+  if (!contrato) {
+    return `
+      <div class="view" id="view-oath">
+        <div class="oath-card" style="text-align:center; padding:var(--s8);">
+          <div style="font-size:48px; margin-bottom:16px;">⚔️</div>
+          <div class="fw-800 text-gold" style="font-size:20px; font-family:var(--font-head); margin-bottom:8px;">
+            Tu Pacto de Acero te espera
+          </div>
+          <div class="text-sm text-muted" style="line-height:1.7; margin-bottom:20px;">
+            Aún no has firmado tu juramento en La Orden.<br>
+            El juramento es el momento en que tu palabra se convierte en piedra.<br><br>
+            Abre el bot de Telegram, completa el proceso de incorporación y sella tu compromiso.
+          </div>
+          <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);border-radius:var(--r-md);padding:12px 16px;">
+            <div class="text-sm fw-600 text-gold">¿Cómo firmar el juramento?</div>
+            <div class="text-xs text-muted" style="margin-top:6px;line-height:1.6;">
+              1. En Telegram → escribe <strong>/start</strong><br>
+              2. Sigue el proceso de incorporación<br>
+              3. Cuando llegues al paso del Juramento, acepta el Pacto de Acero
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Con juramento firmado
   const { numero, inicio, fin, diasTotales, diasRestantes, renovaciones } = contrato;
 
-  const porcentajeTranscurrido = Math.round(((diasTotales - diasRestantes) / diasTotales) * 100);
-  const inicioFmt = new Date(inicio).toLocaleDateString('es-CO', { day:'numeric', month:'long' });
-  const finFmt   = new Date(fin).toLocaleDateString('es-CO', { day:'numeric', month:'long', year:'numeric' });
+  // Días reportados = días con al menos un log (nivel > 0 en historial)
+  const diasConReporte = (historial || []).filter(n => n > 0).length;
 
-  const urgencia = diasRestantes <= 5;
-  const frecLabels = { DIARIO: 'Diario', L_V: 'Lun–Vie', FDS: 'Fines de semana', CUSTOM: 'Días específicos' };
+  // Progreso real = solo si hay reportes
+  const diasEjecutados       = diasConReporte;
+  const porcentajeTranscurrido = diasConReporte > 0
+    ? Math.min(100, Math.round((diasConReporte / diasTotales) * 100))
+    : 0;
+
+  let inicioFmt = '—', finFmt = '—';
+  try {
+    inicioFmt = new Date(inicio).toLocaleDateString('es-CO', { day:'numeric', month:'long' });
+    finFmt    = new Date(fin).toLocaleDateString('es-CO', { day:'numeric', month:'long', year:'numeric' });
+  } catch(e) {}
+
+  const urgencia    = diasRestantes <= 5;
+  const frecLabels  = { DIARIO:'Diario', L_V:'Lun–Vie', FDS:'Fines de semana', CUSTOM:'Personalizado' };
 
   return `
     <div class="view" id="view-oath">
@@ -35,13 +80,15 @@ function renderOath(data) {
                 style="width:${porcentajeTranscurrido}%; background: ${urgencia ? 'linear-gradient(90deg, var(--fire-dim), var(--fire))' : ''};">
               </div>
             </div>
-            <div class="text-xs text-muted" style="margin-top:4px; text-align:right;">${porcentajeTranscurrido}% ejecutado</div>
+            <div class="text-xs text-muted" style="margin-top:4px; text-align:right;">
+              ${diasConReporte > 0 ? porcentajeTranscurrido + '% de días con reporte' : 'Sin reportes aún'}
+            </div>
           </div>
         </div>
 
         ${urgencia ? `
-          <div style="background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.2); border-radius:var(--r-md); padding:10px 14px; margin-top:8px;">
-            <div class="text-sm fw-600" style="color:var(--fire);">📅 Próximo cierre en ${diasRestantes} días</div>
+          <div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:10px 14px;margin-top:8px;">
+            <div class="text-sm fw-600" style="color:var(--fire);">📅 Cierre en ${diasRestantes} días</div>
             <div class="text-xs text-muted" style="margin-top:4px;">El sistema calculará tu ICD final y generará tu siguiente contrato.</div>
           </div>
         ` : ''}
@@ -50,13 +97,17 @@ function renderOath(data) {
       <!-- COMPROMISOS SELLADOS -->
       <div class="card">
         <div class="section-title" style="margin-bottom:var(--s4);">Compromisos sellados</div>
-        ${compromisos.map(c => `
+        ${compromisos.length > 0 ? compromisos.map(c => `
           <div class="oath-commitment-item">
             <span class="oath-commitment-emoji">${c.emoji}</span>
             <span class="oath-commitment-name">${c.nombre}</span>
-            <span class="oath-commitment-meta">${c.meta.toLocaleString('es-CO')} ${c.unidad} · Diario</span>
+            <span class="oath-commitment-meta">${Number(c.meta).toLocaleString('es-CO')} ${c.unidad} · ${frecLabels[c.frecuencia] || 'Diario'}</span>
           </div>
-        `).join('')}
+        `).join('') : `
+          <div class="text-sm text-muted" style="padding:12px 0;">
+            Tus compromisos se mostrarán aquí una vez firmado el juramento.
+          </div>
+        `}
       </div>
 
       <!-- STATS DEL CONTRATO -->
@@ -64,8 +115,8 @@ function renderOath(data) {
         <div class="section-title" style="margin-bottom:var(--s3);">Este contrato</div>
         <div class="stat-row">
           <div class="stat-chip">
-            <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${diasTotales - diasRestantes}</div>
-            <div class="stat-lbl">Días ejecutados</div>
+            <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${diasEjecutados}</div>
+            <div class="stat-lbl">Días con reporte</div>
           </div>
           <div class="stat-chip">
             <div class="stat-val" style="font-family:var(--font-head);">${compromisos.length}</div>
@@ -75,25 +126,23 @@ function renderOath(data) {
       </div>
 
       <!-- FRASE DEL JURAMENTO -->
-      <div class="card" style="background: linear-gradient(145deg, rgba(212,168,67,0.06), rgba(123,97,255,0.03)); border-color:var(--border-gold); text-align:center; padding:var(--s6);">
-        <div style="font-size:28px; margin-bottom:12px;">⚔️</div>
-        <div class="fw-600" style="font-size:15px; color:var(--text-1); line-height:1.6; font-style:italic;">
+      <div class="card" style="background:linear-gradient(145deg,rgba(212,168,67,0.06),rgba(123,97,255,0.03));border-color:var(--border-gold);text-align:center;padding:var(--s6);">
+        <div style="font-size:28px;margin-bottom:12px;">⚔️</div>
+        <div class="fw-600" style="font-size:15px;color:var(--text-1);line-height:1.6;font-style:italic;">
           "El compromiso es la decisión de honrar una promesa mucho después de que el entusiasmo inicial haya desaparecido."
         </div>
         <div class="text-xs text-muted" style="margin-top:12px;">— Tu Juramento, ${inicioFmt}</div>
       </div>
 
       <!-- RANGO ACTUAL -->
-      <div class="card flex" style="align-items:center; gap:var(--s4);">
-        <div style="font-size:40px;">${user.rango.split(' ')[0]}</div>
+      <div class="card flex" style="align-items:center;gap:var(--s4);">
+        <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
         <div>
           <div class="text-xs text-muted uppercase ls-wide" style="margin-bottom:3px;">Tu Rango</div>
-          <div class="fw-800" style="font-size:18px; font-family:var(--font-head); color:var(--gold);">
-            ${user.rango.split(' ').slice(1).join(' ')}
+          <div class="fw-800" style="font-size:18px;font-family:var(--font-head);color:var(--gold);">
+            ${(user.rango || '🌱 Aspirante').split(' ').slice(1).join(' ')}
           </div>
-          <div class="text-xs text-muted" style="margin-top:4px;">
-            🌱→⚔️→🛡️→🔱→💎→🏛️→👁️
-          </div>
+          <div class="text-xs text-muted" style="margin-top:4px;">🌱→⚔️→🛡️→🔱→💎→🏛️→👁️</div>
         </div>
       </div>
 
