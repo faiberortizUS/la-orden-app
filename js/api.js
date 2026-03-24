@@ -5,19 +5,6 @@
 
 const GAS_API_URL = window.GAS_API_URL || 'https://script.google.com/macros/s/AKfycbwoKZ_Rol4ZwncndruxX96syz7UDSG1C6L4B9H-UHVwkuTczL3B7YPZJBmjmxAcqNX1lQ/exec';
 
-const DEMO_DATA = {
-  user: {
-    nombre: 'DEMO — No conectado', rango: '🌱 Aspirante', rangoId: 'ASPIRANTE',
-    icd: 0, lineaActiva: 0, pcTotal: 0, diasActivos: 0, escudos: 0,
-    tendencia: '→', celula: 'Célula Demo', estadoPago: 'PENDIENTE',
-  },
-  compromisos: [],
-  contrato: { numero:1, inicio:'2026-03-23', fin:'2026-04-23', diasTotales:30, diasRestantes:30, renovaciones:0 },
-  celula: [],
-  historial: Array(28).fill(0),
-  semana: [0,0,0,0,0,0,0],
-};
-
 /* ─── DEBUG HELPER ─────────────────────────────────────── */
 function _showDebug(msg, color) {
   var el = document.getElementById('debugBanner');
@@ -28,98 +15,120 @@ function _showDebug(msg, color) {
     document.body.appendChild(el);
   }
   el.style.background = color || '#1a0a0a';
-  el.style.color = color ? '#fff' : '#ff9';
+  el.style.color = '#fff';
   el.style.borderTop = '2px solid ' + (color || '#ff0');
-  el.innerHTML = '🔍 DEBUG:<br>' + msg;
+  el.innerHTML = '🔍 ' + msg;
+}
+
+/* ─── ESTADO DE USUARIO SIN REGISTRO ──────────────────── */
+// Usado cuando el usuario existe en Telegram pero no ha firmado el juramento
+function _buildNoRegistradoData(tgUser) {
+  const nombre = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
+  return {
+    _noRegistrado: true,  // flag para el UI
+    user: {
+      nombre:      nombre,
+      rango:       '🌱 Aspirante',
+      rangoId:     'ASPIRANTE',
+      icd:         0,
+      lineaActiva: 0,
+      pcTotal:     0,
+      diasActivos: 0,
+      escudos:     0,
+      tendencia:   '→',
+      celula:      '',
+      estadoPago:  'PENDIENTE',
+    },
+    compromisos: [],
+    contrato:    null,  // null = sin juramento firmado
+    celula:      [],
+    historial:   Array(28).fill(0),
+    semana:      Array(7).fill(0),
+  };
 }
 
 /* ─── FETCH PRINCIPAL ───────────────────────────────────── */
 async function fetchUserData() {
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-  // Detectar si estamos en Telegram
   if (!tg) {
-    _showDebug('Sin objeto Telegram.WebApp — abierto en navegador');
-    return DEMO_DATA;
+    _showDebug('Sin Telegram.WebApp — modo navegador');
+    return _buildNoRegistradoData(null);
   }
 
-  // Recopilar identificadores disponibles
   const initData   = tg.initData || '';
   const unsafe     = tg.initDataUnsafe || {};
   const tgUser     = unsafe.user || null;
   const tid        = tgUser ? String(tgUser.id) : '';
 
   _showDebug(
-    'Telegram detectado<br>' +
-    'initData: ' + (initData ? initData.substring(0,40)+'…' : '⚠️ VACÍO') + '<br>' +
-    'tid: ' + (tid || '⚠️ NO DISPONIBLE') + '<br>' +
-    'nombre: ' + (tgUser ? tgUser.first_name : '—')
+    'Telegram OK · ' +
+    'initData: ' + (initData ? '✅' : '⚠️VACÍO') +
+    ' · tid: ' + (tid || '⚠️') +
+    ' · nombre: ' + (tgUser ? tgUser.first_name : '—')
   );
 
   if (!initData && !tid) {
-    _showDebug('❌ Sin initData ni tid', '#700');
-    return DEMO_DATA;
+    _showDebug('❌ Sin identificación', '#700');
+    return _buildNoRegistradoData(tgUser);
   }
 
-  // Enviar SIEMPRE initData + tid como respaldo
-  // GAS usa tid si no puede parsear initData
-  var url = GAS_API_URL
+  const url = GAS_API_URL
     + '?initData=' + encodeURIComponent(initData)
     + (tid ? '&tid=' + tid : '');
 
   try {
-    _showDebug('Llamando GAS…');
     const resp = await fetch(url, { method: 'GET' });
 
-
     if (!resp.ok) {
-      _showDebug('❌ HTTP ' + resp.status + ': ' + resp.statusText, '#700');
-      return DEMO_DATA;
+      _showDebug('❌ HTTP ' + resp.status, '#700');
+      return _buildNoRegistradoData(tgUser);
     }
 
     const text = await resp.text();
-    _showDebug('GAS raw response: ' + text.substring(0, 200));
-
     let data;
-    try {
-      data = JSON.parse(text);
-    } catch(pe) {
-      _showDebug('❌ No es JSON válido: ' + text.substring(0, 100), '#700');
-      return DEMO_DATA;
+    try { data = JSON.parse(text); }
+    catch(pe) {
+      _showDebug('❌ JSON inválido: ' + text.substring(0,80), '#700');
+      return _buildNoRegistradoData(tgUser);
+    }
+
+    // Usuario no encontrado en la hoja (no hizo juramento aún)
+    if (data.error === 'Usuario no encontrado' || data.registered === false) {
+      _showDebug('ℹ️ Usuario sin registro — juramento pendiente', '#440');
+      return _buildNoRegistradoData(tgUser);
     }
 
     if (data.error) {
-      _showDebug('❌ Error del backend: ' + data.error, '#700');
-      return DEMO_DATA;
+      _showDebug('❌ Error backend: ' + data.error, '#700');
+      return _buildNoRegistradoData(tgUser);
     }
 
     if (!data.user) {
-      _showDebug('❌ Respuesta sin campo user: ' + JSON.stringify(data).substring(0,100), '#700');
-      return DEMO_DATA;
+      _showDebug('❌ Respuesta sin user', '#700');
+      return _buildNoRegistradoData(tgUser);
     }
 
-    _showDebug('✅ OK — ' + data.user.nombre + ' | ICD: ' + data.user.icd, '#050');
+    _showDebug('✅ ' + data.user.nombre + ' · ICD:' + data.user.icd + ' · Pago:' + data.user.estadoPago, '#050');
     return data;
 
   } catch (e) {
-    _showDebug('❌ Fetch exception: ' + e.message, '#700');
-    return DEMO_DATA;
+    _showDebug('❌ Fetch: ' + e.message, '#700');
+    return _buildNoRegistradoData(tgUser);
   }
 }
 
 /* ─── POST REPORTE ──────────────────────────────────────── */
 async function postReport(compromisoId, valor) {
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-  if (!tg || (!tg.initData && !(tg.initDataUnsafe && tg.initDataUnsafe.user))) {
-    return { ok: true, pcGanados: 28, cumplimiento: 100, esCritico: false };
+  if (!tg) {
+    return { ok: true, pcGanados: 0, cumplimiento: 100, esCritico: false };
   }
   try {
     const body = { action: 'REPORT', compromisoId, valor };
-    if (tg.initData) {
-      body.initData = tg.initData;
-    } else {
-      body.tid = String(tg.initDataUnsafe.user.id);
-    }
+    if (tg.initData) body.initData = tg.initData;
+    else if (tg.initDataUnsafe && tg.initDataUnsafe.user) body.tid = String(tg.initDataUnsafe.user.id);
+
     const resp = await fetch(GAS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
