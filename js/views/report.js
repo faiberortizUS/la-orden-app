@@ -19,6 +19,27 @@ function renderReport(data, params) {
   params = params || {};
   const compromisos = data.compromisos || [];
   const pendientes  = compromisos.filter(c => !c.hecho);
+  const estadoPago  = (data.user || {}).estadoPago || 'PENDIENTE';
+  const pagado      = estadoPago === 'ACTIVO';
+
+  // ── Sin acceso si no ha pagado
+  if (!pagado) {
+    return `
+      <div class="view" id="view-report">
+        <div class="empty-state" style="margin-top:60px;">
+          <div class="empty-icon">🔐</div>
+          <div class="empty-title">Membresía requerida</div>
+          <div class="empty-sub" style="line-height:1.7;">
+            Registrar victorias es una función exclusiva para miembros activos de La Orden.<br><br>
+            Activa tu membresía en Telegram y desbloquea todo el poder del sistema.
+          </div>
+          <div style="margin-top:20px;">
+            <span class="badge-chip badge-chip--gold">🏛️ Activar en Telegram</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
   // Si viene seleccionado directamente, ir al input
   if (params.selectedId) {
@@ -208,6 +229,14 @@ function updateInputDisplay() {
 async function submitReport() {
   const c = reportState.commitment;
   if (!c || reportState.currentValue <= 0) return;
+
+  // Gate de pago: verificar antes de procesar
+  const estadoPago = (window._appData && window._appData.user) ? window._appData.user.estadoPago : 'PENDIENTE';
+  if (estadoPago !== 'ACTIVO') {
+    const btn = document.getElementById('reportBtn');
+    if (btn) btn.textContent = '🔐 Requiere membresía activa';
+    return;
+  }
 
   const btn = document.getElementById('reportBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Registrando…'; }
