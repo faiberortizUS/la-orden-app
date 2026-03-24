@@ -100,23 +100,32 @@ function initOathAnimation() {
     const textEl = document.getElementById('oath-text');
     if (textEl) textEl.style.opacity = '1';
 
-    let html = '';
+    // Inyectar el style de animación una sola vez antes de empezar
+    if (!document.getElementById('oath-style-dynamic')) {
+      const style = document.createElement('style');
+      style.id = 'oath-style-dynamic';
+      style.textContent = `
+        @keyframes fadeInLine {
+          from { opacity:0; transform:translateX(-10px); }
+          to   { opacity:1; transform:translateX(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
     OATH_LINES.forEach((line, i) => {
       setTimeout(() => {
-        if (!document.getElementById('oath-text')) return;
+        const oathText = document.getElementById('oath-text');
+        if (!oathText) return;
+        
         if (line.text === '') {
-          html += '<br>';
+          oathText.insertAdjacentHTML('beforeend', '<br>');
         } else {
           const t = line.text.replace('{nombre}', OB.nombre || 'Aspirante');
-          html += `<span style="animation:fadeInLine 0.4s ease forwards;opacity:0;display:block;">${t}</span>`;
+          oathText.insertAdjacentHTML('beforeend', 
+            `<span style="animation:fadeInLine 0.4s ease forwards;opacity:0;display:block;">${t}</span>`
+          );
         }
-        document.getElementById('oath-text').innerHTML = html +
-          `<style>
-            @keyframes fadeInLine {
-              from { opacity:0; transform:translateX(-10px); }
-              to   { opacity:1; transform:translateX(0); }
-            }
-          </style>`;
 
         // Mostrar botón al final del juramento
         if (i === OATH_LINES.length - 1) {
