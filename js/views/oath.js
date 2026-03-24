@@ -23,16 +23,14 @@ function renderOath(data) {
           <div class="text-sm text-muted" style="line-height:1.7; margin-bottom:20px;">
             Aún no has firmado tu juramento en La Orden.<br>
             El juramento es el momento en que tu palabra se convierte en piedra.<br><br>
-            Abre el bot de Telegram, completa el proceso de incorporación y sella tu compromiso.
+            Completa el proceso de incorporación inmersivo para sellar tu compromiso.
           </div>
-          <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);border-radius:var(--r-md);padding:12px 16px;">
-            <div class="text-sm fw-600 text-gold">¿Cómo firmar el juramento?</div>
-            <div class="text-xs text-muted" style="margin-top:6px;line-height:1.6;">
-              1. En Telegram → escribe <strong>/start</strong><br>
-              2. Sigue el proceso de incorporación<br>
-              3. Cuando llegues al paso del Juramento, acepta el Pacto de Acero
-            </div>
-          </div>
+          <button onclick="startOnboarding()" 
+            style="width:100%;padding:14px;border:none;border-radius:var(--r-md);
+            background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+            color:#0A0A0F;font-family:var(--font-head);font-weight:800;font-size:15px;cursor:pointer;">
+            🔥 FIRMAR MI PACTO
+          </button>
         </div>
       </div>
     `;
