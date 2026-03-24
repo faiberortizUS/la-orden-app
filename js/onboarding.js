@@ -88,11 +88,14 @@ function renderOnboardingStep() {
   obSave();
 
   switch(step) {
-    case 'welcome':     container.innerHTML = renderObWelcome();      break;
+    case 'welcome':
+      container.innerHTML = renderObWelcome();
+      setTimeout(initObWelcomeAnimations, 50);
+      break;
     case 'areas':       container.innerHTML = renderObAreas();        break;
     case 'commitments': renderObCommitmentsAsync(container);          break;
     case 'oath':        container.innerHTML = renderObOath();
-                        initOathAnimation();                           break;
+                        setTimeout(initOathAnimation, 50);             break;
     case 'payment':     container.innerHTML = renderObPayment();       break;
     default:            finishOnboarding(); return;
   }
