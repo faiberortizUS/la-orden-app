@@ -227,37 +227,36 @@ function updateInputDisplay() {
 }
 
 async function submitReport() {
-  const c = reportState.commitment;
-  if (!c || reportState.currentValue <= 0) return;
-
-  // Gate de pago: verificar antes de procesar
-  const estadoPago = (window._appData && window._appData.user) ? window._appData.user.estadoPago : 'PENDIENTE';
-  if (estadoPago !== 'ACTIVO') {
-    const btn = document.getElementById('reportBtn');
-    if (btn) btn.textContent = '🔐 Requiere membresía activa';
-    return;
-  }
+  const c = reportState.currentValue > 0 ? reportState.commitment : null;
+  if (!c) return;
 
   const btn = document.getElementById('reportBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Registrando…'; }
 
   const result = await postReport(c.id, reportState.currentValue);
 
-  // PC ganados: usar el calculado localmente si el backend no lo devuelve
-  const pcGanados = result.pcGanados
-    || _calcularPC(reportState.currentValue, Number(c.meta), Number(c.pcBase) || 25);
-  const esCritico = result.esCritico
-    || (reportState.currentValue > Number(c.meta));
-
-  // Actualizar datos locales para que el home refleje el cambio
-  const commitment = (window._appData.compromisos || []).find(x => x.id === c.id);
-  if (commitment) {
-    commitment.hecho    = true;
-    commitment.valorHoy = reportState.currentValue;
+  if (!result || !result.ok) {
+    if (btn) {
+       btn.disabled = false;
+       btn.textContent = '❌ Error al sellar (intenta de nuevo)';
+    }
+    return;
   }
-  // Sumar PC al total local (estimación optimista hasta próximo refresh)
-  if (window._appData.user) {
-    window._appData.user.pcTotal = (Number(window._appData.user.pcTotal) || 0) + pcGanados;
+
+  // PC ganados devueltos por backend o calculados localmente fallback
+  const pcGanados = result.pcGanados || _calcularPC(reportState.currentValue, Number(c.meta), Number(c.pcBase) || 25);
+  const esCritico = result.esCritico || (reportState.currentValue > Number(c.meta));
+
+  // Actualizar datos locales optimistas
+  if (window._appData) {
+    const commitment = (window._appData.compromisos || []).find(x => x.id === c.id);
+    if (commitment) {
+      commitment.hecho    = true;
+      commitment.valorHoy = reportState.currentValue;
+    }
+    if (window._appData.user) {
+      window._appData.user.pcTotal = (Number(window._appData.user.pcTotal) || 0) + pcGanados;
+    }
   }
 
   showVictoryOverlay({
