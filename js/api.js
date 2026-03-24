@@ -140,3 +140,47 @@ async function postReport(compromisoId, valor) {
     return { ok: false };
   }
 }
+
+/* ─── ONBOARDING API ─────────────────────────────────────── */
+
+/** Catálogo de compromisos para un área */
+async function fetchCatalog(areaId) {
+  try {
+    const resp = await fetch(`${GAS_API_URL}?action=catalog&area=${areaId}`, { method: 'GET' });
+    const data = await resp.json();
+    return data.catalog || [];
+  } catch(e) { return []; }
+}
+
+/** Crea el usuario en GAS con nombre + telegramId */
+async function createUser(nombre) {
+  return _postOnboarding({ action: 'CREATE_USER', nombre });
+}
+
+/** Guarda la lista de compromisos del onboarding */
+async function saveCompromisos(lista) {
+  return _postOnboarding({ action: 'SAVE_COMPROMISOS', compromisos: lista });
+}
+
+/** Firma el juramento y crea el contrato de 30 días */
+async function signUserOath() {
+  return _postOnboarding({ action: 'SIGN_OATH' });
+}
+
+async function _postOnboarding(body) {
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  if (tg && tg.initData) body.initData = tg.initData;
+  else if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) body.tid = String(tg.initDataUnsafe.user.id);
+
+  try {
+    const resp = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return await resp.json();
+  } catch(e) {
+    console.error('[LaOrden] onboarding POST falló:', e.message);
+    return { ok: false, error: e.message };
+  }
+}
