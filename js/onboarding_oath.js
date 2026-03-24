@@ -181,8 +181,23 @@ async function signOath() {
 
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = '❌ ERROR: REINTENTAR FIRMA'; }
-    if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('No pudimos sellar el pacto en los servidores (Google Sheets). Error: ' + e.message);
+    if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('No pudimos sellar el pacto en Google Sheets. Error: ' + e.message);
     else alert('Error: ' + e.message);
+
+    // Salvavidas: si la caché está rota o base de datos en blanco y no tiene compromisos vivos, permitirle reiniciar todo
+    if (!document.getElementById('oath-reset-btn')) {
+      const resetBtn = document.createElement('button');
+      resetBtn.id = 'oath-reset-btn';
+      resetBtn.textContent = '🔄 Destrabar (Borrar caché y reiniciar)';
+      resetBtn.style.cssText = 'margin-top:16px;width:100%;max-width:360px;padding:12px;background:transparent;border:1px solid var(--border);border-radius:var(--r-md);color:var(--text-3);font-size:12px;cursor:pointer;';
+      resetBtn.onclick = () => {
+         obClear();
+         OB.step = 0;
+         OB.compromisos = [];
+         window.location.reload();
+      };
+      btn.parentNode.appendChild(resetBtn);
+    }
     console.error('[Oath] Error:', e.message);
   }
 }
