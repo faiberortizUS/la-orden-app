@@ -27,6 +27,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
   }
 
+  // Si la TWA fue abierta desde /start (reset=1), limpiar el localStorage de onboarding
+  // para garantizar siempre un inicio limpio desde paso 1
+  if (new URLSearchParams(window.location.search).get('reset') === '1') {
+    try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
+  }
+
   // Cargar datos del usuario
   appData = await fetchUserData();
   window._appData = appData;
