@@ -30,11 +30,17 @@ function renderReport(data, params) {
           <div class="empty-icon">🔐</div>
           <div class="empty-title">Membresía requerida</div>
           <div class="empty-sub" style="line-height:1.7;">
-            Registrar victorias es una función exclusiva para miembros activos de La Orden.<br><br>
-            Activa tu membresía en Telegram y desbloquea todo el poder del sistema.
+            Registrar victorias es exclusivo para miembros activos de La Orden.<br><br>
+            Tu estructura está lista. Activa tu membresía para desbloquear el sistema completo.
           </div>
           <div style="margin-top:20px;">
-            <span class="badge-chip badge-chip--gold">🏛️ Activar en Telegram</span>
+            <button onclick="resumePaymentOnboarding()"
+              style="width:100%;padding:14px 20px;border:none;border-radius:var(--r-lg);
+                cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:800;
+                background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+                color:#0A0A0F;box-shadow:0 0 20px rgba(212,168,67,0.3);">
+              ⚡ ACTIVAR MEMBRESÍA AHORA
+            </button>
           </div>
         </div>
       </div>
