@@ -131,7 +131,7 @@ async function postReport(compromisoId, valor) {
 
     const resp = await fetch(GAS_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),
     });
     return await resp.json();
@@ -175,7 +175,7 @@ async function _postOnboarding(body) {
   try {
     const resp = await fetch(GAS_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),
     });
     return await resp.json();
