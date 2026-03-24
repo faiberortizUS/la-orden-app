@@ -58,8 +58,12 @@ function obClear() {
 function startOnboarding(tgUser) {
   OB.nombre = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
 
-  // Restaurar progreso si hay sesión guardada
-  const hasSaved = obLoad();
+  // PRUEBAS Y DEVELOPER MODE: Si has borrado la BD o tienes un histórico trancado, limpiamos inmediatamente forzando el reinicio del ciclo a TIER 0.
+  obClear();
+  const hasSaved = false;
+
+  // Restaurar progreso si hay sesión guardada (Se desactivó para reiniciar)
+  // const hasSaved = obLoad();
 
   // Ocultar la app principal y mostrar el contenedor de onboarding
   const appEl = document.getElementById('app');
