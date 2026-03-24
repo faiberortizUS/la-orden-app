@@ -74,6 +74,14 @@ const OB_WELCOME_TEXT = [
   '¿Estás listo para construir la versión más dura de ti mismo?',
 ];
 
+function _showWelcomeButton() {
+  const btn = document.getElementById('ob-cta');
+  if (btn && btn.style.opacity !== '1') {
+    btn.style.opacity = '1';
+    btn.style.transform = 'translateY(0)';
+  }
+}
+
 function initObWelcomeAnimations() {
   // Activar logo y título
   setTimeout(() => {
@@ -91,20 +99,20 @@ function initObWelcomeAnimations() {
     if (sub) { sub.style.opacity = '1'; }
   }, 450);
 
-  // Activar texto
+  // Activar texto con typewriter
   setTimeout(() => {
     const textEl = document.getElementById('ob-text');
     if (textEl) { textEl.style.opacity = '1'; }
-    typewriterLines(textEl, OB_WELCOME_TEXT, 0, () => {
-      // Al terminar el typewriter, mostrar el botón
-      const btn = document.getElementById('ob-cta');
-      if (btn) { btn.style.opacity = '1'; btn.style.transform = 'translateY(0)'; }
-    });
+    typewriterLines(textEl, OB_WELCOME_TEXT, 0, _showWelcomeButton);
   }, 600);
+
+  // Fallback: si el typewriter no termina en 7s, el botón aparece igual
+  setTimeout(_showWelcomeButton, 7000);
 
   // Partículas
   startParticles();
 }
+
 
 function typewriterLines(el, lines, index, onDone) {
   if (!el || index >= lines.length) { if (onDone) onDone(); return; }
