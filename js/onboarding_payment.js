@@ -136,8 +136,13 @@ function renderObPayment() {
 function openStripePayment(plan) {
   const url = STRIPE_LINKS[plan];
   if (!url) {
-    // Si no hay link configurado, continuar igual (admin activará manualmente)
-    skipPayment();
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.showAlert('🔐 La integración con la pasarela de pagos aún no ha sido configurada por el administrador. Continúa con acceso limitado seleccionando "Lo haré más tarde".');
+    } else {
+      alert('La pasarela de pagos no está configurada. Usa "Lo haré más tarde" por ahora.');
+    }
+    // Mostramos la opción manual de "lo haré más tarde" de inmediato para que pueda seguir
+    payLater();
     return;
   }
   const tg = window.Telegram?.WebApp;
