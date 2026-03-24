@@ -21,15 +21,15 @@ function renderOath(data) {
             Tu Pacto de Acero te espera
           </div>
           <div class="text-sm text-muted" style="line-height:1.7; margin-bottom:20px;">
-            Aún no has firmado tu juramento en La Orden.<br>
-            El juramento es el momento en que tu palabra se convierte en piedra.<br><br>
-            Completa el proceso de incorporación inmersivo para sellar tu compromiso.
+            Aún no has completado el proceso de activación.<br>
+            Tu estructura y compromisos ya están diseñados.<br><br>
+            Solo falta un paso: activar tu membresía para que el sistema empiece a vigilar y auditar tu disciplina en tiempo real.
           </div>
-          <button onclick="startOnboarding()" 
+          <button onclick="resumePaymentOnboarding()" 
             style="width:100%;padding:14px;border:none;border-radius:var(--r-md);
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
             color:#0A0A0F;font-family:var(--font-head);font-weight:800;font-size:15px;cursor:pointer;">
-            🔥 FIRMAR MI PACTO
+            🔓 ACTIVAR MI MEMBRESÍA
           </button>
         </div>
       </div>
