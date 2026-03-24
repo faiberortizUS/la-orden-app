@@ -27,11 +27,11 @@ function renderReport(data, params) {
     return `
       <div class="view" id="view-report">
         <div class="empty-state" style="margin-top:60px;">
-          <div class="empty-icon">🔐</div>
-          <div class="empty-title">Membresía requerida</div>
+          <div class="empty-icon">&#128272;</div>
+          <div class="empty-title">Membres&#237;a requerida</div>
           <div class="empty-sub" style="line-height:1.7;">
             Registrar victorias es exclusivo para miembros activos de La Orden.<br><br>
-            Tu estructura está lista. Activa tu membresía para desbloquear el sistema completo.
+            Tu estructura est&#225; lista. Activa tu membres&#237;a para desbloquear el sistema completo.
           </div>
           <div style="margin-top:20px;">
             <button onclick="resumePaymentOnboarding()"
@@ -39,13 +39,14 @@ function renderReport(data, params) {
                 cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:800;
                 background:linear-gradient(135deg,var(--gold-dim),var(--gold));
                 color:#0A0A0F;box-shadow:0 0 20px rgba(212,168,67,0.3);">
-              ⚡ ACTIVAR MEMBRESÍA AHORA
+              &#9889; ACTIVAR MEMBRESIA AHORA
             </button>
           </div>
         </div>
       </div>
     `;
   }
+
 
   // Si viene seleccionado directamente, ir al input
   if (params.selectedId) {
