@@ -54,7 +54,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         navigateTo('home');
       }
     }
-  }, 2000);
+  }, 700);
 });
 
 // ─── ROUTER DE VISTAS ─────────────────────────────────────
