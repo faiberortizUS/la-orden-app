@@ -79,17 +79,17 @@ function initObWelcomeAnimations() {
   setTimeout(() => {
     const logo = document.getElementById('ob-logo');
     if (logo) { logo.style.opacity = '1'; logo.style.transform = 'scale(1)'; }
-  }, 200);
+  }, 100);
 
   setTimeout(() => {
     const title = document.getElementById('ob-title');
     if (title) { title.style.opacity = '1'; title.style.transform = 'translateY(0)'; }
-  }, 600);
+  }, 300);
 
   setTimeout(() => {
     const sub = document.getElementById('ob-subtitle');
     if (sub) { sub.style.opacity = '1'; }
-  }, 900);
+  }, 450);
 
   // Activar texto
   setTimeout(() => {
@@ -100,7 +100,7 @@ function initObWelcomeAnimations() {
       const btn = document.getElementById('ob-cta');
       if (btn) { btn.style.opacity = '1'; btn.style.transform = 'translateY(0)'; }
     });
-  }, 1200);
+  }, 600);
 
   // Partículas
   startParticles();
@@ -111,7 +111,7 @@ function typewriterLines(el, lines, index, onDone) {
   const line = lines[index];
   if (line === '') {
     el.innerHTML += '<br>';
-    setTimeout(() => typewriterLines(el, lines, index + 1, onDone), 200);
+    setTimeout(() => typewriterLines(el, lines, index + 1, onDone), 100);
     return;
   }
   let i = 0;
@@ -123,9 +123,9 @@ function typewriterLines(el, lines, index, onDone) {
     } else {
       clearInterval(iv);
       el.appendChild(document.createElement('br'));
-      setTimeout(() => typewriterLines(el, lines, index + 1, onDone), 300);
+      setTimeout(() => typewriterLines(el, lines, index + 1, onDone), 150);
     }
-  }, 28);
+  }, 10);
 }
 
 function startParticles() {
