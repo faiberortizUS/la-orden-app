@@ -58,12 +58,12 @@ function obClear() {
 function startOnboarding(tgUser) {
   OB.nombre = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
 
-  // PRUEBAS Y DEVELOPER MODE: Si has borrado la BD o tienes un histórico trancado, limpiamos inmediatamente forzando el reinicio del ciclo a TIER 0.
-  obClear();
-  const hasSaved = false;
-
-  // Restaurar progreso si hay sesión guardada (Se desactivó para reiniciar)
-  // const hasSaved = obLoad();
+  // Restaurar progreso si el usuario cerró a medios (ej. en la pasarela de pago)
+  const hasSaved = obLoad();
+  if (!hasSaved) {
+    obClear();
+    OB.step = 0;
+  }
 
   // Ocultar la app principal y mostrar el contenedor de onboarding
   const appEl = document.getElementById('app');
@@ -137,6 +137,27 @@ function obProgressBar(currentStep, totalSteps) {
     </div>
   `;
 }
+
+/* ─── RESUMEN HACIA EL PAGO ─────────────────────────────── */
+window.resumePaymentOnboarding = function() {
+  OB.step = 4; // Paso de los pagos
+  obSave();
+  
+  const appEl = document.getElementById('app');
+  if (appEl) appEl.classList.add('hidden');
+
+  let obContainer = document.getElementById('onboardingContainer');
+  if (!obContainer) {
+    obContainer = document.createElement('div');
+    obContainer.id = 'onboardingContainer';
+    obContainer.style.cssText = 'position:fixed;inset:0;z-index:100;background:var(--bg-base);overflow-y:auto;';
+    document.body.appendChild(obContainer);
+  }
+  obContainer.style.display = 'flex';
+  obContainer.style.flexDirection = 'column';
+
+  renderOnboardingStep();
+};
 
 /* ─── FINALIZAR ONBOARDING ──────────────────────────────── */
 async function finishOnboarding() {
