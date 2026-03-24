@@ -1,6 +1,7 @@
 /**
  * 🏛️ LA ORDEN — app.js
  * Bootstrap principal: Telegram WebApp API + router de vistas + confetti
+ * ACTUALIZADO: detecta estado del usuario y lanza onboarding si es necesario
  */
 
 // ─── Estado global ────────────────────────────────────────
@@ -17,7 +18,6 @@ function updateHeader(data) {
 
 // ─── INICIALIZACIÓN ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  // 1. Configurar Telegram WebApp
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
@@ -27,23 +27,40 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
   }
 
-  // 2. Cargar datos iniciales
+  // Cargar datos del usuario
   appData = await fetchUserData();
   window._appData = appData;
-  updateHeader(appData);
 
-  // 4. Esperar a que el splash termine y mostrar app
+  // Ocultar splash
   setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('app').classList.remove('hidden');
-    navigateTo('home');
-  }, 2400);
+    const splash = document.getElementById('splash');
+    if (splash) splash.style.display = 'none';
+
+    // ── DECISIÓN DE FLUJO ───────────────────────────────────
+    if (appData._noRegistrado) {
+      // Usuario sin registro → lanzar onboarding completo en el TWA
+      const tgUser = tg?.initDataUnsafe?.user || null;
+      startOnboarding(tgUser);
+    } else {
+      // Usuario registrado → mostrar app
+      updateHeader(appData);
+      const appEl = document.getElementById('app');
+      if (appEl) appEl.classList.remove('hidden');
+
+      // ¿Primera visita post-juramento? → Centro de Comandos
+      if (localStorage.getItem('laorden_first_visit') === '1') {
+        navigateTo('command_center');
+      } else {
+        navigateTo('home');
+      }
+    }
+  }, 2000);
 });
 
 // ─── ROUTER DE VISTAS ─────────────────────────────────────
-function navigateTo(view, params = {}) {
+function navigateTo(view, params) {
+  params = params || {};
   if (!appData) return;
-
   currentView = view;
 
   // Actualizar nav
@@ -51,7 +68,6 @@ function navigateTo(view, params = {}) {
     el.classList.toggle('active', el.dataset.view === view);
   });
 
-  // Render view
   const container = document.getElementById('viewContainer');
   let html = '';
 
@@ -71,6 +87,12 @@ function navigateTo(view, params = {}) {
     case 'celula':
       html = renderCelula(appData);
       break;
+    case 'command_center': {
+      const isFirst = localStorage.getItem('laorden_first_visit') === '1';
+      html = renderCommandCenter(appData, isFirst);
+      if (isFirst) localStorage.removeItem('laorden_first_visit');
+      break;
+    }
     default:
       html = renderHome(appData);
   }
@@ -78,7 +100,6 @@ function navigateTo(view, params = {}) {
   container.innerHTML = html;
   container.scrollTop = 0;
 
-  // Post-render animations
   requestAnimationFrame(() => {
     switch (view) {
       case 'home':  initHomeAnimations();  break;
@@ -107,10 +128,10 @@ function startConfetti() {
     d:     Math.random() * count,
     color: colors[Math.floor(Math.random() * colors.length)],
     tilt:  Math.floor(Math.random() * 10) - 10,
-    tiltAngle:       Math.random() * Math.PI,
-    tiltAngleDelta:  0.05 + Math.random() * 0.07,
-    speed:           2 + Math.random() * 4,
-    shape:           Math.random() < 0.5 ? 'rect' : 'circle',
+    tiltAngle:      Math.random() * Math.PI,
+    tiltAngleDelta: 0.05 + Math.random() * 0.07,
+    speed:          2 + Math.random() * 4,
+    shape:          Math.random() < 0.5 ? 'rect' : 'circle',
   }));
 
   function draw() {
@@ -128,16 +149,9 @@ function startConfetti() {
         ctx.ellipse(p.x, p.y, p.r * 0.6, p.r, p.tiltAngle, 0, 2 * Math.PI);
       }
       ctx.fill();
-
-      // Update
       p.tiltAngle += p.tiltAngleDelta;
       p.y += p.speed;
-      p.tilt = Math.sin(p.tiltAngle) * 12;
-
-      if (p.y > canvas.height) {
-        p.y = -20;
-        p.x = Math.random() * canvas.width;
-      }
+      if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
     });
     confettiAnim = requestAnimationFrame(draw);
   }
@@ -147,30 +161,25 @@ function startConfetti() {
 function stopConfetti() {
   if (confettiAnim) { cancelAnimationFrame(confettiAnim); confettiAnim = null; }
   const canvas = document.getElementById('confettiCanvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
+  if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   confettiParticles = [];
 }
 
-// ─── MANEJO DE BOTÓN BACK DE TELEGRAM ────────────────────
+// ─── BOTÓN BACK ───────────────────────────────────────────
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
   if (currentView !== 'home') navigateTo('home');
   else window.Telegram.WebApp.close();
 });
 
-// ─── REFRESCO AUTOMÁTICO AL VOLVER A LA APP ───────────────
-// Cuando el usuario minimiza y vuelve (ej: fue a Telegram a reportar),
-// recarga los datos desde GAS para reflejar los cambios.
+// ─── REFRESCO AL VOLVER A LA APP ─────────────────────────
 document.addEventListener('visibilitychange', async () => {
-  if (document.visibilityState === 'visible' && appData) {
+  if (document.visibilityState === 'visible' && appData && !appData._noRegistrado) {
     const fresh = await fetchUserData();
-    if (fresh && fresh.user && fresh.user.nombre && fresh.user.nombre !== 'DEMO — No conectado') {
-      appData          = fresh;
-      window._appData  = fresh;
+    if (fresh && fresh.user && !fresh._noRegistrado) {
+      appData         = fresh;
+      window._appData = fresh;
       updateHeader(fresh);
-      navigateTo(currentView); // re-render la vista actual con datos frescos
+      navigateTo(currentView);
     }
   }
 });
