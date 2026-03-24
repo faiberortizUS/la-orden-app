@@ -81,9 +81,14 @@ function renderHome(data) {
             </text>
           </svg>
 
-          <div class="flex gap-3">
-            <span class="badge-chip badge-chip--gold">⚡ ${Number(user.pcTotal || 0).toLocaleString('es-CO')} PC</span>
-            <span class="badge-chip badge-chip--electric">${user.diasActivos || 0} días activo</span>
+          <div class="flex gap-3" style="flex-direction:column;align-items:center;gap:8px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text-1);font-family:var(--font-head);letter-spacing:0.05em;">
+              ${user.nombre || 'Aspirante'}
+            </div>
+            <div class="flex gap-3">
+              <span class="badge-chip badge-chip--gold">⚡ ${Number(user.pcTotal || 0).toLocaleString('es-CO')} PC</span>
+              <span class="badge-chip badge-chip--electric">${user.diasActivos || 0} días activo</span>
+            </div>
           </div>
         </div>
       </div>
