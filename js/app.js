@@ -37,8 +37,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (splash) splash.style.display = 'none';
 
     // ── DECISIÓN DE FLUJO ───────────────────────────────────
-    if (appData._noRegistrado) {
-      // Usuario sin registro → lanzar onboarding completo en el TWA
+    if (appData._noRegistrado || obLoad()) {
+      // Usuario sin registro o con onboarding inconcluso → lanzar TWA modal
       const tgUser = tg?.initDataUnsafe?.user || null;
       startOnboarding(tgUser);
     } else {
