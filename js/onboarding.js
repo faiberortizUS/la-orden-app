@@ -58,11 +58,23 @@ function obClear() {
 function startOnboarding(tgUser) {
   OB.nombre = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
 
-  // Restaurar progreso si el usuario cerró a medios (ej. en la pasarela de pago)
+  // Intentar restaurar progreso guardado en localStorage
   const hasSaved = obLoad();
-  if (!hasSaved) {
+
+  // Solo restaurar si hay datos REALES (el usuario configuró al menos un compromiso)
+  // Si el paso es avanzado pero no hay compromisos, el localStorage está corrupto — reiniciar
+  const estadoValido = hasSaved && (
+    OB.compromisos.length > 0 ||
+    OB.areas.length > 0 ||
+    OB.step <= 1   // Steps 0-1 no necesitan datos previos
+  );
+
+  if (!estadoValido) {
     obClear();
-    OB.step = 0;
+    OB.step        = 0;
+    OB.areas       = [];
+    OB.areaIndex   = 0;
+    OB.compromisos = [];
   }
 
   // Ocultar la app principal y mostrar el contenedor de onboarding
