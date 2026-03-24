@@ -7,17 +7,7 @@ const GAS_API_URL = window.GAS_API_URL || 'https://script.google.com/macros/s/AK
 
 /* ─── DEBUG HELPER ─────────────────────────────────────── */
 function _showDebug(msg, color) {
-  var el = document.getElementById('debugBanner');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'debugBanner';
-    el.style.cssText = 'position:fixed;bottom:80px;left:0;right:0;z-index:9999;padding:10px 14px;font-size:12px;font-family:monospace;word-break:break-all;line-height:1.4;max-height:220px;overflow-y:auto;';
-    document.body.appendChild(el);
-  }
-  el.style.background = color || '#1a0a0a';
-  el.style.color = '#fff';
-  el.style.borderTop = '2px solid ' + (color || '#ff0');
-  el.innerHTML = '🔍 ' + msg;
+  return; // Debug silencioso para producción
 }
 
 /* ─── ESTADO DE USUARIO SIN REGISTRO ──────────────────── */
