@@ -7,6 +7,14 @@
 let currentView = 'home';
 let appData     = null;
 
+// ─── ACTUALIZAR HEADER ─────────────────────────────────────
+function updateHeader(data) {
+  const rankEl = document.getElementById('headerRank');
+  if (rankEl && data && data.user) {
+    rankEl.textContent = data.user.rango || '🌱 Aspirante';
+  }
+}
+
 // ─── INICIALIZACIÓN ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   // 1. Configurar Telegram WebApp
@@ -16,17 +24,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     tg.expand();
     tg.setHeaderColor('#0A0A0F');
     tg.setBackgroundColor('#0A0A0F');
-    // Deshabilitar cierre con swipe down solo si está disponible
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
   }
 
-  // 2. Cargar datos
+  // 2. Cargar datos iniciales
   appData = await fetchUserData();
   window._appData = appData;
-
-  // 3. Actualizar header con rango
-  const rankEl = document.getElementById('headerRank');
-  if (rankEl && appData.user) rankEl.textContent = appData.user.rango;
+  updateHeader(appData);
 
   // 4. Esperar a que el splash termine y mostrar app
   setTimeout(() => {
@@ -154,6 +158,21 @@ function stopConfetti() {
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
   if (currentView !== 'home') navigateTo('home');
   else window.Telegram.WebApp.close();
+});
+
+// ─── REFRESCO AUTOMÁTICO AL VOLVER A LA APP ───────────────
+// Cuando el usuario minimiza y vuelve (ej: fue a Telegram a reportar),
+// recarga los datos desde GAS para reflejar los cambios.
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && appData) {
+    const fresh = await fetchUserData();
+    if (fresh && fresh.user && fresh.user.nombre && fresh.user.nombre !== 'DEMO — No conectado') {
+      appData          = fresh;
+      window._appData  = fresh;
+      updateHeader(fresh);
+      navigateTo(currentView); // re-render la vista actual con datos frescos
+    }
+  }
 });
 
 // ─── RESIZE ───────────────────────────────────────────────
