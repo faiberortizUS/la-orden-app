@@ -5,13 +5,13 @@
 
 function renderObWelcome() {
   return `
-    <div id="ob-welcome" style="min-height:100vh;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;padding:40px 24px;position:relative;overflow:hidden;">
+    <div id="ob-welcome" style="min-height:100%;display:flex;flex-direction:column;
+      align-items:center;padding:40px 24px 120px;position:relative;overflow:hidden;">
 
       <!-- Partículas de fondo -->
       <canvas id="particleCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
 
-      <!-- Contenido centrado -->
+      <!-- Contenido -->
       <div style="position:relative;z-index:1;text-align:center;max-width:340px;width:100%;">
 
         <!-- Logo animado -->
@@ -36,23 +36,20 @@ function renderObWelcome() {
 
         <!-- Texto typewriter -->
         <div id="ob-text" style="font-size:15px;line-height:1.8;color:var(--text-2);
-          margin-bottom:40px;min-height:200px;text-align:left;
+          margin-bottom:32px;min-height:180px;text-align:left;
           background:rgba(212,168,67,0.04);border:1px solid rgba(212,168,67,0.1);
           border-radius:var(--r-lg);padding:20px;
           opacity:0;transition:opacity 0.4s ease 1.2s;">
         </div>
 
-        <!-- Botón -->
+        <!-- Botón — visible por defecto, sin depender de animaciones -->
         <button id="ob-cta" onclick="obWelcomeProceed()"
           style="width:100%;padding:18px 24px;
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
             border:none;border-radius:var(--r-lg);cursor:pointer;
             font-family:var(--font-head);font-size:16px;font-weight:800;
             color:#0A0A0F;letter-spacing:0.08em;
-            box-shadow:0 0 30px rgba(212,168,67,0.4);
-            opacity:0;transform:translateY(20px);
-            transition:all 0.6s ease;
-            animation: none;">
+            box-shadow:0 0 30px rgba(212,168,67,0.4);">
           ⚔️ ESTOY LISTO — SOY DEL 1%
         </button>
 
@@ -60,6 +57,7 @@ function renderObWelcome() {
     </div>
   `;
 }
+
 
 const OB_WELCOME_TEXT = [
   'Esto no es una aplicación.',
