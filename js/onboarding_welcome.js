@@ -6,12 +6,13 @@
 function renderObWelcome() {
   return `
     <div id="ob-welcome" style="min-height:100%;display:flex;flex-direction:column;
-      align-items:center;padding:40px 24px 120px;position:relative;overflow:hidden;">
+      align-items:center;padding:40px 24px 120px;position:relative;overflow-x:hidden;">
 
       <!-- Partículas de fondo -->
       <canvas id="particleCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
 
       <!-- Contenido -->
+
       <div style="position:relative;z-index:1;text-align:center;max-width:340px;width:100%;">
 
         <!-- Logo animado -->
