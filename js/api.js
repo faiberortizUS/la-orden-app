@@ -63,9 +63,11 @@ async function fetchUserData() {
     return _buildNoRegistradoData(tgUser);
   }
 
+  const isReset = new URLSearchParams(window.location.search).get('reset') === '1';
   const url = GAS_API_URL
     + '?initData=' + encodeURIComponent(initData)
-    + (tid ? '&tid=' + tid : '');
+    + (tid ? '&tid=' + tid : '')
+    + (isReset ? '&reset=1' : '');
 
   try {
     const resp = await fetch(url, { method: 'GET' });
