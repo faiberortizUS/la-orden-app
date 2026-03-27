@@ -202,7 +202,11 @@ async function signOath() {
          obClear();
          OB.step = 0;
          OB.compromisos = [];
-         window.location.href = window.location.pathname + '?reset=1';
+         
+         // En Telegram WebApp no podemos cambiar libremente la URL porque perdemos los datos de autenticación (hash tgWebAppData)
+         // Así que pasamos la bandera a través de localStorage
+         localStorage.setItem('laorden_force_reset', '1');
+         window.location.reload();
       };
       btn.parentNode.appendChild(resetBtn);
     }
