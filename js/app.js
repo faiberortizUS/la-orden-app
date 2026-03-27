@@ -27,20 +27,28 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
   }
 
-  // Si la TWA fue abierta desde /start (reset=1), limpiar el localStorage de onboarding
-  // para garantizar siempre un inicio limpio desde paso 1
+  // Si la TWA fue abierta desde /start (reset=1), limpiar localStorage de onboarding
   if (new URLSearchParams(window.location.search).get('reset') === '1') {
     try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
   }
 
-  // Cargar datos del usuario
-  appData = await fetchUserData();
-  window._appData = appData;
+  // ── FETCH + SPLASH EN PARALELO ──────────────────────────────
+  // No hay setTimeout: el splash desaparece en cuanto lleguen los datos
+  const splashMinMs = 400; // mínimo visual para que no haga flash
+  const [data] = await Promise.all([
+    fetchUserData(),
+    new Promise(r => setTimeout(r, splashMinMs)),
+  ]);
+  appData         = data;
+  window._appData = data;
 
   // Ocultar splash
-  setTimeout(() => {
-    const splash = document.getElementById('splash');
-    if (splash) splash.style.display = 'none';
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.style.transition = 'opacity 0.25s ease';
+    splash.style.opacity    = '0';
+    setTimeout(() => { splash.style.display = 'none'; }, 260);
+  }
 
     // ── DECISIÓN DE FLUJO ───────────────────────────────────
     if (appData._noRegistrado) {
@@ -77,7 +85,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         navigateTo('home');
       }
     }
-  }, 700);
 });
 
 // ─── ROUTER DE VISTAS ─────────────────────────────────────
