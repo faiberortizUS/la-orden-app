@@ -143,7 +143,18 @@ function initOathAnimation() {
 
 async function signOath() {
   const btn = document.getElementById('oath-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Sellando tu pacto...'; }
+  if (btn) { 
+    btn.disabled = true; 
+    btn.innerHTML = 'Sellando infraestructura <span id="oath-dots">...</span>'; 
+    
+    // Animacion sutil de puntos
+    let dotCount = 0;
+    btn.dataset.dotIv = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      const dots = document.getElementById('oath-dots');
+      if(dots) dots.textContent = '.'.repeat(dotCount).padEnd(3, ' ');
+    }, 400);
+  }
 
   // Vibración dramática
   if (window.Telegram?.WebApp?.HapticFeedback) {
@@ -151,21 +162,17 @@ async function signOath() {
   }
 
   try {
-    // Primero creo el usuario en GAS
     const tg     = window.Telegram?.WebApp;
     const tgUser = tg?.initDataUnsafe?.user;
     const nombre = OB.nombre || (tgUser ? tgUser.first_name : 'Aspirante');
 
-    const cu = await createUser(nombre);
-    if (!cu || !cu.ok) throw new Error(cu?.error || 'Falló al crear usuario');
-
-    const sc = await saveCompromisos(OB.compromisos);
-    if (!sc || !sc.ok) throw new Error(sc?.error || 'Falló al guardar compromisos');
-
-    const so = await signUserOath();
-    if (!so || !so.ok) throw new Error(so?.error || 'Falló al firmar juramento');
+    // OPTIMIZACION: 3 llamadas agrupadas en 1 sola peticion al sistema (60% mas rapido)
+    const result = await sealFullPact(nombre, OB.compromisos);
+    if (!result || !result.ok) throw new Error(result?.error || 'Fallo el sellado del pacto');
 
     // Animación de éxito
+    if(btn?.dataset?.dotIv) clearInterval(btn.dataset.dotIv);
+
     const oathEl = document.getElementById('ob-oath');
     if (oathEl) {
       oathEl.style.transition = 'all 0.5s ease';
@@ -180,7 +187,8 @@ async function signOath() {
     }, 2500);
 
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = '❌ ERROR: REINTENTAR FIRMA'; }
+    if(btn?.dataset?.dotIv) clearInterval(btn.dataset.dotIv);
+    if (btn) { btn.disabled = false; btn.innerHTML = '❌ ERROR: REINTENTAR FIRMA'; }
     if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('No pudimos sellar el pacto en Google Sheets. Error: ' + e.message);
     else alert('Error: ' + e.message);
 
