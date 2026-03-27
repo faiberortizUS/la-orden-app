@@ -86,6 +86,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     tg.setHeaderColor('#0A0A0F');
     tg.setBackgroundColor('#0A0A0F');
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
   }
 
   // Si la TWA fue abierta desde /start (reset=1), limpiar localStorage de onboarding
@@ -136,9 +137,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         navigateTo('home');
       }
     }
-    
-    // Configurar trampa de historial para el botón físico de Atrás (Android)
-    window.history.pushState({ page: 'main' }, '');
 });
 
 // --- ROUTER DE VISTAS ------------------------------------
@@ -298,23 +296,6 @@ window.Telegram?.WebApp?.BackButton?.onClick(() => {
   }
 });
 
-// --- BOTON FISICO DE ATRÁS (Android / Popstate) ----------
-window.addEventListener('popstate', (e) => {
-  // Volver a atrapar en el historial para no salir de la WebView
-  window.history.pushState({ page: 'main' }, '');
-
-  if (currentView === 'report' && document.getElementById('view-report-input')) {
-    // Si estaba en el input de reporte, volver a la lista
-    navigateTo('report');
-  } else if (currentView !== 'home') {
-    // Si está en cualquier otra vista, volver al inicio
-    navigateTo('home');
-  } else {
-    // Si está en inicio, lanzar el popup de fricción
-    _mostrarPopupSalida();
-  }
-});
-
 function _mostrarPopupSalida() {
   window.Telegram.WebApp.showPopup({
     title: '¿Abandonar la base?',
@@ -325,6 +306,19 @@ function _mostrarPopupSalida() {
     ]
   }, (buttonId) => {
     if (buttonId === 'close') window.Telegram.WebApp.close();
+  });
+}
+
+function showCancelReportFriction() {
+  window.Telegram.WebApp.showPopup({
+    title: '¿Retirada táctica?',
+    message: 'Estás a punto de cancelar este reporte. El 1% no se rinde ante la incomodidad.',
+    buttons: [
+      {id: 'close', type: 'destructive', text: 'Sí, cancelar reporte'},
+      {id: 'stay', type: 'default', text: 'Quedarme batallando'}
+    ]
+  }, (buttonId) => {
+    if (buttonId === 'close') navigateTo('report');
   });
 }
 
