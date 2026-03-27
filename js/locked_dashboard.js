@@ -65,7 +65,7 @@ function _renderLocked(nombre, compromisos) {
     </div>
 
     <!-- SCROLL AREA -->
-    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;position:relative;">
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:160px;position:relative;">
 
       <!-- [2] HERO BLOQUEADO - Dotacion + Zeigarnik -->
       <div style="position:relative;margin:16px;border-radius:20px;overflow:hidden;">
@@ -128,17 +128,17 @@ function _renderLocked(nombre, compromisos) {
         <div style="font-size:30px;margin-bottom:8px;">⏳</div>
         <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;
           color:#FF6B35;margin-bottom:8px;">
-          Llevas <span id="ldDaysLost">${_ldDaysLost}</span> dias sin registrar nada.
+          Tu estructura está inactiva.
         </div>
         <div style="font-size:13px;color:#A0A0B0;line-height:1.8;margin-bottom:12px;">
-          Tu Línea Activa sigue en <strong style="color:#F5F5F5;">cero</strong>.
-          Tu ICD no se mueve. Tu rango no avanza.<br>
-          <span style="color:#FF6B35;font-weight:700;">El 99% te alcanza mientras esperas.</span>
+          Solo has dado el primer paso, pero tu Línea Activa sigue en <strong style="color:#F5F5F5;">cero</strong>.
+          Tu ICD no se mueve y tu rango no avanza.<br>
+          <span style="color:#FF6B35;font-weight:700;">El momento de máximo impulso se pierde ahora.</span>
         </div>
         <div style="font-size:11px;color:#5A5A72;border-top:1px solid rgba(255,255,255,0.06);
           padding-top:10px;">
-          💡 Los miembros activos llevan en promedio
-          <strong style="color:#D4A843;">23 días de racha continua</strong>
+          💡 Los miembros que deciden 'esperar'
+          <strong style="color:#D4A843;">nunca vuelven a completar la estructura.</strong>
         </div>
       </div>
 
