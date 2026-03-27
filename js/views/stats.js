@@ -3,6 +3,8 @@
  * Estadísticas: Heatmap, gráfica semanal, ranking de compromisos REALES
  */
 
+let currentStatsFilter = 'GLOBAL';
+
 function renderStats(data) {
   const { user, compromisos, historial, semana } = data;
 
@@ -11,14 +13,33 @@ function renderStats(data) {
   const pcTotal    = Number(user.pcTotal)    || 0;
   const diasActivos = Number(user.diasActivos) || 0;
 
+  if (currentStatsFilter !== 'GLOBAL' && !(compromisos || []).find(c => c.id === currentStatsFilter)) {
+    currentStatsFilter = 'GLOBAL';
+  }
+
   // ── Heatmap labels (días de la semana)
   const days     = ['D','L','M','M','J','V','S'];
-  const heatArr  = (historial && historial.length === 28) ? historial : Array(28).fill(0);
+  const histList = historial ? (historial[currentStatsFilter] || historial.GLOBAL || []) : [];
+  const heatArr  = histList.length === 28 ? histList : Array(28).fill(0);
 
   // ── Barra semanal
-  const semanaArr    = (semana && semana.length === 7) ? semana : Array(7).fill(0);
+  const semList      = semana ? (semana[currentStatsFilter] || semana.GLOBAL || []) : [];
+  const semanaArr    = semList.length === 7 ? semList : Array(7).fill(0);
   const diasLabels   = ['L','M','M','J','V','S','D'];
   const maxPct       = Math.max(...semanaArr.filter(v => v > 0), 1);
+
+  const filterHtml = `
+    <select id="statsFilterSelect" onchange="changeStatsFilter(this.value)" 
+      style="width:100%; padding:12px 14px; margin-bottom:16px; 
+             background:var(--bg-elevated); border:1px solid var(--border); 
+             border-radius:var(--r-md); color:var(--text-1); font-family:var(--font-head);
+             font-size:14px; font-weight:600; outline:none; cursor:pointer;">
+      <option value="GLOBAL" ${currentStatsFilter === 'GLOBAL' ? 'selected' : ''}>🌍 Todas las misiones (Global)</option>
+      ${(compromisos || []).map(c => `
+        <option value="${c.id}" ${currentStatsFilter === c.id ? 'selected' : ''}>${c.emoji} ${c.nombre}</option>
+      `).join('')}
+    </select>
+  `;
 
   // ── Ranking real de compromisos (calculado desde compromisos del usuario)
   // Como el backend no devuelve % histórico por compromiso, usamos los datos disponibles
@@ -66,7 +87,9 @@ function renderStats(data) {
 
       <!-- HEATMAP -->
       <div class="card">
-        <div class="section-title" style="margin-bottom:var(--s4);">Mapa de Consistencia</div>
+        <div class="section-title" style="margin-bottom:var(--s4);">Analítica Detallada</div>
+        ${filterHtml}
+        
         <div class="heatmap-labels">
           ${days.map(d => `<div class="heatmap-day-label">${d}</div>`).join('')}
         </div>
@@ -165,5 +188,13 @@ function initStatsAnimations() {
     document.querySelectorAll('[id^="bar-"]').forEach(el => {
       el.style.height = el.dataset.h;
     });
-  }, 200);
+  }, 50); // Reducido para mayor fluidez al cambiar el filtro
+}
+
+function changeStatsFilter(val) {
+  currentStatsFilter = val;
+  if (window._appData) {
+    document.getElementById('viewContainer').innerHTML = renderStats(window._appData);
+    initStatsAnimations();
+  }
 }
