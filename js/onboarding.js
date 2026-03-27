@@ -135,7 +135,7 @@ function obPrev() {
 function obProgressBar(currentStep, totalSteps) {
   const pct = Math.round(((currentStep) / totalSteps) * 100);
   return `
-    <div style="position:sticky;top:0;z-index:10;background:var(--bg-base);padding:12px 20px 8px;
+    <div style="position:sticky;top:0;z-index:999;background:var(--bg-base);padding:12px 20px 8px;
       border-bottom:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:10px;">
         ${currentStep > 1 ? `<button onclick="obPrev()"
