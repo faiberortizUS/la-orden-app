@@ -5,8 +5,10 @@
 
 function renderHome(data) {
   const { user, compromisos } = data;
-  const total     = (compromisos || []).length;
-  const doneCount = (compromisos || []).filter(c => c.hecho).length;
+  const total        = (compromisos || []).length;
+  const activos      = (compromisos || []).filter(c => c.aplicaHoy !== false);
+  const inactivos    = (compromisos || []).filter(c => c.aplicaHoy === false);
+  const doneCount    = activos.filter(c => c.hecho).length;
 
   // Calcular zona ICD
   const icd = Number(user.icd) || 0;
@@ -33,7 +35,7 @@ function renderHome(data) {
 
   // Estado de compromisos del día
   const sinCompromisos = total === 0;
-  const todoCompleto   = total > 0 && doneCount === total;
+  const todoCompleto   = activos.length > 0 && doneCount === activos.length;
 
   return `
     <div class="view" id="view-home">
@@ -132,14 +134,14 @@ function renderHome(data) {
         <div>
           <div class="missions-header">
             <span class="section-title">Misiones de hoy</span>
-            <span class="missions-count">${doneCount}/${total}</span>
+            <span class="missions-count">${doneCount}/${activos.length}</span>
           </div>
           <div class="prog-bar-wrap" style="margin-bottom:var(--s4);">
             <div class="prog-bar-fill prog-bar-fill--gold"
-              style="width:${total > 0 ? Math.round((doneCount/total)*100) : 0}%"></div>
+              style="width:${activos.length > 0 ? Math.round((doneCount/activos.length)*100) : 0}%"></div>
           </div>
           <div class="mission-list">
-            ${(compromisos || []).map(c => `
+            ${activos.map(c => `
               <div class="mission-item ${c.hecho ? 'done' : ''}" onclick="selectMission('${c.id}')">
                 <span class="mission-emoji">${c.emoji}</span>
                 <div class="mission-info">
@@ -150,6 +152,19 @@ function renderHome(data) {
                   </div>
                 </div>
                 <span class="mission-check">${c.hecho ? '✅' : '⟩'}</span>
+              </div>
+            `).join('')}
+            
+            ${inactivos.map(c => `
+              <div class="mission-item" style="opacity: 0.5; cursor: not-allowed;">
+                <span class="mission-emoji" style="filter: grayscale(1);">${c.emoji}</span>
+                <div class="mission-info">
+                  <div class="mission-name" style="color: var(--text-3); text-decoration: line-through;">${c.nombre}</div>
+                  <div class="mission-meta" style="color: var(--text-3);">
+                    ⏸️ Pausado hoy (${c.frecuencia === 'FDS' ? 'Fines de semana' : 'Lunes a viernes'})
+                  </div>
+                </div>
+                <span class="mission-check" style="color: var(--text-3);">🔒</span>
               </div>
             `).join('')}
           </div>
