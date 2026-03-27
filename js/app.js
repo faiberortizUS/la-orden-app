@@ -16,6 +16,67 @@ function updateHeader(data) {
   }
 }
 
+// --- MODAL SYSTEM ----------------------------------------
+function showInteractiveModal(title, text, badge) {
+  const existing = document.getElementById('interactiveModal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'interactiveModal';
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    animation: modalBgIn 0.3s ease forwards;
+  `;
+
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: #12121A; border-top: 1px solid var(--border-gold);
+    border-radius: 24px 24px 0 0; padding: 32px 24px 40px;
+    box-shadow: 0 -10px 40px rgba(212,168,67,0.15);
+    transform: translateY(100%); animation: modalSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  `;
+
+  content.innerHTML = `
+    <div style="width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 24px;"></div>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+      ${badge ? `<div style="width:48px;height:48px;border-radius:50%;background:rgba(212,168,67,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--border-gold);flex-shrink:0;">${badge}</div>` : ''}
+      <div style="font-family:var(--font-head); font-size:22px; font-weight:800; color:var(--text-1); line-height:1.2;">${title}</div>
+    </div>
+    <div style="font-size:15px; color:var(--text-2); line-height:1.6; margin-bottom:32px;">
+      ${text}
+    </div>
+    <button onclick="document.getElementById('interactiveModal').remove()" 
+      style="width:100%; padding:16px; border-radius:14px; background:var(--bg-elevated); border:1px solid var(--border); color:var(--text-1); font-family:var(--font-head); font-weight:700; font-size:15px; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+      Entendido
+    </button>
+  `;
+
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+
+  // Close on outside click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+  
+  // Inject keyframes if not exists
+  if (!document.getElementById('modalKeyframes')) {
+    const style = document.createElement('style');
+    style.id = 'modalKeyframes';
+    style.innerHTML = `
+      @keyframes modalBgIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes modalSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+  }
+}
+
 // --- INICIALIZACION --------------------------------------
 window.addEventListener('DOMContentLoaded', async () => {
   const tg = window.Telegram?.WebApp;
