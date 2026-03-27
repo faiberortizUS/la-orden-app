@@ -86,6 +86,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     tg.setHeaderColor('#0A0A0F');
     tg.setBackgroundColor('#0A0A0F');
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
   }
 
   // Si la TWA fue abierta desde /start (reset=1), limpiar localStorage de onboarding
@@ -289,7 +290,18 @@ function stopConfetti() {
 // --- BOTON BACK ------------------------------------------
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
   if (currentView !== 'home') navigateTo('home');
-  else window.Telegram.WebApp.close();
+  else {
+    window.Telegram.WebApp.showPopup({
+      title: '¿Abandonar la base?',
+      message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
+      buttons: [
+        {id: 'close', type: 'destructive', text: 'Retirarme'},
+        {id: 'stay', type: 'default', text: 'Continuar luchando'}
+      ]
+    }, (buttonId) => {
+      if (buttonId === 'close') window.Telegram.WebApp.close();
+    });
+  }
 });
 
 // --- REFRESCO AL VOLVER A LA APP -------------------------
