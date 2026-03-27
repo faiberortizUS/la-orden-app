@@ -1,22 +1,22 @@
 /**
- * 🏛️ LA ORDEN — app.js
+ * LA ORDEN - app.js
  * Bootstrap principal: Telegram WebApp API + router de vistas + confetti
  * ACTUALIZADO: detecta estado del usuario y lanza onboarding si es necesario
  */
 
-// ─── Estado global ────────────────────────────────────────
+// --- Estado global ---------------------------------------
 let currentView = 'home';
 let appData     = null;
 
-// ─── ACTUALIZAR HEADER ─────────────────────────────────────
+// --- ACTUALIZAR HEADER -----------------------------------
 function updateHeader(data) {
   const rankEl = document.getElementById('headerRank');
   if (rankEl && data && data.user) {
-    rankEl.textContent = data.user.rango || '🌱 Aspirante';
+    rankEl.textContent = data.user.rango || 'Aspirante';
   }
 }
 
-// ─── INICIALIZACIÓN ────────────────────────────────────────
+// --- INICIALIZACION --------------------------------------
 window.addEventListener('DOMContentLoaded', async () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
@@ -32,7 +32,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
   }
 
-  // ── FETCH + SPLASH EN PARALELO ──────────────────────────────
+  // --- FETCH + SPLASH EN PARALELO ------------------------
   // No hay setTimeout: el splash desaparece en cuanto lleguen los datos
   const splashMinMs = 400; // mínimo visual para que no haga flash
   const [data] = await Promise.all([
@@ -50,25 +50,25 @@ window.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { splash.style.display = 'none'; }, 260);
   }
 
-    // ── DECISIÓN DE FLUJO ───────────────────────────────────
+    // --- DECISION DE FLUJO ---------------------------------
     if (appData._noRegistrado) {
-      // Usuario sin registro en la BD → onboarding desde cero
+      // Usuario sin registro en la BD -> onboarding desde cero
       const tgUser = tg?.initDataUnsafe?.user || null;
       startOnboarding(tgUser);
 
     } else if (appData._onboardingIncompleto) {
       // Usuario con onboarding completo pero sin pago.
-      // Mostrar el dashboard BLOQUEADO con neuromarketing — no ir directo al pago.
+      // Mostrar el dashboard BLOQUEADO con neuromarketing - no ir directo al pago.
       // Esto activa el Efecto de Dotación y el Zeigarnik antes de pedir la tarjeta.
       showLockedDashboard(appData);
 
     } else {
-      // Usuario completamente registrado → mostrar app
+      // Usuario completamente registrado -> mostrar app
       updateHeader(appData);
       const appEl = document.getElementById('app');
       if (appEl) appEl.classList.remove('hidden');
 
-      // ¿Primera visita post-juramento? → Centro de Comandos
+      // ¿Primera visita post-juramento? -> Centro de Comandos
       if (localStorage.getItem('laorden_first_visit') === '1') {
         navigateTo('command_center');
       } else {
@@ -77,7 +77,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// ─── ROUTER DE VISTAS ─────────────────────────────────────
+// --- ROUTER DE VISTAS ------------------------------------
 function navigateTo(view, params) {
   params = params || {};
   if (!appData) return;
@@ -128,7 +128,7 @@ function navigateTo(view, params) {
   });
 }
 
-// ─── CONFETTI ─────────────────────────────────────────────
+// --- CONFETTI --------------------------------------------
 let confettiAnim = null;
 let confettiParticles = [];
 
@@ -185,13 +185,13 @@ function stopConfetti() {
   confettiParticles = [];
 }
 
-// ─── BOTÓN BACK ───────────────────────────────────────────
+// --- BOTON BACK ------------------------------------------
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
   if (currentView !== 'home') navigateTo('home');
   else window.Telegram.WebApp.close();
 });
 
-// ─── REFRESCO AL VOLVER A LA APP ─────────────────────────
+// --- REFRESCO AL VOLVER A LA APP -------------------------
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState === 'visible' && appData && !appData._noRegistrado) {
     const fresh = await fetchUserData();
@@ -204,7 +204,7 @@ document.addEventListener('visibilitychange', async () => {
   }
 });
 
-// ─── RESIZE ───────────────────────────────────────────────
+// --- RESIZE ----------------------------------------------
 window.addEventListener('resize', () => {
   const canvas = document.getElementById('confettiCanvas');
   if (canvas && confettiAnim) {
