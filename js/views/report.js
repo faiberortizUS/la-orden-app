@@ -118,7 +118,7 @@ function renderReportInput(c) {
       <div style="position: sticky; top: -20px; background: rgba(10,10,15,0.95); backdrop-filter: blur(8px); 
            padding: 16px 0; margin: -20px -20px 16px -20px; z-index: 50; display: flex; align-items: center; 
            gap: 8px; cursor: pointer; border-bottom: 1px solid var(--border);" 
-           onclick="navigateTo('report')">
+           onclick="showCancelReportFriction()">
         <div style="padding: 0 20px; display: flex; align-items: center; gap: 8px; width: 100%;">
           <span style="font-size:20px;color:var(--gold);">←</span>
           <span style="font-size:14px; font-weight:700; color:var(--text-1); letter-spacing:0.04em;">Atrás / Cancelar Reporte</span>
