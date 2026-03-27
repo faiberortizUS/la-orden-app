@@ -156,15 +156,15 @@ function renderHome(data) {
             `).join('')}
             
             ${inactivos.map(c => `
-              <div class="mission-item" style="opacity: 0.5; cursor: not-allowed;">
-                <span class="mission-emoji" style="filter: grayscale(1);">${c.emoji}</span>
+              <div class="mission-item" onclick="selectMission('${c.id}')" style="opacity: 0.8; cursor: pointer; background: rgba(255,255,255,0.02); border: 1px dashed var(--border);">
+                <span class="mission-emoji" style="filter: grayscale(0.5);">${c.emoji}</span>
                 <div class="mission-info">
-                  <div class="mission-name" style="color: var(--text-3); text-decoration: line-through;">${c.nombre}</div>
-                  <div class="mission-meta" style="color: var(--text-3);">
-                    ⏸️ Pausado hoy (${c.frecuencia === 'FDS' ? 'Fines de semana' : 'Lunes a viernes'})
+                  <div class="mission-name" style="color: var(--text-2);">${c.nombre}</div>
+                  <div class="mission-meta" style="color: var(--gold);">
+                    ⚡ Misión Extra (${c.frecuencia === 'FDS' ? 'Fines de semana' : 'Lunes a viernes'})
                   </div>
                 </div>
-                <span class="mission-check" style="color: var(--text-3);">🔒</span>
+                <span class="mission-check" style="color: var(--text-3);">⟩</span>
               </div>
             `).join('')}
           </div>
