@@ -63,7 +63,13 @@ async function fetchUserData() {
     return _buildNoRegistradoData(tgUser);
   }
 
-  const isReset = new URLSearchParams(window.location.search).get('reset') === '1';
+  // Detectar reset manual ya sea por URL o por bandera de pánico
+  let isReset = new URLSearchParams(window.location.search).get('reset') === '1';
+  if (localStorage.getItem('laorden_force_reset') === '1') {
+    isReset = true;
+    localStorage.removeItem('laorden_force_reset');
+  }
+
   const url = GAS_API_URL
     + '?initData=' + encodeURIComponent(initData)
     + (tid ? '&tid=' + tid : '')
