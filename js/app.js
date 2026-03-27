@@ -86,7 +86,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     tg.setHeaderColor('#0A0A0F');
     tg.setBackgroundColor('#0A0A0F');
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
-    if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
   }
 
   // Si la TWA fue abierta desde /start (reset=1), limpiar localStorage de onboarding
@@ -137,6 +136,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         navigateTo('home');
       }
     }
+    
+    // Configurar trampa de historial para el botón físico de Atrás (Android)
+    window.history.pushState({ page: 'main' }, '');
 });
 
 // --- ROUTER DE VISTAS ------------------------------------
@@ -287,22 +289,44 @@ function stopConfetti() {
 }
 
 
-// --- BOTON BACK ------------------------------------------
+// --- BOTON BACK (Telegram Header) ------------------------
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
-  if (currentView !== 'home') navigateTo('home');
-  else {
-    window.Telegram.WebApp.showPopup({
-      title: '¿Abandonar la base?',
-      message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
-      buttons: [
-        {id: 'close', type: 'destructive', text: 'Retirarme'},
-        {id: 'stay', type: 'default', text: 'Continuar luchando'}
-      ]
-    }, (buttonId) => {
-      if (buttonId === 'close') window.Telegram.WebApp.close();
-    });
+  if (currentView !== 'home') {
+    navigateTo('home');
+  } else {
+    _mostrarPopupSalida();
   }
 });
+
+// --- BOTON FISICO DE ATRÁS (Android / Popstate) ----------
+window.addEventListener('popstate', (e) => {
+  // Volver a atrapar en el historial para no salir de la WebView
+  window.history.pushState({ page: 'main' }, '');
+
+  if (currentView === 'report' && document.getElementById('view-report-input')) {
+    // Si estaba en el input de reporte, volver a la lista
+    navigateTo('report');
+  } else if (currentView !== 'home') {
+    // Si está en cualquier otra vista, volver al inicio
+    navigateTo('home');
+  } else {
+    // Si está en inicio, lanzar el popup de fricción
+    _mostrarPopupSalida();
+  }
+});
+
+function _mostrarPopupSalida() {
+  window.Telegram.WebApp.showPopup({
+    title: '¿Abandonar la base?',
+    message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
+    buttons: [
+      {id: 'close', type: 'destructive', text: 'Retirarme'},
+      {id: 'stay', type: 'default', text: 'Continuar luchando'}
+    ]
+  }, (buttonId) => {
+    if (buttonId === 'close') window.Telegram.WebApp.close();
+  });
+}
 
 // --- REFRESCO AL VOLVER A LA APP -------------------------
 document.addEventListener('visibilitychange', async () => {
