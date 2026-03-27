@@ -277,8 +277,21 @@ async function submitReport() {
       commitment.valorHoy = reportState.currentValue;
     }
     if (window._appData.user) {
-      window._appData.user.pcTotal = (Number(window._appData.user.pcTotal) || 0) + pcGanados;
+      window._appData.user.pcTotal     = (Number(window._appData.user.pcTotal) || 0) + pcGanados;
+          
+      if (result.icd !== undefined)         window._appData.user.icd         = result.icd;
+      if (result.tendencia !== undefined)   window._appData.user.tendencia   = result.tendencia;
+      if (result.lineaActiva !== undefined) window._appData.user.lineaActiva = result.lineaActiva;
+      if (result.diasActivos !== undefined) window._appData.user.diasActivos = result.diasActivos;
     }
+  }
+
+  // ── Pedir silenciosamente una actualización al servidor mientras la animación se muestra
+  // para asegurar consistencia perfecta (Rango, Historial Semanal, etc) si vuelven al inicio.
+  if (typeof fetchUserData === 'function') {
+    fetchUserData().then(fresh => {
+       if (fresh && fresh.user) window._appData = fresh;
+    });
   }
 
   showVictoryOverlay({
