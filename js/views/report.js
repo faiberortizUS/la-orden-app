@@ -238,7 +238,16 @@ async function submitReport() {
   if (!c) return;
 
   const btn = document.getElementById('reportBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Registrando…'; }
+  if (btn) { 
+    btn.disabled = true; 
+    if (!document.getElementById('loading-dots-style')) {
+      const style = document.createElement('style');
+      style.id = 'loading-dots-style';
+      style.innerHTML = `@keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } } .loading-dots span { animation-name: blink; animation-duration: 1.4s; animation-iteration-count: infinite; animation-fill-mode: both; } .loading-dots span:nth-child(2) { animation-delay: .2s; } .loading-dots span:nth-child(3) { animation-delay: .4s; }`;
+      document.head.appendChild(style);
+    }
+    btn.innerHTML = 'Sellando victoria <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
+  }
 
   const result = await postReport(c.id, reportState.currentValue);
 
