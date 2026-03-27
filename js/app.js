@@ -57,20 +57,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       startOnboarding(tgUser);
 
     } else if (appData._onboardingIncompleto) {
-      // Usuario que completó el onboarding (áreas + compromisos + juramento)
-      // pero se fue antes de pagar → llevarlo directamente al paso de pago
-      // sin borrar sus compromisos ya guardados en Sheets.
-      const tgUser = tg?.initDataUnsafe?.user || null;
-      const nombre  = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
-      // Limpiar cualquier estado de onboarding guardado en localStorage
-      // para forzar el salto directo al paso 4 (payment)
-      try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
-      OB.nombre       = nombre;
-      OB.step         = 4; // Paso: payment
-      OB.areas        = [];
-      OB.areaIndex    = 0;
-      OB.compromisos  = []; // Los compromisos ya están en Sheets; no los necesitamos aquí
-      resumePaymentOnboarding();
+      // Usuario con onboarding completo pero sin pago.
+      // Mostrar el dashboard BLOQUEADO con neuromarketing — no ir directo al pago.
+      // Esto activa el Efecto de Dotación y el Zeigarnik antes de pedir la tarjeta.
+      showLockedDashboard(appData);
 
     } else {
       // Usuario completamente registrado → mostrar app
