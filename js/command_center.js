@@ -26,6 +26,16 @@ const CC_ZONES = [
     tip:    'Los Escudos te protegen de perder tu racha si fallas un día. ¡Acumúlalos antes de que los necesites!',
   },
   {
+    id:     'escudos',
+    emoji:  '🛡️',
+    nombre: 'Escudos de Protección',
+    corto:  'ESCUDOS',
+    color:  '#EAB308',
+    desc:   'Tu salvavidas contra la pérdida de inercia. Te salvan automáticamente si fallas un día.',
+    detalle:'Se ganan al alcanzar hitos de racha (7, 14, 21, 30, 60, 90 días). Si tu racha se va a romper por inactividad, un escudo se sacrifica automáticamente para proteger tu fuego y mantener la racha viva.',
+    tip:    'Nunca uses tu último escudo como "Día Libre". Úsalos como seguro para emergencias reales. Perder la racha cuesta semanas de recuperación mental.',
+  },
+  {
     id:     'pc',
     emoji:  '⚡',
     nombre: 'Puntos de Poder',
@@ -39,17 +49,17 @@ const CC_ZONES = [
     id:     'rangos',
     emoji:  '🏛️',
     nombre: 'Rangos',
-    corto:  'JERARQUÍA',
+    corto:  'JERARQUIA',
     color:  '#A855F7',
     desc:   'Tu posición en La Orden, determinada por tus PC totales acumulados.',
-    detalle:'🌱 Aspirante → ⚔️ Iniciado → 🛡️ Comprometido → 🔱 Veterano → 💎 Élite → 🏛️ Arquitecto → 👁️ Custodio',
+    detalle:'Aspirante -> Iniciado -> Comprometido -> Veterano -> Elite -> Arquitecto -> Custodio',
     tip:    'Cada rango desbloquea nuevas funciones y visibilidad en tu Célula.',
   },
   {
     id:     'celula',
     emoji:  '⚔️',
     nombre: 'Célula de Rendimiento',
-    corto:  'CÉLULA',
+    corto:  'CELULA',
     color:  'var(--success)',
     desc:   'Tu equipo de 5-8 personas con objetivos similares. Compiten y se empujan mutuamente.',
     detalle:'El leaderboard de tu Célula se actualiza en tiempo real según el ICD de cada miembro.',
@@ -101,6 +111,11 @@ function renderCommandCenter(data, isFirstTime) {
             border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
             <div style="font-size:20px;font-weight:900;color:var(--fire);font-family:var(--font-head);">${user.lineaActiva || 0}🔥</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">RACHA</div>
+          </div>
+          <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            <div style="font-size:20px;font-weight:900;color:#EAB308;font-family:var(--font-head);">${user.escudos || 0}🛡️</div>
+            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ESCUDOS</div>
           </div>
           <div style="background:rgba(123,97,255,0.08);border:1px solid rgba(123,97,255,0.2);
             border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
