@@ -85,8 +85,27 @@ function renderObAreas() {
 
 function toggleArea(areaId) {
   const idx = OB.areas.indexOf(areaId);
-  if (idx === -1) OB.areas.push(areaId);
-  else OB.areas.splice(idx, 1);
+  if (idx === -1) {
+    OB.areas.push(areaId);
+
+    // ── MAGIA DE PREFETCH SILENCIOSO (Zero Latency) ──
+    // Justo al momento en que The user de selecciona un área, mandamos a descargar 
+    // su catálogo del servidor de forma silenciosa en segundo plano.
+    // Mientras la persona lee y avanza de pantalla (tarda ~4-8 segs), los datos 
+    // se cargarán. Resultado: cero pantalla de "Cargando" y datos 100% frescos.
+    try {
+      if (typeof fetchCatalog !== 'undefined' && typeof _catalogCache !== 'undefined') {
+        if (!_catalogCache[areaId]) {
+          fetchCatalog(areaId).then(data => {
+            if (data && data.length > 0) _catalogCache[areaId] = data;
+          }).catch(() => {});
+        }
+      }
+    } catch(e) {}
+
+  } else {
+    OB.areas.splice(idx, 1);
+  }
 
   // Re-render el elemento específico para no perder scroll
   const el = document.getElementById(`area-${areaId}`);
