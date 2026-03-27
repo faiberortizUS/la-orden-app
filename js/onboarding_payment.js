@@ -226,5 +226,5 @@ function openStripePayment(plan) {
 }
 
 function skipPayment() {
-  finishOnboarding();
+  finishOnboarding(true);
 }
