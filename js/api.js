@@ -83,9 +83,9 @@ async function fetchUserData() {
       return _buildNoRegistradoData(tgUser);
     }
 
-    // Usuario no encontrado en la hoja (no hizo juramento aún)
+    // Usuario no encontrado en la hoja (nunca empezó el onboarding)
     if (data.error === 'Usuario no encontrado' || data.registered === false) {
-      _showDebug('ℹ️ Usuario sin registro — juramento pendiente', '#440');
+      _showDebug('ℹ️ Usuario sin registro — onboarding desde cero', '#440');
       return _buildNoRegistradoData(tgUser);
     }
 
@@ -97,6 +97,14 @@ async function fetchUserData() {
     if (!data.user) {
       _showDebug('❌ Respuesta sin user', '#700');
       return _buildNoRegistradoData(tgUser);
+    }
+
+    // Usuario que completó compromisos/juramento pero NO pagó todavía
+    // El backend devuelve _onboardingIncompleto: true para este estado
+    if (data._onboardingIncompleto) {
+      _showDebug('ℹ️ Onboarding incompleto — redirigir a pago', '#840');
+      // Preservar los compromisos ya guardados en el estado OB del onboarding
+      return data; // app.js manejará el flag _onboardingIncompleto
     }
 
     _showDebug('✅ ' + data.user.nombre + ' · ICD:' + data.user.icd + ' · Pago:' + data.user.estadoPago, '#050');
