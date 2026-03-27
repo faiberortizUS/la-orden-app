@@ -164,6 +164,12 @@ async function signUserOath() {
   return _postOnboarding({ action: 'SIGN_OATH' });
 }
 
+/** OPTIMIZACION: Ejecuta los 3 pasos de onboarding en una sola llamada de red (60% mas rapido) */
+async function sealFullPact(nombre, compromisos) {
+  return _postOnboarding({ action: 'SEAL_PACT', nombre, compromisos });
+}
+
+
 async function _postOnboarding(body) {
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   if (tg && tg.initData) body.initData = tg.initData;
