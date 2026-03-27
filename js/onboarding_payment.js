@@ -149,8 +149,14 @@ function renderObPayment() {
         </div>
       </div>
 
-      <!-- Activar después -->
+      <!-- Activar después o Continuar -->
       <div style="padding:4px 20px 8px;text-align:center;">
+        <button id="skipPayBtn" onclick="finishOnboarding(false)"
+          style="display:none;width:100%;padding:14px;border:none;border-radius:var(--r-lg);
+            cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:900;
+            background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;margin-bottom:12px;">
+          CONTINUAR →
+        </button>
         <button onclick="_showPayLaterModal()"
           style="background:none;border:none;color:var(--text-3);
             font-size:12px;cursor:pointer;text-decoration:underline;padding:8px;">
