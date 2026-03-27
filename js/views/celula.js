@@ -95,8 +95,7 @@ function compartirRanking() {
   if (window.Telegram?.WebApp) {
     const data = window._appData;
     const myPos = [...data.celula].sort((a,b) => b.icd - a.icd).findIndex(m => m.yo) + 1;
-    window.Telegram.WebApp.switchInlineQuery(
-      `¡Soy #${myPos} en mi Célula de La Orden con un ICD de ${data.user.icd}! 🏛️⚔️ El 1% no para.`
-    );
+    const msg = `¡Soy #${myPos} en mi Célula de La Orden con un ICD de ${data.user.icd}! 🏛️⚔️ El 1% no para.`;
+    window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent('https://t.me/LaOrdenTrackingBot') + '&text=' + encodeURIComponent(msg));
   }
 }
