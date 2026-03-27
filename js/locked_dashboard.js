@@ -1,23 +1,23 @@
 /**
- * 🏛️ LA ORDEN — locked_dashboard.js
- * Vista de panel bloqueado para usuarios sin membresía activa.
+ * LA ORDEN - locked_dashboard.js
+ * Vista de panel bloqueado para usuarios sin membresia activa.
  *
  * Sesgos cognitivos activos:
- *  ① Efecto de Dotación   — ven SUS compromisos ya configurados
- *  ② Efecto Zeigarnik     — tarea incompleta genera tensión cognitiva
- *  ③ FOMO                 — contador de miembros activos en tiempo real
- *  ④ Aversión a la Pérdida— "llevas N días sin registrar"
- *  ⑤ Prueba Social        — "247 personas eligieron construir hoy"
- *  ⑥ Anclaje de Precio    — $0.63/día vs precio total
- *  ⑦ Escasez              — contador live que sube
- *  ⑧ Consistencia         — "Ya firmaste el juramento. Tu estructura te espera."
+ *  [1] Efecto de Dotacion    - ven SUS compromisos ya configurados
+ *  [2] Efecto Zeigarnik      - tarea incompleta genera tension cognitiva
+ *  [3] FOMO                  - contador de miembros activos en tiempo real
+ *  [4] Aversion a la Perdida - "llevas N dias sin registrar"
+ *  [5] Prueba Social         - "247 personas eligieron construir hoy"
+ *  [6] Anclaje de Precio     - $0.63/dia vs precio total
+ *  [7] Escasez               - contador live que sube
+ *  [8] Consistencia          - "Ya firmaste el juramento. Tu estructura te espera."
  */
 
 let _ldLiveCounter = 247;
 let _ldLiveIv      = null;
 let _ldDaysLost    = 3; // Días de "pérdida" percibida
 
-/* ─── PUNTO DE ENTRADA ───────────────────────────────────── */
+/* --- PUNTO DE ENTRADA ------------------------------------- */
 function showLockedDashboard(data) {
   const user       = data.user || {};
   const compromisos = data.compromisos || [];
@@ -49,17 +49,17 @@ function showLockedDashboard(data) {
   _startLiveCounter();
 }
 
-/* ─── RENDER PRINCIPAL ───────────────────────────────────── */
+/* --- RENDER PRINCIPAL ------------------------------------- */
 function _renderLocked(nombre, compromisos) {
 
   const misionesHtml = _renderMisionesBlur(compromisos);
   const extrasCount  = Math.max(0, compromisos.length - 3);
 
   return `
-    <!-- ① BANNER LIVE — Prueba Social + FOMO -->
+    <!-- [1] BANNER LIVE - Prueba Social + FOMO -->
     <div class="ld-live-banner">
       <span class="ld-live-dot"></span>
-      <span>EN VIVO —</span>
+      <span>EN VIVO -</span>
       <strong id="ldLiveCounter">${_ldLiveCounter}</strong>
       <span>miembros del 1% ya reportaron hoy · <strong style="color:#EF4444;">TÚ NO</strong></span>
     </div>
@@ -67,7 +67,7 @@ function _renderLocked(nombre, compromisos) {
     <!-- SCROLL AREA -->
     <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;position:relative;">
 
-      <!-- ② HERO BLOQUEADO — Dotación + Zeigarnik -->
+      <!-- [2] HERO BLOQUEADO - Dotacion + Zeigarnik -->
       <div style="position:relative;margin:16px;border-radius:20px;overflow:hidden;">
 
         <!-- Contenido real borroso (Dotación: "esto ya es tuyo") -->
@@ -123,12 +123,12 @@ function _renderLocked(nombre, compromisos) {
         </div>
       </div>
 
-      <!-- ④ PÉRDIDA ACUMULADA — Aversión a la pérdida -->
+      <!-- [4] PERDIDA ACUMULADA - Aversion a la perdida -->
       <div class="ld-loss-card">
         <div style="font-size:30px;margin-bottom:8px;">⏳</div>
         <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;
           color:#FF6B35;margin-bottom:8px;">
-          Llevas <span id="ldDaysLost">${_ldDaysLost}</span> días sin registrar nada.
+          Llevas <span id="ldDaysLost">${_ldDaysLost}</span> dias sin registrar nada.
         </div>
         <div style="font-size:13px;color:#A0A0B0;line-height:1.8;margin-bottom:12px;">
           Tu Línea Activa sigue en <strong style="color:#F5F5F5;">cero</strong>.
@@ -142,7 +142,7 @@ function _renderLocked(nombre, compromisos) {
         </div>
       </div>
 
-      <!-- ① MISIONES BORROSAS — Dotación ("tus compromisos te esperan") -->
+      <!-- [1] MISIONES BORROSAS - Dotacion ("tus compromisos te esperan") -->
       <div style="margin:0 16px 16px;">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;
           color:#5A5A72;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
@@ -158,7 +158,7 @@ function _renderLocked(nombre, compromisos) {
           </div>` : ''}
       </div>
 
-      <!-- ⑥ ANCLAJE DE PRECIO — Precio per cápita vs real -->
+      <!-- [6] ANCLAJE DE PRECIO - Precio per capita vs real -->
       <div class="ld-price-anchor">
         <div style="font-size:10px;letter-spacing:0.2em;color:#5A5A72;
           text-transform:uppercase;margin-bottom:10px;">¿Cuánto vale el 1%?</div>
@@ -178,7 +178,7 @@ function _renderLocked(nombre, compromisos) {
         </div>
       </div>
 
-      <!-- ⑤ PRUEBA SOCIAL — Social proof + contador dinámico -->
+      <!-- [5] PRUEBA SOCIAL - Social proof + contador dinamico -->
       <div class="ld-social-proof">
         <div style="display:flex;gap:-4px;justify-content:center;margin-bottom:10px;">
           <span style="font-size:20px;">👨</span><span style="font-size:20px;margin-left:-4px;">🧑</span>
@@ -196,17 +196,17 @@ function _renderLocked(nombre, compromisos) {
 
     </div><!-- end scroll area -->
 
-    <!-- ③ STICKY CTA BOTTOM — siempre visible -->
+    <!-- [3] STICKY CTA BOTTOM - siempre visible -->
     <div class="ld-sticky-bottom">
       <button onclick="lockedActivarNow()" class="ld-cta-btn ld-cta-btn--full">
-        ⚡ ACTIVAR MEMBRESÍA — DESDE $19/MES
+        ⚡ ACTIVAR MEMBRESIA - DESDE $19/MES
       </button>
       <div style="text-align:center;margin-top:7px;font-size:10px;color:#5A5A72;letter-spacing:0.03em;">
         🔒 Pago cifrado con Stripe · Cancela cuando quieras
       </div>
     </div>
 
-    <!-- ⑧ MODAL DE INTERCEPCIÓN — aparece al tocar nav o blur -->
+    <!-- [8] MODAL DE INTERCEPCION - aparece al tocar nav o blur -->
     <div id="ldInterceptModal" class="ld-intercept-modal">
       <div class="ld-intercept-card">
         <div style="font-size:40px;margin-bottom:10px;">🏛️</div>
@@ -225,7 +225,7 @@ function _renderLocked(nombre, compromisos) {
         </div>
         <button onclick="lockedActivarNow()" class="ld-cta-btn"
           style="width:100%;margin-bottom:10px;font-size:14px;">
-          ⚡ ACTIVAR AHORA — SOY DEL 1%
+          ⚡ ACTIVAR AHORA - SOY DEL 1%
         </button>
         <button id="ldInterceptClose"
           style="width:100%;padding:11px;background:none;border:1px solid rgba(255,255,255,0.07);
@@ -237,7 +237,7 @@ function _renderLocked(nombre, compromisos) {
   `;
 }
 
-/* ─── MISIONES BORROSAS ──────────────────────────────────── */
+/* --- MISIONES BORROSAS ------------------------------------ */
 function _renderMisionesBlur(compromisos) {
   const items = compromisos.length > 0 ? compromisos.slice(0, 3) : [
     { emoji: '🏃', nombre: 'Entrenamiento de fuerza', meta: 45, unidad: 'min' },
@@ -255,11 +255,11 @@ function _renderMisionesBlur(compromisos) {
         <div style="font-size:13px;font-weight:600;color:#F5F5F5;">${c.nombre}</div>
         <div style="font-size:11px;color:#5A5A72;margin-top:2px;">Meta: ${c.meta} ${c.unidad}</div>
       </div>
-      <span style="font-size:16px;color:#5A5A72;">⟩</span>
+      <span style="font-size:16px;color:#5A5A72;">&gt;</span>
     </div>`).join('');
 }
 
-/* ─── INTERCEPT NAV ──────────────────────────────────────── */
+/* --- INTERCEPT NAV ---------------------------------------- */
 function _initNavIntercept() {
   // Esperar a que el DOM procese el nuevo HTML y luego parchear el nav
   setTimeout(() => {
@@ -290,7 +290,7 @@ function _hideLdModal() {
   if (modal) modal.style.display = 'none';
 }
 
-/* ─── CONTADOR LIVE ──────────────────────────────────────── */
+/* --- CONTADOR LIVE ---------------------------------------- */
 function _startLiveCounter() {
   if (_ldLiveIv) clearInterval(_ldLiveIv);
   _ldLiveIv = setInterval(() => {
@@ -304,7 +304,7 @@ function _startLiveCounter() {
   }, 3800);
 }
 
-/* ─── ACCIÓN: ACTIVAR ────────────────────────────────────── */
+/* --- ACCION: ACTIVAR -------------------------------------- */
 function lockedActivarNow() {
   _hideLdModal();
   if (_ldLiveIv) { clearInterval(_ldLiveIv); _ldLiveIv = null; }
