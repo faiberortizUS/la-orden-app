@@ -9,6 +9,7 @@
 :root {
   /* Paleta Dark Gold */
   --bg-primary:   #0A0A0F;
+  --bg-base:      #0A0A0F;  /* <- Agregado: Requerido por los sticky headers */
   --bg-card:      #12121A;
   --bg-elevated:  #1A1A28;
   --bg-glass:     rgba(26, 26, 40, 0.7);
