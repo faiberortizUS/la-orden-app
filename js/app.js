@@ -44,12 +44,28 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // ── DECISIÓN DE FLUJO ───────────────────────────────────
     if (appData._noRegistrado) {
-      // Usuario sin registro → lanzar onboarding. startOnboarding() decide internamente
-      // si restaurar el paso guardado o arrancar desde cero.
+      // Usuario sin registro en la BD → onboarding desde cero
       const tgUser = tg?.initDataUnsafe?.user || null;
       startOnboarding(tgUser);
+
+    } else if (appData._onboardingIncompleto) {
+      // Usuario que completó el onboarding (áreas + compromisos + juramento)
+      // pero se fue antes de pagar → llevarlo directamente al paso de pago
+      // sin borrar sus compromisos ya guardados en Sheets.
+      const tgUser = tg?.initDataUnsafe?.user || null;
+      const nombre  = tgUser ? (tgUser.first_name || 'Aspirante') : 'Aspirante';
+      // Limpiar cualquier estado de onboarding guardado en localStorage
+      // para forzar el salto directo al paso 4 (payment)
+      try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
+      OB.nombre       = nombre;
+      OB.step         = 4; // Paso: payment
+      OB.areas        = [];
+      OB.areaIndex    = 0;
+      OB.compromisos  = []; // Los compromisos ya están en Sheets; no los necesitamos aquí
+      resumePaymentOnboarding();
+
     } else {
-      // Usuario registrado → mostrar app
+      // Usuario completamente registrado → mostrar app
       updateHeader(appData);
       const appEl = document.getElementById('app');
       if (appEl) appEl.classList.remove('hidden');
