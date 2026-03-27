@@ -172,14 +172,28 @@ window.resumePaymentOnboarding = function() {
 };
 
 /* --- FINALIZAR ONBOARDING -------------------------------- */
-async function finishOnboarding() {
+async function finishOnboarding(isSkip = false) {
   obClear();
 
   // Ocultar onboarding
   const ob = document.getElementById('onboardingContainer');
   if (ob) ob.style.display = 'none';
 
-  // Recargar datos frescos desde GAS
+  // ── OPTIMIZACIÓN EXTREMA (Velocidad Vibe 1%) ──
+  // Si el usuario acaba de tocar "Entendido, asumo las consecuencias", 
+  // no necesitamos llamar a Google Sheets para saber qué pasó.
+  // Lo estrellamos instantáneamente (0ms) contra el Locked Dashboard usando un estado sintético.
+  if (isSkip) {
+    appData = window._appData || { 
+      user: { nombre: OB.nombre || 'Aspirante', estadoPago: 'PENDIENTE' }, 
+      _onboardingIncompleto: true 
+    };
+    window._appData = appData;
+    showLockedDashboard(appData);
+    return;
+  }
+
+  // Si no fue skip (ej: completó Stripe y tocó regresar), hacemos la llamada real para verificar
   appData = await fetchUserData();
   window._appData = appData;
 
