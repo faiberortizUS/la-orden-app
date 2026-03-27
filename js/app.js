@@ -128,7 +128,7 @@ function navigateTo(view, params) {
   });
 }
 
-// --- CONFETTI --------------------------------------------
+// --- EFECTO MISTICO (CHISPAS DE LA ORDEN) ----------------------
 let confettiAnim = null;
 let confettiParticles = [];
 
@@ -138,41 +138,63 @@ function startConfetti() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const colors = ['#D4A843','#FF6B35','#7B61FF','#22C55E','#F0C060','#FF6B8A'];
-  const count  = 120;
+  // Paleta de la Orden: Oro Brillante, Naranja Fuego, Violeta Electrón, Blanco Caliente
+  const colors = ['#F0C060', '#FF6B35', '#D4A843', '#7B61FF', '#FFFFFF'];
+  const count  = window.innerWidth < 400 ? 80 : 120; // Optimización móvil
 
-  confettiParticles = Array.from({ length: count }, () => ({
-    x:     Math.random() * canvas.width,
-    y:     Math.random() * -200,
-    r:     Math.random() * 7 + 3,
-    d:     Math.random() * count,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    tilt:  Math.floor(Math.random() * 10) - 10,
-    tiltAngle:      Math.random() * Math.PI,
-    tiltAngleDelta: 0.05 + Math.random() * 0.07,
-    speed:          2 + Math.random() * 4,
-    shape:          Math.random() < 0.5 ? 'rect' : 'circle',
-  }));
+  confettiParticles = Array.from({ length: count }, () => {
+    return {
+      x: Math.random() * canvas.width,
+      y: canvas.height + Math.random() * window.innerHeight, // Empieza desde muy abajo
+      r: Math.random() * 2.5 + 0.8, // Tamaños de chispa
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speedY: 1.5 + Math.random() * 4, // Velocidad de subida
+      sway: Math.random() * Math.PI * 2, // Fase inicial de senoide
+      swaySpeed: 0.01 + Math.random() * 0.05, // Velocidad de giro lateral
+      swayAmp: 0.5 + Math.random() * 2 // Amplitud lateral
+    };
+  });
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     confettiParticles.forEach(p => {
+      // Fade in abajo, fade out arriba
+      const heightPercent = p.y / canvas.height;
+      let op = 1;
+      if (heightPercent > 0.8) op = (1 - heightPercent) * 5; // entra suave
+      if (heightPercent < 0.2) op = heightPercent * 5;     // sale suave
+      if(op < 0) op = 0; if(op > 1) op = 1;
+
+      // Resplandor (falso glow muy rápido en rendimiento)
+      ctx.globalAlpha = op * 0.3;
       ctx.beginPath();
       ctx.fillStyle = p.color;
-      if (p.shape === 'rect') {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.tiltAngle);
-        ctx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r);
-        ctx.restore();
-      } else {
-        ctx.ellipse(p.x, p.y, p.r * 0.6, p.r, p.tiltAngle, 0, 2 * Math.PI);
-      }
+      ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2);
       ctx.fill();
-      p.tiltAngle += p.tiltAngleDelta;
-      p.y += p.speed;
-      if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+
+      // Centro radiante (chispa core)
+      ctx.globalAlpha = op;
+      ctx.beginPath();
+      ctx.fillStyle = (Math.random() > 0.8) ? '#FFFFFF' : p.color; // parpadeo ocasional blanco
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Resetea alfa
+      ctx.globalAlpha = 1;
+
+      // Movimiento hacia arriba como humo/chispas
+      p.y -= p.speedY;
+      p.sway += p.swaySpeed;
+      p.x += Math.sin(p.sway) * p.swayAmp;
+
+      // Reciclar la chispa si sale por arriba
+      if (p.y < -50) {
+        p.y = canvas.height + 50 + Math.random() * 100;
+        p.x = Math.random() * canvas.width;
+      }
     });
+
     confettiAnim = requestAnimationFrame(draw);
   }
   draw();
@@ -181,9 +203,27 @@ function startConfetti() {
 function stopConfetti() {
   if (confettiAnim) { cancelAnimationFrame(confettiAnim); confettiAnim = null; }
   const canvas = document.getElementById('confettiCanvas');
-  if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  confettiParticles = [];
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    // En lugar de borrar de tajo, hacemos fade out dramático al final
+    let fadeOut = 1;
+    function endAnim() {
+      fadeOut -= 0.05;
+      if (fadeOut <= 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiParticles = [];
+        return;
+      }
+      ctx.fillStyle = `rgba(10,10,15,0.1)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(endAnim);
+    }
+    endAnim();
+  } else {
+    confettiParticles = [];
+  }
 }
+
 
 // --- BOTON BACK ------------------------------------------
 window.Telegram?.WebApp?.BackButton?.onClick(() => {
