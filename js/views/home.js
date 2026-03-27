@@ -58,7 +58,7 @@ function renderHome(data) {
       ` : ''}
 
       <!-- ICD HERO CARD -->
-      <div class="card card--glass card--gold">
+      <div class="card card--glass card--gold" style="cursor:pointer;" onclick="showInteractiveModal('Índice de Consistencia Disciplinada (ICD)', 'El ICD mide tu confiabilidad matemática. Se calcula analizando tus últimos 28 días de cumplimiento de 0 a 100.<br><br><b>✨ Regla del Oro:</b> Protege tu ICD como tu vida. Entrar a la <i>Zona Élite</i> (85+) requiere constancia brutal.', '🎯')">
         <div class="gauge-wrap">
           <svg class="gauge-svg" viewBox="0 0 180 180">
             <defs>
@@ -96,7 +96,7 @@ function renderHome(data) {
       </div>
 
       <!-- STREAK CARD -->
-      <div class="card card--fire" style="padding:var(--s4);">
+      <div class="card card--fire" style="padding:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
         <div class="streak-card" style="padding:0;">
           <div class="streak-fire">🔥</div>
           <div class="streak-info">
@@ -117,12 +117,12 @@ function renderHome(data) {
 
       <!-- STATS ROW -->
       <div class="stat-row">
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escalera de Rangos', 'Tu rango demuestra nivel de jerarquía.<br><br><b>🌱 Aspirante:</b> El inicio.<br><b>🛡️ Escudero:</b> +50 ICD y 7 días.<br><b>⚔️ Gladiador:</b> +70 ICD y 21 días.<br><b>🏛️ Custodio:</b> +85 ICD y 60 días.<br><br>Solo el 1% sostiene su posición en Custodio.', '${rangoEmoji}')">
           <div class="stat-val stat-val--gold">${rangoEmoji}</div>
           <div class="stat-lbl">${rangoNombre}</div>
           <div class="stat-delta">${user.tendencia || '→'}</div>
         </div>
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escudos de Protección', 'Al cumplir 14 días ininterrumpidos protegiendo la línea ganas 1 Escudo.<br><br>Si fallas un día por completo, el sistema consumirá un escudo automáticamente en lugar de destruir tu racha a cero. Es tu seguro de vida.', '🛡️')">
           <div class="stat-val">🛡️ ${user.escudos || 0}</div>
           <div class="stat-lbl">Escudos activos</div>
           <div class="stat-delta">Cada 14 días</div>
