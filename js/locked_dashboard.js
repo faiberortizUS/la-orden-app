@@ -73,7 +73,8 @@ function _renderLocked(nombre, compromisos) {
         <!-- Contenido real borroso (Dotación: "esto ya es tuyo") -->
         <div class="ld-blur-wrap">
           <div style="background:rgba(26,26,40,0.7);border:1px solid rgba(212,168,67,0.25);
-            border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            border-radius:20px;padding:40px 24px;display:flex;flex-direction:column;
+            align-items:center;gap:16px;min-height:380px;justify-content:center;">
             <svg viewBox="0 0 180 180" style="width:150px;height:150px;">
               <defs>
                 <linearGradient id="ldGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -103,15 +104,15 @@ function _renderLocked(nombre, compromisos) {
         </div>
 
         <!-- Overlay glassmorphism con lock + CTA -->
-        <div class="ld-lock-overlay">
+        <div class="ld-lock-overlay" style="padding:20px;">
           <div style="text-align:center;">
-            <div style="font-size:44px;margin-bottom:8px;
+            <div style="font-size:42px;margin-bottom:6px;
               filter:drop-shadow(0 0 24px rgba(212,168,67,0.7));">🔒</div>
-            <div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;
-              color:#F5F5F5;line-height:1.3;margin-bottom:6px;">
-              ${nombre},<br>tu estructura<br>te espera.
+            <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;
+              color:#F5F5F5;line-height:1.2;margin-bottom:8px;">
+              ${nombre},<br>tu estructura te espera.
             </div>
-            <div style="font-size:12px;color:#A0A0B0;margin-bottom:18px;line-height:1.7;">
+            <div style="font-size:13px;color:#A0A0B0;margin-bottom:16px;line-height:1.5;">
               Tu Juramento está sellado.<br>
               Tus compromisos están listos.<br>
               <strong style="color:#D4A843;">Solo falta activar el sistema.</strong>
