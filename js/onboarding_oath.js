@@ -202,7 +202,7 @@ async function signOath() {
          obClear();
          OB.step = 0;
          OB.compromisos = [];
-         window.location.reload();
+         window.location.href = window.location.pathname + '?reset=1';
       };
       btn.parentNode.appendChild(resetBtn);
     }
