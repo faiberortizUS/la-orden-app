@@ -171,7 +171,7 @@ window.resumePaymentOnboarding = function() {
   renderOnboardingStep();
 };
 
-/* ─── FINALIZAR ONBOARDING ──────────────────────────────── */
+/* --- FINALIZAR ONBOARDING -------------------------------- */
 async function finishOnboarding() {
   obClear();
 
@@ -182,13 +182,20 @@ async function finishOnboarding() {
   // Recargar datos frescos desde GAS
   appData = await fetchUserData();
   window._appData = appData;
-  updateHeader(appData);
 
-  // Mostrar la app y el Centro de Comandos (primera vez)
-  const appEl = document.getElementById('app');
-  if (appEl) appEl.classList.remove('hidden');
+  // RUTEO EXACTO (Misma logica que app.js)
+  if (appData._onboardingIncompleto) {
+    // Si asume las consecuencias y skipea el pago, choca contra el muro
+    showLockedDashboard(appData);
+  } else {
+    updateHeader(appData);
 
-  // Marcar que ya vio el onboarding → ir al centro de comandos por primera vez
-  localStorage.setItem('laorden_first_visit', '1');
-  navigateTo('command_center');
+    // Mostrar la app y el Centro de Comandos (primera vez)
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.classList.remove('hidden');
+
+    // Marcar que ya vio el onboarding -> ir al centro de comandos por primera vez
+    localStorage.setItem('laorden_first_visit', '1');
+    navigateTo('command_center');
+  }
 }
