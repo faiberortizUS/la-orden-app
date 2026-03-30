@@ -103,27 +103,32 @@ function renderCommandCenter(data, isFirstTime) {
       ${user.icd !== undefined ? `
         <div style="display:flex;gap:10px;padding:0 20px 16px;overflow-x:auto;">
           <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);
-            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            onclick="showInteractiveModal('ICD', 'El Índice de Consistencia es tu brújula interior. Mide qué tan firme es la palabra que te diste a ti mismo.', '🎯')">
             <div style="font-size:20px;font-weight:900;color:var(--gold);font-family:var(--font-head);">${user.icd || 0}</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ICD</div>
           </div>
           <div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
-            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            onclick="showInteractiveModal('Línea Activa (Fuego)', 'Tu racha actual. ¿Un mal día? Salva todo cumpliendo tan solo 1 diminuto pilar de tu pacto.', '🔥')">
             <div style="font-size:20px;font-weight:900;color:var(--fire);font-family:var(--font-head);">${user.lineaActiva || 0}🔥</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">RACHA</div>
           </div>
           <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);
-            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            onclick="showInteractiveModal('Escudos Protectores', 'Salvan tu racha cuando fracasas rotundamente al reportar todo un día. Gánalos manteniendo un fuego largo e ininterrumpido.', '🛡️')">
             <div style="font-size:20px;font-weight:900;color:#EAB308;font-family:var(--font-head);">${user.escudos || 0}🛡️</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ESCUDOS</div>
           </div>
           <div style="background:rgba(123,97,255,0.08);border:1px solid rgba(123,97,255,0.2);
-            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            onclick="showInteractiveModal('Puntos PC', 'Divisa interna y poder adquisitivo. Úsalos como comprobante empírico de que honraste cada meta diaria por encima de tus límites.', '⚡')">
             <div style="font-size:20px;font-weight:900;color:var(--electric);font-family:var(--font-head);">${Number(user.pcTotal||0).toLocaleString('es-CO')}</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">PC</div>
           </div>
           <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);
-            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;">
+            border-radius:var(--r-md);padding:12px 16px;min-width:90px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            onclick="showInteractiveModal('Rango', 'Demuestra quién eres dentro de tu Célula de rendimiento. Escapa del promedio logrando Ascensos tácticos.', '👑')">
             <div style="font-size:20px;font-weight:900;color:#A855F7;font-family:var(--font-head);">${(user.rango||'🌱').split(' ')[0]}</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">RANGO</div>
           </div>
@@ -131,7 +136,7 @@ function renderCommandCenter(data, isFirstTime) {
       ` : ''}
 
       <!-- Zonas del mapa -->
-      <div style="padding:0 20px;" id="ccZones">
+      <div style="padding:0 20px 120px;" id="ccZones">
         ${CC_ZONES.map((z, i) => `
           <div id="cc-zone-${z.id}"
             onclick="toggleCCZone('${z.id}')"
