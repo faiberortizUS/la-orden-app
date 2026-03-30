@@ -16,7 +16,7 @@ function renderCelula(data) {
     <div class="view" id="view-celula">
 
       <!-- Tu posición destacada -->
-      <div class="card card--glass card--gold" style="text-align:center; padding: var(--s6);">
+      <div class="card card--glass card--gold" style="text-align:center; padding: var(--s6); cursor:pointer;" onclick="showInteractiveModal('Ley de la Hermandad Táctica', 'La Célula es presión social pura. O eres el miembro incansable que eleva al resto de los guerreros, o eres tú el ancla que empuja la integridad general al abismo.<br><br><b>🏆 El Leaderboard es implacable:</b> Ordena asimétricamente a los miembros comparando estrictamente las puntuaciones de ICD.', '⚔️')">
         <div style="font-size:11px; font-weight:600; letter-spacing:0.12em; color:var(--text-3); text-transform:uppercase; margin-bottom:8px;">
           Tu posición en la Célula
         </div>
