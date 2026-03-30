@@ -134,7 +134,13 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (localStorage.getItem('laorden_first_visit') === '1') {
         navigateTo('command_center');
       } else {
-        navigateTo('home');
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetView = urlParams.get('view');
+        if (targetView && ['home', 'report', 'stats', 'oath', 'celula', 'add_habit', 'command_center'].includes(targetView)) {
+          navigateTo(targetView);
+        } else {
+          navigateTo('home');
+        }
       }
     }
 });
