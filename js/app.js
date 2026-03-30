@@ -169,6 +169,9 @@ function navigateTo(view, params) {
     case 'celula':
       html = renderCelula(appData);
       break;
+    case 'add_habit':
+      html = renderAddHabit(appData);
+      break;
     case 'command_center': {
       const isFirst = localStorage.getItem('laorden_first_visit') === '1';
       html = renderCommandCenter(appData, isFirst);
