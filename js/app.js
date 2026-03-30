@@ -113,7 +113,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
     // --- DECISION DE FLUJO ---------------------------------
-    if (appData._noRegistrado) {
+    if (appData._apiError) {
+      showConnectionErrorScreen(appData.errorMessage);
+
+    } else if (appData._noRegistrado) {
       // Usuario sin registro en la BD -> onboarding desde cero
       const tgUser = tg?.initDataUnsafe?.user || null;
       startOnboarding(tgUser);
@@ -352,3 +355,28 @@ window.addEventListener('resize', () => {
     canvas.height = window.innerHeight;
   }
 });
+
+function showConnectionErrorScreen(errorMsg) {
+  const appEl = document.getElementById('app');
+  if (appEl) appEl.classList.add('hidden');
+  
+  const container = document.getElementById('viewContainer') || document.body;
+  
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; text-align:center; background:#0A0A0F;">
+      <div style="width:80px;height:80px;border-radius:50%;background:rgba(212,168,67,0.1);display:flex;align-items:center;justify-content:center;font-size:32px;border:1px solid var(--border-gold);margin-bottom:24px;">
+        ⚠️
+      </div>
+      <h2 style="font-family:var(--font-head); font-size:24px; font-weight:800; color:var(--text-1); margin-bottom:12px;">Interferencia en la Señal</h2>
+      <p style="font-size:15px; color:var(--text-2); line-height:1.6; margin-bottom:32px; max-width:300px;">
+        El Oráculo no pudo sincronizar tu archivo con la base de datos central en este intento. La red puede estar saturada.
+        <br><br>
+        <span style="font-size:13px; color:var(--text-3); font-family:monospace;">Detalle: ${errorMsg || 'Timeout de conexión'}</span>
+      </p>
+      <button onclick="window.location.reload()" 
+        style="width:100%; max-width:280px; padding:16px; border-radius:14px; background:var(--bg-elevated); border:1px solid var(--border); color:var(--text-1); font-family:var(--font-head); font-weight:700; font-size:15px; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+        Reintentar Sincronización
+      </button>
+    </div>
+  `;
+}
