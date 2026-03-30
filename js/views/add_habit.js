@@ -78,13 +78,13 @@ function renderAddHabit(data) {
 async function saveNewHabit() {
   const nameInput = document.getElementById('newHabitName');
   const metaInput = document.getElementById('newHabitMeta');
-  const uniInput  = document.getElementById('newHabitUnidad');
-  const areaSelect= document.getElementById('newHabitArea');
-  const freqSelect= document.getElementById('newHabitFreq');
-  const btn       = document.getElementById('saveHabitBtn');
+  const uniInput = document.getElementById('newHabitUnidad');
+  const areaSelect = document.getElementById('newHabitArea');
+  const freqSelect = document.getElementById('newHabitFreq');
+  const btn = document.getElementById('saveHabitBtn');
 
   const nombre = nameInput.value.trim();
-  const meta   = parseFloat(metaInput.value);
+  const meta = parseFloat(metaInput.value);
   const unidad = uniInput.value.trim() || 'unidades';
 
   if (!nombre) {
@@ -120,7 +120,7 @@ async function saveNewHabit() {
       action: 'SAVE_COMPROMISOS',
       compromisos: [compromiso]
     });
-    
+
     if (!data || !data.ok) throw new Error(data?.error || 'No se pudo guardar el pilar');
 
     if (window.Telegram?.WebApp?.HapticFeedback) {
@@ -130,13 +130,13 @@ async function saveNewHabit() {
     // Refresh user data silently to get the new missions
     if (typeof fetchUserData === 'function') {
       const fresh = await fetchUserData();
-      if(fresh && fresh.user) window._appData = fresh;
+      if (fresh && fresh.user) window._appData = fresh;
     }
 
     // Volver a la vista del Pacto
     navigateTo('oath');
 
-  } catch(e) {
+  } catch (e) {
     btn.disabled = false;
     btn.innerHTML = '❌ ERROR: REINTENTAR';
     if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('Fallo el servidor: ' + e.message);
