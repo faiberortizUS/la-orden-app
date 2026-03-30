@@ -63,23 +63,23 @@ function renderStats(data) {
 
       <!-- KPIs -->
       <div class="stat-row">
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Índice de Consistencia Disciplinada (ICD)', 'El ICD mide tu confiabilidad matemática calculando tus últimos 28 días. 100 equivale a perfección absoluta. Al fallar un solo día pierdes integridad exponencialmente de tu credibilidad de base.', '🎯')">
           <div class="stat-val stat-val--electric fw-900" style="font-family:var(--font-head);">${icd}</div>
           <div class="stat-lbl">ICD Actual</div>
           <div class="stat-delta">${user.tendencia || '→'}</div>
         </div>
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Línea Activa (Fuego)', 'Son los días continuos cumpliendo de forma ininterrumpida por lo menos con <b>1 victoria</b>.<br><br><b>✨ Regla del Oro (2 min):</b> Salva siempre tu inercia. Si fue un día negro, cumple tan solo 1 de tus actividades y la pálida luz roja de tu Racha seguirá encendida.', '🔥')">
           <div class="stat-val" style="color:var(--fire);font-family:var(--font-head);">${lineaActiva}🔥</div>
           <div class="stat-lbl">Línea Activa</div>
           <div class="stat-delta">${lineaActiva >= 7 ? '🏆 Hito alcanzado' : 'Sigue construyendo'}</div>
         </div>
       </div>
       <div class="stat-row">
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Puntos de Poder (PC)', 'Acumulas poder como pago por cada meta triturada. Puedes llevarte jugosos diamantes de hasta <b>+20 PC extras</b> si la aplastas y logras exceder tu meta al 150%.<br><br>Acumula este capital para ascender e invitarte dentro de tu ranking en la jerarquía estructurada.', '⚡')">
           <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${pcTotal.toLocaleString('es-CO')}</div>
           <div class="stat-lbl">PC Totales</div>
         </div>
-        <div class="stat-chip">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Días de Disciplina Bruta', 'Es tu historial absoluto e inquebrantable contabilizando en total los días en los que has honrado el pacto, de forma acumulativa y sin castigo al caer o si reinicias tu Racha.<br><br>Demuestra tu constancia estoica a largo plazo.', '📅')">
           <div class="stat-val" style="font-family:var(--font-head);">${diasActivos}</div>
           <div class="stat-lbl">Días Activos</div>
         </div>
