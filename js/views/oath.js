@@ -94,7 +94,10 @@ function renderOath(data) {
 
       <!-- COMPROMISOS SELLADOS -->
       <div class="card">
-        <div class="section-title" style="margin-bottom:var(--s4);">Compromisos sellados</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--s4);">
+          <div class="section-title" style="margin:0;">Compromisos sellados</div>
+          <button onclick="navigateTo('add_habit')" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;cursor:pointer;padding:4px 0;">+ AÑADIR</button>
+        </div>
         ${compromisos.length > 0 ? compromisos.map(c => `
           <div class="oath-commitment-item">
             <span class="oath-commitment-emoji">${c.emoji}</span>
@@ -112,11 +115,11 @@ function renderOath(data) {
       <div class="card card--glass">
         <div class="section-title" style="margin-bottom:var(--s3);">Este contrato</div>
         <div class="stat-row">
-          <div class="stat-chip">
+          <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Días Ejecutados', 'De los 30 días fijados en este contrato cerrado, este número certifica el peso real de tu esfuerzo.<br><br><b>🎯 Objetivo base:</b> Renovar tus contratos al final del periodo contabilizando al menos 25 días ejecutados para reclamar el éxito táctico y certificar tu disciplina.', '📜')">
             <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${diasEjecutados}</div>
             <div class="stat-lbl">Días con reporte</div>
           </div>
-          <div class="stat-chip">
+          <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Cargar la Cruz (Pilares)', 'El número de promesas simultáneas (hábitos) que sostienes bajo este contrato sin excusas.<br><br>Solo los miembros puramente élites mantienen su palabra de honor inquebrantable en más de 4 áreas a la vez durante mucho tiempo.', '🏛️')">
             <div class="stat-val" style="font-family:var(--font-head);">${compromisos.length}</div>
             <div class="stat-lbl">Pilares activos</div>
           </div>
@@ -133,7 +136,7 @@ function renderOath(data) {
       </div>
 
       <!-- RANGO ACTUAL -->
-      <div class="card flex" style="align-items:center;gap:var(--s4);">
+      <div class="card flex" style="align-items:center;gap:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante:</b> Primera fase.<br><b>🛡️ Escudero:</b> +50 ICD y 7 días.<br><b>⚔️ Gladiador:</b> +70 ICD y 21 días.<br><b>🏛️ Custodio:</b> +85 ICD y 60 días.<br><br>Sella tu próxima victoria para subir al trono.', '🏛️')">
         <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
         <div>
           <div class="text-xs text-muted uppercase ls-wide" style="margin-bottom:3px;">Tu Rango</div>
