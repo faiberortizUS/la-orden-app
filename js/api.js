@@ -37,6 +37,14 @@ function _buildNoRegistradoData(tgUser) {
   };
 }
 
+/* ─── ESTADO DE ERROR DE RED O SERVIDOR ───────────────── */
+function _buildErrorData(errorMessage) {
+  return {
+    _apiError: true,
+    errorMessage: errorMessage || 'Error desconocido'
+  };
+}
+
 /* ─── FETCH PRINCIPAL ───────────────────────────────────── */
 async function fetchUserData() {
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -80,7 +88,7 @@ async function fetchUserData() {
 
     if (!resp.ok) {
       _showDebug('❌ HTTP ' + resp.status, '#700');
-      return _buildNoRegistradoData(tgUser);
+      return _buildErrorData('Error de protocolo HTTP (' + resp.status + ')');
     }
 
     const text = await resp.text();
@@ -88,7 +96,7 @@ async function fetchUserData() {
     try { data = JSON.parse(text); }
     catch(pe) {
       _showDebug('❌ JSON inválido: ' + text.substring(0,80), '#700');
-      return _buildNoRegistradoData(tgUser);
+      return _buildErrorData('Respuesta corrupta desde la central');
     }
 
     // Usuario no encontrado en la hoja (nunca empezó el onboarding)
@@ -99,12 +107,12 @@ async function fetchUserData() {
 
     if (data.error) {
       _showDebug('❌ Error backend: ' + data.error, '#700');
-      return _buildNoRegistradoData(tgUser);
+      return _buildErrorData(data.error);
     }
 
     if (!data.user) {
       _showDebug('❌ Respuesta sin user', '#700');
-      return _buildNoRegistradoData(tgUser);
+      return _buildErrorData('Bloque de datos de usuario extraviado');
     }
 
     // Usuario que completó compromisos/juramento pero NO pagó todavía
@@ -120,7 +128,7 @@ async function fetchUserData() {
 
   } catch (e) {
     _showDebug('❌ Fetch: ' + e.message, '#700');
-    return _buildNoRegistradoData(tgUser);
+    return _buildErrorData('Fallo de señal de red o límite de tiempo excedido');
   }
 }
 
