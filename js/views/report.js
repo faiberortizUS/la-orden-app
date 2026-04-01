@@ -260,7 +260,17 @@ async function submitReport() {
   if (!result || !result.ok) {
     if (btn) {
        btn.disabled = false;
-       btn.textContent = '❌ Error al sellar (intenta de nuevo)';
+       btn.innerHTML = '🔄 Error de red — Toca para reintentar';
+       btn.style.background = 'rgba(239,68,68,0.15)';
+       btn.style.border     = '1px solid rgba(239,68,68,0.4)';
+       btn.style.color      = '#EF4444';
+       // Restaurar botón original tras 3 segundos para no bloquear al usuario
+       setTimeout(() => {
+         btn.innerHTML        = '✍️ SELLAR MI VICTORIA';
+         btn.style.background = '';
+         btn.style.border     = '';
+         btn.style.color      = '';
+       }, 3000);
     }
     return;
   }
