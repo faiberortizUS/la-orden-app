@@ -127,13 +127,19 @@ async function saveNewHabit() {
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
     }
 
-    // Refresh user data silently to get the new missions
+    // Refresh user data para obtener las nuevas misiones con la data fresca
+    // CRÍTICO: actualizar AMBAS referencias (appData global + _appData)
     if (typeof fetchUserData === 'function') {
       const fresh = await fetchUserData();
-      if (fresh && fresh.user) window._appData = fresh;
+      if (fresh && fresh.user) {
+        // appData es la variable global que usa navigateTo()
+        // eslint-disable-next-line no-undef
+        appData         = fresh;
+        window._appData = fresh;
+      }
     }
 
-    // Volver a la vista del Pacto
+    // Volver a la vista del Pacto con los datos ya actualizados
     navigateTo('oath');
 
   } catch (e) {
