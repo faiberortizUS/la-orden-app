@@ -89,6 +89,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
   }
 
+  // ── TRAMPA PARA EL BOTÓN FÍSICO DE RETROCESO (Android) ──
+  // Empujamos un estado falso al historial. Cuando el usuario aprieta
+  // "Atrás" en el celular, el navegador vuelve a este estado (popstate)
+  // en lugar de cerrar la app. Nosotros interceptamos y manejamos la lógica.
+  history.pushState({ laorden: true }, '');
+  window.addEventListener('popstate', () => {
+    // Volver a poner el estado trampa para la próxima pulsación
+    history.pushState({ laorden: true }, '');
+    _handleBackAction();
+  });
+
   // Si la TWA fue abierta desde /start (reset=1), limpiar localStorage de onboarding
   if (new URLSearchParams(window.location.search).get('reset') === '1') {
     try { localStorage.removeItem('laorden_onboarding'); } catch(e) {}
@@ -153,6 +164,9 @@ function navigateTo(view, params) {
   params = params || {};
   if (!appData) return;
   currentView = view;
+
+  // Sincronizar BackButton de Telegram según la vista
+  _syncBackButton(view);
 
   // Actualizar nav
   document.querySelectorAll('.nav-item').forEach(el => {
@@ -299,26 +313,61 @@ function stopConfetti() {
 }
 
 
-// --- BOTON BACK (Telegram Header) ------------------------
-window.Telegram?.WebApp?.BackButton?.onClick(() => {
+// --- BOTON BACK (Telegram Header + Hardware Android) -----
+
+// Función unificada de "acción atrás" — usada tanto por el
+// BackButton de Telegram como por el botón físico del celular.
+function _handleBackAction() {
+  // Si hay un onboarding activo, retroceder dentro del onboarding
+  const obContainer = document.getElementById('onboardingContainer');
+  if (obContainer && obContainer.style.display !== 'none') {
+    obPrev();
+    return;
+  }
+  // Si hay un modal abierto, cerrarlo
+  const modal = document.getElementById('interactiveModal');
+  if (modal) { modal.remove(); return; }
+  // Si hay un locked dashboard activo, no hacer nada (solo el CTA puede salir)
+  const ld = document.getElementById('lockedDashboard');
+  if (ld && ld.style.display !== 'none') { return; }
+  // Navegación normal del dashboard
   if (currentView !== 'home') {
     navigateTo('home');
   } else {
     _mostrarPopupSalida();
   }
-});
+}
+
+// Registrar el BackButton de Telegram
+if (window.Telegram?.WebApp?.BackButton) {
+  window.Telegram.WebApp.BackButton.onClick(_handleBackAction);
+}
+
+// Sincronizar la visibilidad del BackButton de Telegram con la vista actual
+function _syncBackButton(view) {
+  const bb = window.Telegram?.WebApp?.BackButton;
+  if (!bb) return;
+  if (view && view !== 'home') {
+    bb.show();
+  } else {
+    bb.hide();
+  }
+}
 
 function _mostrarPopupSalida() {
-  window.Telegram.WebApp.showPopup({
-    title: '¿Abandonar la base?',
-    message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
-    buttons: [
-      {id: 'close', type: 'destructive', text: 'Retirarme'},
-      {id: 'stay', type: 'default', text: 'Continuar luchando'}
-    ]
-  }, (buttonId) => {
-    if (buttonId === 'close') window.Telegram.WebApp.close();
-  });
+  const tg = window.Telegram?.WebApp;
+  if (tg && tg.showPopup) {
+    tg.showPopup({
+      title: '¿Abandonar la base?',
+      message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
+      buttons: [
+        {id: 'close', type: 'destructive', text: 'Retirarme'},
+        {id: 'stay', type: 'default', text: 'Continuar luchando'}
+      ]
+    }, (buttonId) => {
+      if (buttonId === 'close') tg.close();
+    });
+  }
 }
 
 function showCancelReportFriction() {
