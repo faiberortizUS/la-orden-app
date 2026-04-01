@@ -84,7 +84,7 @@ async function fetchUserData() {
     + (isReset ? '&reset=1' : '');
 
   try {
-    const resp = await fetch(url, { method: 'GET' });
+    const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
 
     if (!resp.ok) {
       _showDebug('❌ HTTP ' + resp.status, '#700');
@@ -144,13 +144,21 @@ async function postReport(compromisoId, valor) {
     else if (tg.initDataUnsafe && tg.initDataUnsafe.user) body.tid = String(tg.initDataUnsafe.user.id);
 
     const resp = await fetch(GAS_API_URL, {
-      method: 'POST',
-      body: JSON.stringify(body),
+      method:   'POST',
+      redirect: 'follow',                                         // GAS hace 302 antes de ejecutar doPost
+      headers:  { 'Content-Type': 'text/plain;charset=utf-8' },  // GAS parsea el body con este header
+      body:     JSON.stringify(body),
     });
+
+    if (!resp.ok) {
+      console.error('[LaOrden] postReport HTTP', resp.status);
+      return { ok: false, error: 'HTTP ' + resp.status };
+    }
+
     return await resp.json();
   } catch (e) {
     console.error('[LaOrden] postReport falló:', e.message);
-    return { ok: false };
+    return { ok: false, error: e.message };
   }
 }
 
@@ -193,9 +201,17 @@ async function _postOnboarding(body) {
 
   try {
     const resp = await fetch(GAS_API_URL, {
-      method: 'POST',
-      body: JSON.stringify(body),
+      method:   'POST',
+      redirect: 'follow',                                         // GAS hace 302 antes de ejecutar doPost
+      headers:  { 'Content-Type': 'text/plain;charset=utf-8' },  // GAS parsea el body con este header
+      body:     JSON.stringify(body),
     });
+
+    if (!resp.ok) {
+      console.error('[LaOrden] onboarding POST HTTP', resp.status);
+      return { ok: false, error: 'HTTP ' + resp.status };
+    }
+
     return await resp.json();
   } catch(e) {
     console.error('[LaOrden] onboarding POST falló:', e.message);
