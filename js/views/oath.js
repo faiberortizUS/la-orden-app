@@ -136,7 +136,7 @@ function renderOath(data) {
       </div>
 
       <!-- RANGO ACTUAL -->
-      <div class="card flex" style="align-items:center;gap:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante:</b> Primera fase.<br><b>🛡️ Escudero:</b> +50 ICD y 7 días.<br><b>⚔️ Gladiador:</b> +70 ICD y 21 días.<br><b>🏛️ Custodio:</b> +85 ICD y 60 días.<br><br>Sella tu próxima victoria para subir al trono.', '🏛️')">
+      <div class="card flex" style="align-items:center;gap:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
         <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
         <div>
           <div class="text-xs text-muted uppercase ls-wide" style="margin-bottom:3px;">Tu Rango</div>
@@ -144,6 +144,21 @@ function renderOath(data) {
             ${(user.rango || '🌱 Aspirante').split(' ').slice(1).join(' ')}
           </div>
           <div class="text-xs text-muted" style="margin-top:4px;">🌱→⚔️→🛡️→🔱→💎→🏛️→👁️</div>
+        </div>
+      </div>
+
+      <!-- ACCIÓN PRINCIPAL DEL PACTO -->
+      <div style="padding:8px 0 24px;">
+        <button onclick="navigateTo('add_habit')"
+          style="width:100%;padding:18px 24px;border:none;border-radius:var(--r-lg);cursor:pointer;
+            font-family:var(--font-head);font-size:15px;font-weight:900;color:#0A0A0F;letter-spacing:0.06em;
+            background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+            box-shadow:0 0 30px rgba(212,168,67,0.25);
+            display:flex;align-items:center;justify-content:center;gap:10px;">
+          ⚔️ FORJAR NUEVO COMPROMISO
+        </button>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text-3);line-height:1.5;">
+          Cada compromiso nuevo exige más de ti. Solo añade lo que puedas cumplir con honor.
         </div>
       </div>
 
