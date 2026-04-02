@@ -11,9 +11,9 @@ const CC_ZONES = [
     nombre: 'Índice de Consistencia',
     corto:  'ICD',
     color:  'var(--gold)',
-    desc:   'Tu métrica maestra. Mide qué tan consistente eres frente a tus compromisos en los últimos 28 días.',
-    detalle:'100 = perfecta consistencia. 85+ = Zona Élite del 1%. Se actualiza cada vez que reportas.',
-    tip:    'Sube tu ICD reportando todos tus compromisos cada día. Un solo día fallado puede bajarlo hasta 4 puntos.',
+    desc:   'Tu activo más frágil. Un solo día de silencio destruye lo que tardaste semanas en construir. El ICD mide los últimos 28 días — el sistema no olvida.',
+    detalle:'100 = consistencia perfecta. 85+ = Zona Élite del 1%.\n\nLo que pierdes al fallar:\n• 1 día sin reportar → hasta −4 puntos de ICD\n• 2 días seguidos → penalización exponencial\n• Caer de 85 a 70 puede costar 3 semanas de trabajo\n\nEl ICD no sube de golpe. Cae en horas. Sube en semanas.',
+    tip:    '⚠️ Cada día que no reportas, el sistema registra un 0% de cumplimiento. Esos ceros se promedian sobre 28 días y arrastran tu ICD hacia abajo. No pierdas hoy lo que construiste ayer.',
   },
   {
     id:     'streak',
@@ -104,7 +104,7 @@ function renderCommandCenter(data, isFirstTime) {
         <div style="display:flex;gap:10px;padding:0 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
           <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);
             border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
-            onclick="showInteractiveModal('ICD', 'El Indice de Consistencia es tu brujula interior. Mide que tan firme es la palabra que te diste a ti mismo.', '🎯')">
+            onclick="showInteractiveModal('🎯 ICD — Tu Activo Más Frágil', 'El ICD no sube de golpe. Cae en horas. Sube en semanas.<br><br>Cada día sin reportar, el sistema registra 0% de cumplimiento y ese cero se promedia sobre 28 días.<br><br><b>Lo que pierdes al fallar:</b><br>• 1 día → hasta −4 puntos<br>• 2 días seguidos → penalización exponencial<br>• Caer de 85 a 70 toma 3 semanas recuperar<br><br>El sistema no olvida. Tú tampoco puedes permitirte olvidar.', '🎯')">
             <div style="font-size:20px;font-weight:900;color:var(--gold);font-family:var(--font-head);">${user.icd || 0}</div>
             <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ICD</div>
           </div>
