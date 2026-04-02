@@ -1,0 +1,134 @@
+/**
+ * 🏛️ LA ORDEN — onboarding_initiation.js
+ * Las Reglas del Juego — Iniciación Post-Juramento
+ */
+
+const INITIATION_SLIDES = [
+  {
+    icon: '🗺️',
+    title: 'EL TERRITORIO',
+    text: `Bienvenido a La Orden, <b>{nombre}</b>.<br><br>Acabas de cruzar la línea que divide al 99% de las personas que prometen, del 1% que opera. A partir de hoy, tus hábitos no son tareas. Son <b>misiones</b> que alteran directamente los atributos de tu propia identidad.`,
+    button: 'Comprendido'
+  },
+  {
+    icon: '📊',
+    title: 'TU ICD Y LA CAÍDA',
+    text: `El activo más valioso aquí es tu <b>ICD (Índice de Consistencia Disciplinada)</b>.<br><br>Este número mide quién eres cuando nadie mira. Romper tu compromiso un día te restará puntos. Romperlo dos días seguidos te castigará brutalmente debido a la aversión a la pérdida. <i>La intensidad importa poco si no hay consistencia.</i>`,
+    button: 'Acepto las reglas'
+  },
+  {
+    icon: '🛡️',
+    title: 'LÍNEA ACTIVA Y ESCUDOS',
+    text: `Tus días de éxito ininterrumpidos forman tu <b>Línea Activa</b>. Cada 14 días impecables forjarás un <b>Escudo</b>.<br><br>Si caes un día, un Escudo se sacrificará para proteger tu racha. Si caes y estás desprotegido... regresas al inicio.`,
+    button: 'Defenderé mi posición'
+  },
+  {
+    icon: '⚔️',
+    title: 'TUS HERMANOS DE ARMAS',
+    text: `No vas a pelear esta guerra solo. El sistema integrará tu progreso en una <b>Célula</b> de 5 personas de tu mismo calibre.<br><br>Si tú fallas, arrastras el rango de la célula. Si todos cumplen, los atributos se multiplican. Tu debilidad expone a tu equipo.`,
+    button: 'Honor a mi Célula'
+  },
+  {
+    icon: '💎',
+    title: 'EL PRECIO DE ENTRADA',
+    text: `Tanto el dolor de la disciplina como el dolor del arrepentimiento cobran una tarifa. Tú eliges qué precio quieres pagar.<br><br>Cruzarás ahora el umbral final. Invierte en tu transformación para sellar irrevocablemente tu <b>Juramento</b>. Lo gratuito rara vez impone respeto.`,
+    button: 'Cruzar el umbral'
+  }
+];
+
+let currentSlideIndex = 0;
+
+async function renderObInitiationAsync(container) {
+  currentSlideIndex = 0;
+  
+  const nombreFmt = OB.nombre || 'Arquitecto';
+  
+  const html = `
+    <div id="ob-initiation" style="min-height:100vh;display:flex;flex-direction:column;
+      background:radial-gradient(circle at top right, #17110e, #0A0A0F);
+      padding-bottom:120px; position:relative;">
+      
+      ${obProgressBar(5, 6)}
+      
+      <div style="flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;padding:24px;z-index:2;">
+         
+         <!-- Progress Dots -->
+         <div id="initiation-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:40px;margin-top:20px;">
+           ${INITIATION_SLIDES.map((_, i) => `<div class="init-dot ${i===0?'active':''}"></div>`).join('')}
+         </div>
+         
+         <!-- Cards Wrapper -->
+         <div id="init-cards-wrapper" style="position:relative;flex:1;width:100%;">
+            ${INITIATION_SLIDES.map((s, i) => `
+               <div class="init-card ${i===0?'active':''}" id="init-card-${i}">
+                 <div class="init-card-icon">${s.icon}</div>
+                 <div class="init-card-title">${s.title}</div>
+                 <div class="init-card-text">${s.text.replace('{nombre}', nombreFmt)}</div>
+               </div>
+            `).join('')}
+         </div>
+
+         <!-- CTA -->
+         <button id="init-next-btn" class="btn-premium" style="width:100%;margin-top:20px;height:56px;display:flex;align-items:center;justify-content:center;font-size:16px;letter-spacing:1px;" onclick="nextInitiationSlide()">
+           ${INITIATION_SLIDES[0].button}
+         </button>
+      </div>
+      
+      <!-- Fog / Smoke effect overlay for depth -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:40vh;background:linear-gradient(to top, rgba(10,10,15,1), transparent);z-index:1;pointer-events:none;"></div>
+    </div>
+  `;
+  container.innerHTML = html;
+  
+  // Pequeña aparición al entrar
+  setTimeout(() => {
+    const card0 = document.getElementById('init-card-0');
+    if (card0) card0.style.transform = 'translateY(0) scale(1)';
+  }, 100);
+}
+
+function nextInitiationSlide() {
+  const currentCard = document.getElementById('init-card-' + currentSlideIndex);
+  
+  if (currentSlideIndex < INITIATION_SLIDES.length - 1) {
+    if (currentCard) {
+      currentCard.classList.remove('active');
+      currentCard.classList.add('exit');
+    }
+    
+    const dots = document.querySelectorAll('.init-dot');
+    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active');
+    
+    currentSlideIndex++;
+    
+    const nextCard = document.getElementById('init-card-' + currentSlideIndex);
+    if (nextCard) {
+      nextCard.classList.add('active');
+    }
+    
+    if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active');
+    
+    const btn = document.getElementById('init-next-btn');
+    if (btn) {
+      btn.style.opacity = '0';
+      setTimeout(() => {
+        btn.innerHTML = INITIATION_SLIDES[currentSlideIndex].button;
+        btn.style.opacity = '1';
+        
+        // Estilización de botón para la última diapositiva (Pagar)
+        if(currentSlideIndex === INITIATION_SLIDES.length - 1) {
+           btn.style.background = 'linear-gradient(135deg, var(--gold-dim), var(--gold))';
+           btn.style.color = '#0A0A0F';
+           btn.style.boxShadow = '0 0 30px rgba(212,168,67,0.4)';
+        }
+      }, 200);
+    }
+    
+    if(window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+  } else {
+    // Si estamos en la última tarjeta, avanzamos al siguiente paso (payment)
+    obNext();
+  }
+}
