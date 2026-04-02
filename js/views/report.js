@@ -304,13 +304,34 @@ async function submitReport() {
     });
   }
 
+  // ── Detectar si era la ÚLTIMA misión pendiente del día ──────────
+  const data = window._appData;
+  const compromisosTotales = (data && data.compromisos) ? data.compromisos.filter(x => x.aplicaHoy !== false) : [];
+  // Marcar el compromiso actual como hecho antes de contar
+  const compromisoActualizado = compromisosTotales.find(x => x.id === c.id);
+  if (compromisoActualizado) compromisoActualizado.hecho = true;
+
+  const pendientesRestantes = compromisosTotales.filter(x => !x.hecho);
+  const esDiaCompleto       = pendientesRestantes.length === 0 && compromisosTotales.length > 0;
+
+  if (esDiaCompleto) {
+    // Sellar el día en background — fire-and-forget, no bloquea la UI
+    closeDay().catch(() => {}); // silencioso en caso de error
+    // Vibración especial de logro
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+  }
+
   showVictoryOverlay({
-    nombre:     c.nombre,
-    emoji:      c.emoji,
-    valor:      reportState.currentValue,
-    unidad:     c.unidad,
-    pcGanados:  pcGanados,
-    esCritico:  esCritico,
+    nombre:        c.nombre,
+    emoji:         c.emoji,
+    valor:         reportState.currentValue,
+    unidad:        c.unidad,
+    pcGanados:     pcGanados,
+    esCritico:     esCritico,
+    esDiaCompleto: esDiaCompleto,
+    totalMisiones: compromisosTotales.length,
   });
 
   if (window.Telegram?.WebApp?.HapticFeedback) {
@@ -318,7 +339,8 @@ async function submitReport() {
   }
 }
 
-function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico }) {
+
+function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico, esDiaCompleto, totalMisiones }) {
   const overlay = document.createElement('div');
   overlay.className = 'victory-overlay';
   overlay.id = 'victoryOverlay';
@@ -330,23 +352,47 @@ function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico
     'Tu yo futuro lo agradece.',
   ];
 
-  overlay.innerHTML = `
-    <div class="victory-content">
-      <div class="victory-badge">${esCritico ? '💥' : emoji}</div>
-      <div class="victory-title">${esCritico ? '¡ATAQUE CRÍTICO!' : '¡VICTORIA SELLADA!'}</div>
-      <div class="victory-sub">${titles[Math.floor(Math.random() * titles.length)]}</div>
-      <div style="margin:8px 0;">
-        <div class="victory-pc">+${pcGanados} PC</div>
-        <div class="victory-pc-label">PUNTOS DE PODER GANADOS</div>
+  if (esDiaCompleto) {
+    // ── OVERLAY ESPECIAL: DÍA COMPLETO ─────────────────────────────
+    overlay.innerHTML = `
+      <div class="victory-content">
+        <div class="victory-badge" style="font-size:52px;">🌟</div>
+        <div class="victory-title" style="font-size:22px;">¡DÍA COMPLETO!</div>
+        <div class="victory-sub" style="color:var(--gold);font-weight:700;">Sellaste todas tus ${totalMisiones} misiones.</div>
+        <div style="margin:12px 0;">
+          <div class="victory-pc">+${pcGanados} PC</div>
+          <div class="victory-pc-label">PUNTOS DE PODER GANADOS</div>
+        </div>
+        <div class="badge-chip badge-chip--gold" style="margin-top:4px;">
+          ${nombre}: ${Number(valor).toLocaleString('es-CO')} ${unidad}
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.5);">
+          ✅ Día sellado automáticamente
+        </div>
       </div>
-      <div class="badge-chip badge-chip--gold" style="margin-top:4px;">
-        ${nombre}: ${Number(valor).toLocaleString('es-CO')} ${unidad}
+    `;
+  } else {
+    // ── OVERLAY NORMAL: VICTORIA INDIVIDUAL ────────────────────────
+    overlay.innerHTML = `
+      <div class="victory-content">
+        <div class="victory-badge">${esCritico ? '💥' : emoji}</div>
+        <div class="victory-title">${esCritico ? '¡ATAQUE CRÍTICO!' : '¡VICTORIA SELLADA!'}</div>
+        <div class="victory-sub">${titles[Math.floor(Math.random() * titles.length)]}</div>
+        <div style="margin:8px 0;">
+          <div class="victory-pc">+${pcGanados} PC</div>
+          <div class="victory-pc-label">PUNTOS DE PODER GANADOS</div>
+        </div>
+        <div class="badge-chip badge-chip--gold" style="margin-top:4px;">
+          ${nombre}: ${Number(valor).toLocaleString('es-CO')} ${unidad}
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
   document.body.appendChild(overlay);
   startConfetti();
+
+  const duracion = esDiaCompleto ? 3500 : 3000;
 
   setTimeout(() => {
     overlay.style.opacity = '0';
@@ -354,8 +400,7 @@ function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico
     setTimeout(() => {
       overlay.remove();
       stopConfetti();
-      // Volver al home con datos actualizados localmente
       navigateTo('home');
     }, 400);
-  }, 3000);
+  }, duracion);
 }
