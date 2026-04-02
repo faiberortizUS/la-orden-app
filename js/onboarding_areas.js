@@ -18,7 +18,7 @@ function renderObAreas() {
   const selected = OB.areas;
   return `
     <div id="ob-areas" style="min-height:100vh;padding-bottom:100px;">
-      ${obProgressBar(2, 5)}
+      ${obProgressBar(2, 6)}
 
       <div style="padding:24px 20px 16px;">
         <div style="font-size:11px;letter-spacing:0.25em;color:var(--electric);text-transform:uppercase;margin-bottom:8px;">
