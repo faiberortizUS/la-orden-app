@@ -90,11 +90,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── TRAMPA PARA EL BOTÓN FÍSICO DE RETROCESO (Android) ──
-  // Forzamos un historial infinito para que el botón atrás de hardware 
-  // NUNCA cierre la app nativamente, sino que pase por nuestra fricción.
+  // Doble push garantiza que el stack nunca quede vacío en Android WebView.
+  history.pushState({ laorden: 'base' }, '', window.location.href);
   history.pushState({ laorden: 'trap' }, '', window.location.href);
   window.addEventListener('popstate', (e) => {
-    // Volver a poner el estado trampa de inmediato
+    // Reinsertar el trap de inmediato para que el próximo atrás también quede interceptado
     history.pushState({ laorden: 'trap' }, '', window.location.href);
     _handleBackAction();
   });
@@ -356,15 +356,13 @@ if (window.Telegram?.WebApp?.BackButton) {
   window.Telegram.WebApp.BackButton.onClick(_handleBackAction);
 }
 
-// Sincronizar la visibilidad del BackButton de Telegram con la vista actual
+// Sincronizar el BackButton de Telegram.
+// SIEMPRE visible — incluso en 'home' — para interceptar el botón nativo
+// antes de que el OS cierre la app sin pasar por nuestra fricción.
 function _syncBackButton(view) {
   const bb = window.Telegram?.WebApp?.BackButton;
   if (!bb) return;
-  if (view && view !== 'home') {
-    bb.show();
-  } else {
-    bb.hide();
-  }
+  bb.show(); // Siempre activo: el handler _handleBackAction decide qué hacer
 }
 
 function _mostrarPopupSalida() {
