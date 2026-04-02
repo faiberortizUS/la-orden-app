@@ -61,8 +61,10 @@ function renderOath(data) {
   return `
     <div class="view" id="view-oath">
 
+      ${urgencia ? '<div class="screen-flash-danger"></div>' : ''}
+
       <!-- PACTO ACTIVO -->
-      <div class="oath-card">
+      <div class="oath-card stagger-up stagger-1 ${urgencia ? 'breathe-danger' : 'breathe-gold'}">
         <div class="oath-contract-num">⚔️ Contrato #${numero} · ${renovaciones + 1}ª ejecución</div>
         <div class="flex" style="gap:16px; align-items:flex-end; margin-bottom:8px;">
           <div>
@@ -94,10 +96,10 @@ function renderOath(data) {
       </div>
 
       <!-- COMPROMISOS SELLADOS -->
-      <div class="card">
+      <div class="card stagger-up stagger-2">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--s4);">
           <div class="section-title" style="margin:0;">Compromisos sellados</div>
-          <button onclick="navigateTo('add_habit')" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;cursor:pointer;padding:4px 0;">+ AÑADIR</button>
+          <button onclick="navigateTo('add_habit')" class="tappable" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;padding:4px 0;">+ AÑADIR</button>
         </div>
         ${compromisos.length > 0 ? compromisos.map(c => `
           <div class="oath-commitment-item">
@@ -113,14 +115,14 @@ function renderOath(data) {
       </div>
 
       <!-- STATS DEL CONTRATO -->
-      <div class="card card--glass">
+      <div class="card card--glass stagger-up stagger-3">
         <div class="section-title" style="margin-bottom:var(--s3);">Este contrato</div>
         <div class="stat-row">
-          <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Días Ejecutados', 'De los 30 días fijados en este contrato cerrado, este número certifica el peso real de tu esfuerzo.<br><br><b>🎯 Objetivo base:</b> Renovar tus contratos al final del periodo contabilizando al menos 25 días ejecutados para reclamar el éxito táctico y certificar tu disciplina.', '📜')">
+          <div class="stat-chip tappable" onclick="showInteractiveModal('Días Ejecutados', 'De los 30 días fijados en este contrato cerrado, este número certifica el peso real de tu esfuerzo.<br><br><b>🎯 Objetivo base:</b> Renovar tus contratos al final del periodo contabilizando al menos 25 días ejecutados para reclamar el éxito táctico y certificar tu disciplina.', '📜')">
             <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${diasEjecutados}</div>
             <div class="stat-lbl">Días con reporte</div>
           </div>
-          <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Cargar la Cruz (Pilares)', 'El número de promesas simultáneas (hábitos) que sostienes bajo este contrato sin excusas.<br><br>Solo los miembros puramente élites mantienen su palabra de honor inquebrantable en más de 4 áreas a la vez durante mucho tiempo.', '🏛️')">
+          <div class="stat-chip tappable" onclick="showInteractiveModal('Cargar la Cruz (Pilares)', 'El número de promesas simultáneas (hábitos) que sostienes bajo este contrato sin excusas.<br><br>Solo los miembros puramente élites mantienen su palabra de honor inquebrantable en más de 4 áreas a la vez durante mucho tiempo.', '🏛️')">
             <div class="stat-val" style="font-family:var(--font-head);">${compromisos.length}</div>
             <div class="stat-lbl">Pilares activos</div>
           </div>
@@ -137,7 +139,7 @@ function renderOath(data) {
       </div>
 
       <!-- RANGO ACTUAL -->
-      <div class="card flex" style="align-items:center;gap:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
+      <div class="card flex stagger-up stagger-4 tappable" style="align-items:center;gap:var(--s4);" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
         <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
         <div>
           <div class="text-xs text-muted uppercase ls-wide" style="margin-bottom:3px;">Tu Rango</div>
@@ -149,9 +151,9 @@ function renderOath(data) {
       </div>
 
       <!-- ACCIÓN PRINCIPAL DEL PACTO -->
-      <div style="padding:8px 0 24px;">
-        <button onclick="navigateTo('add_habit')"
-          style="width:100%;padding:18px 24px;border:none;border-radius:var(--r-lg);cursor:pointer;
+      <div class="stagger-up stagger-5" style="padding:8px 0 24px;">
+        <button onclick="navigateTo('add_habit')" class="tappable"
+          style="width:100%;padding:18px 24px;border:none;border-radius:var(--r-lg);
             font-family:var(--font-head);font-size:15px;font-weight:900;color:#0A0A0F;letter-spacing:0.06em;
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
             box-shadow:0 0 30px rgba(212,168,67,0.25);
