@@ -6,10 +6,13 @@
 const AREAS_CATALOG = [
   { id: 'SALUD_FISICA',   emoji: '🏃', nombre: 'Salud Física',      desc: 'Cuerpo como arma' },
   { id: 'SALUD_MENTAL',   emoji: '🧠', nombre: 'Mente Clara',        desc: 'Control total' },
+  { id: 'ANTI_ADICCION',  emoji: '🚫', nombre: 'Sobriedad',          desc: 'Domar el impulso' },
   { id: 'FINANZAS',       emoji: '💰', nombre: 'Finanzas',           desc: 'Libertad real' },
+  { id: 'CARRERA',        emoji: '🚀', nombre: 'Carrera',            desc: 'Impacto y dominio' },
   { id: 'PRODUCTIVIDAD',  emoji: '⚡', nombre: 'Productividad',      desc: 'Máximo rendimiento' },
   { id: 'RELACIONES',     emoji: '🤝', nombre: 'Relaciones',         desc: 'El círculo correcto' },
   { id: 'CRECIMIENTO',    emoji: '📚', nombre: 'Crecimiento',        desc: 'Ventaja cognitiva' },
+  { id: 'ENTORNO',        emoji: '🏠', nombre: 'Entorno',            desc: 'Control del caos' },
   { id: 'ESPIRITUALIDAD', emoji: '🙏', nombre: 'Espiritualidad',     desc: 'Propósito profundo' },
   { id: 'PERSONALIZADO',  emoji: '🎯', nombre: 'Personalizado',      desc: 'Tu campo único' },
 ];
@@ -38,7 +41,7 @@ function renderObAreas() {
         ${AREAS_CATALOG.map(a => {
           const sel = selected.includes(a.id);
           return `
-            <div id="area-${a.id}" class="area-card ${sel ? 'active' : ''}" onclick="toggleArea('${a.id}')">
+            <div id="area-${a.id}" class="area-card tappable ${sel ? 'active' : ''}" onclick="toggleArea('${a.id}')">
                <div class="area-bg-glow"></div>
                <div class="area-content">
                   <div class="area-icon-wrap">
@@ -68,7 +71,7 @@ function renderObAreas() {
         </div>
 
         <button onclick="obAreasProceed()"
-          id="areasBtn" class="btn-premium"
+          id="areasBtn" class="btn-premium tappable"
           style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;
             border-radius:var(--r-xl);font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:0.04em;
             transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
