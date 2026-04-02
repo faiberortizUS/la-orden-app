@@ -44,7 +44,7 @@ function renderHome(data) {
 
       <!-- BIENVENIDA si es nuevo sin compromisos -->
       ${sinCompromisos ? `
-        <div class="card" style="text-align:center; padding:var(--s6); border-color:var(--border-gold);">
+        <div class="card stagger-up stagger-1" style="text-align:center; padding:var(--s6); border-color:var(--border-gold);">
           <div style="font-size:40px; margin-bottom:12px;">🏛️</div>
           <div class="fw-800 text-gold" style="font-size:18px; font-family:var(--font-head); margin-bottom:8px;">
             Bienvenido, ${user.nombre || 'Arquitecto'}
@@ -54,13 +54,13 @@ function renderHome(data) {
             Completa tu <strong>Juramento de Acero</strong> para activar el sistema.
           </div>
           <div style="margin-top:16px;">
-            <button onclick="startOnboarding()" class="badge-chip badge-chip--gold" style="border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;">🏛️ Iniciar Incorporación</button>
+            <button onclick="startOnboarding()" class="badge-chip badge-chip--gold tappable" style="border:none;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;">🏛️ Iniciar Incorporación</button>
           </div>
         </div>
       ` : ''}
 
       <!-- ICD HERO CARD -->
-      <div class="card card--glass card--gold" style="cursor:pointer;" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
+      <div class="card card--glass card--gold stagger-up stagger-1 tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
         <div class="gauge-wrap">
           <svg class="gauge-svg" viewBox="0 0 180 180">
             <defs>
@@ -98,7 +98,7 @@ function renderHome(data) {
       </div>
 
       <!-- STREAK CARD -->
-      <div class="card card--fire" style="padding:var(--s4); cursor:pointer;" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
+      <div class="card card--fire stagger-up stagger-2 tappable" style="padding:var(--s4);" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
         <div class="streak-card" style="padding:0;">
           <div class="streak-fire">🔥</div>
           <div class="streak-info">
@@ -118,13 +118,13 @@ function renderHome(data) {
       </div>
 
       <!-- STATS ROW -->
-      <div class="stat-row">
-        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escalera de Rangos de La Orden', 'Tu rango define tu identidad dentro del círculo. <b>Cada día sin reportar deteriora tu ICD</b> y te aleja del siguiente nivel.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Solo el 1% alcanza Custodio. Sin acción diaria, el sistema te retrograda automáticamente.', '${rangoEmoji}')">
+      <div class="stat-row stagger-up stagger-3">
+        <div class="stat-chip tappable" onclick="showInteractiveModal('Escalera de Rangos de La Orden', 'Tu rango define tu identidad dentro del círculo. <b>Cada día sin reportar deteriora tu ICD</b> y te aleja del siguiente nivel.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Solo el 1% alcanza Custodio. Sin acción diaria, el sistema te retrograda automáticamente.', '${rangoEmoji}')">
           <div class="stat-val stat-val--gold">${rangoEmoji}</div>
           <div class="stat-lbl">${rangoNombre}</div>
           <div class="stat-delta">${user.tendencia || '→'}</div>
         </div>
-        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escudos de Protección', 'Al cumplir 14 días ininterrumpidos protegiendo la línea ganas 1 Escudo.<br><br>Si fallas un día por completo, el sistema consumirá un escudo automáticamente en lugar de destruir tu racha a cero. Es tu seguro de vida.<br><br>⚠️ <b>Sin escudos, 1 día fallado = racha a cero.</b> Acumúlalos antes de que los necesites.', '🛡️')">
+        <div class="stat-chip tappable" onclick="showInteractiveModal('Escudos de Protección', 'Al cumplir 14 días ininterrumpidos protegiendo la línea ganas 1 Escudo.<br><br>Si fallas un día por completo, el sistema consumirá un escudo automáticamente en lugar de destruir tu racha a cero. Es tu seguro de vida.<br><br>⚠️ <b>Sin escudos, 1 día fallado = racha a cero.</b> Acumúlalos antes de que los necesites.', '🛡️')">
           <div class="stat-val">🛡️ ${user.escudos || 0}</div>
           <div class="stat-lbl">Escudos activos</div>
           <div class="stat-delta">Cada 14 días</div>
@@ -133,7 +133,7 @@ function renderHome(data) {
 
       <!-- MISIONES DEL DÍA (solo si hay compromisos) -->
       ${!sinCompromisos ? `
-        <div>
+        <div class="stagger-up stagger-4">
           <div class="missions-header">
             <span class="section-title">Misiones de hoy</span>
             <span class="missions-count">${doneCount}/${activos.length}</span>
@@ -144,7 +144,7 @@ function renderHome(data) {
           </div>
           <div class="mission-list">
             ${activos.map(c => `
-              <div class="mission-item ${c.hecho ? 'done' : ''}" onclick="selectMission('${c.id}')">
+              <div class="mission-item tappable ${c.hecho ? 'done' : ''}" onclick="selectMission('${c.id}')">
                 <span class="mission-emoji">${c.emoji}</span>
                 <div class="mission-info">
                   <div class="mission-name">${c.nombre}</div>
@@ -158,7 +158,7 @@ function renderHome(data) {
             `).join('')}
             
             ${inactivos.map(c => `
-              <div class="mission-item" onclick="selectMission('${c.id}')" style="opacity: 0.8; cursor: pointer; background: rgba(255,255,255,0.02); border: 1px dashed var(--border);">
+              <div class="mission-item tappable" onclick="selectMission('${c.id}')" style="opacity: 0.8; background: rgba(255,255,255,0.02); border: 1px dashed var(--border);">
                 <span class="mission-emoji" style="filter: grayscale(0.5);">${c.emoji}</span>
                 <div class="mission-info">
                   <div class="mission-name" style="color: var(--text-2);">${c.nombre}</div>
@@ -172,14 +172,14 @@ function renderHome(data) {
           </div>
           
           <div style="margin-top:24px;">
-            <button onclick="navigateTo('add_habit')" style="width:100%;height:50px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.2);color:var(--text-3);cursor:pointer;font-family:var(--font-head);font-weight:700;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:0.05em;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+            <button onclick="navigateTo('add_habit')" class="tappable" style="width:100%;height:50px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.2);color:var(--text-3);border:none;font-family:var(--font-head);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">
               <span>➕ FORJAR NUEVA MISIÓN</span>
             </button>
           </div>
         </div>
 
         ${todoCompleto ? `
-          <div class="card" style="text-align:center; border-color:var(--border-gold);
+          <div class="card stagger-up stagger-5" style="text-align:center; border-color:var(--border-gold);
             background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(212,168,67,0.03));">
             <div style="font-size:32px; margin-bottom:8px;">🌟</div>
             <div class="fw-700 text-gold" style="font-size:16px;font-family:var(--font-head);">¡Hoy conquistaste todo!</div>
