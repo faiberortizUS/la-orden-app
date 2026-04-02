@@ -16,7 +16,7 @@ function renderCelula(data) {
     <div class="view" id="view-celula">
 
       <!-- Tu posición destacada -->
-      <div class="card card--glass card--gold" style="text-align:center; padding: var(--s6); cursor:pointer;" onclick="showInteractiveModal('Ley de la Hermandad Táctica', 'La Célula es presión social pura. O eres el miembro incansable que eleva al resto de los guerreros, o eres tú el ancla que empuja la integridad general al abismo.<br><br><b>🏆 El Leaderboard es implacable:</b> Ordena asimétricamente a los miembros comparando estrictamente las puntuaciones de ICD.', '⚔️')">
+      <div class="card card--glass card--gold stagger-up stagger-1 tappable ${myPos === 1 ? 'breathe-gold' : ''}" style="text-align:center; padding: var(--s6);" onclick="showInteractiveModal('Ley de la Hermandad Táctica', 'La Célula es presión social pura. O eres el miembro incansable que eleva al resto de los guerreros, o eres tú el ancla que empuja la integridad general al abismo.<br><br><b>🏆 El Leaderboard es implacable:</b> Ordena asimétricamente a los miembros comparando estrictamente las puntuaciones de ICD.', '⚔️')">
         <div style="font-size:11px; font-weight:600; letter-spacing:0.12em; color:var(--text-3); text-transform:uppercase; margin-bottom:8px;">
           Tu posición en la Célula
         </div>
@@ -31,7 +31,7 @@ function renderCelula(data) {
       </div>
 
       <!-- CTA Compartir -->
-      <button onclick="compartirRanking()" style="
+      <button onclick="compartirRanking()" class="stagger-up stagger-2 tappable" style="
         width:100%; padding:var(--s3) var(--s4);
         background:var(--bg-elevated); border:1px solid var(--border);
         border-radius:var(--r-md); color:var(--text-2); font-size:13px;
@@ -43,7 +43,7 @@ function renderCelula(data) {
       </button>
 
       <!-- Tabla de la Célula -->
-      <div class="card" style="padding:var(--s4);">
+      <div class="card stagger-up stagger-3" style="padding:var(--s4);">
         <div class="section-title" style="margin-bottom:var(--s4);">${user.celula}</div>
 
         ${sorted.map((m, i) => {
@@ -53,7 +53,7 @@ function renderCelula(data) {
           const maxIcd   = sorted[0].icd;
 
           return `
-            <div class="celula-rank-item ${m.yo ? 'me' : ''}">
+            <div class="celula-rank-item tappable ${m.yo ? 'me' : ''}" onclick="if(window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light')">
               <div class="celula-pos ${posClass}">${posLabel}</div>
               <div class="celula-avatar">${m.yo ? '👤' : '👥'}</div>
               <div class="celula-info">
@@ -71,7 +71,7 @@ function renderCelula(data) {
       </div>
 
       <!-- Motivación de la célula -->
-      <div class="card" style="border-color:var(--border-gold); background:linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02));">
+      <div class="card stagger-up stagger-4" style="border-color:var(--border-gold); background:linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02));">
         <div class="fw-700" style="color:var(--gold); font-size:14px; margin-bottom:8px;">🤝 Ley de la Célula</div>
         <div class="text-sm text-muted" style="line-height:1.6;">
           Tu Célula ve tu progreso. Tu negligencia los afecta. Tu excelencia los eleva.
