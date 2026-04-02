@@ -71,7 +71,7 @@ function renderAddHabit(data) {
           </select>
         </div>
         
-        <button id="saveHabitBtn" onclick="saveNewHabit()" 
+      <button id="saveHabitBtn" onclick="saveNewHabit()" 
           style="width:100%; margin-top:16px; padding:18px 24px; border:none; border-radius:var(--r-lg); cursor:pointer; 
                  font-family:var(--font-head); font-size:16px; font-weight:900; color:#0A0A0F; letter-spacing:0.06em; 
                  background:linear-gradient(135deg,var(--gold-dim),var(--gold)); box-shadow:0 0 30px rgba(212,168,67,0.2);">
@@ -81,6 +81,11 @@ function renderAddHabit(data) {
 
     </div>
   `;
+}
+
+function initAddHabitView() {
+  // Inicializar sugerencias con el area por defecto al cargar la vista
+  requestAnimationFrame(() => updateActivitySuggestions());
 }
 
 // Catálogo de sugerencias por área con descripción científica
@@ -151,8 +156,24 @@ function updateActivitySuggestions() {
   const catalog = ADD_HABIT_CATALOG[area] || [];
   if (catalog.length === 0) {
     container.innerHTML = '';
+    // Limpiar para area personalizada
+    const nameInput = document.getElementById('newHabitName');
+    const uniInput  = document.getElementById('newHabitUnidad');
+    const metaInput = document.getElementById('newHabitMeta');
+    if (nameInput) nameInput.value = '';
+    if (uniInput)  uniInput.value  = '';
+    if (metaInput) metaInput.value = '';
     return;
   }
+
+  // Auto-rellenar con la primera actividad sugerida del area
+  const primera = catalog[0];
+  const nameInput = document.getElementById('newHabitName');
+  const uniInput  = document.getElementById('newHabitUnidad');
+  const metaInput = document.getElementById('newHabitMeta');
+  if (nameInput) nameInput.value = primera.nombre;
+  if (uniInput)  uniInput.value  = primera.unidad;
+  if (metaInput) metaInput.value = primera.meta;
   
   container.innerHTML = `
     <div style="margin-bottom:12px;">
@@ -183,6 +204,7 @@ function updateActivitySuggestions() {
     </div>
   `;
 }
+
 
 function selectSuggestedActivity(nombre, unidad, meta, info) {
   const nameInput = document.getElementById('newHabitName');
