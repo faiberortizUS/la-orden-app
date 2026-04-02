@@ -343,7 +343,33 @@ function _handleBackAction() {
     }
   }
 
-  // 4. Navegación normal App
+  // 4. ⚠️ REPORTE EN CURSO — si el usuario está dentro del input de una misión
+  //    el botón atrás NO debe salir silenciosamente: lanzar fricción de cancelación.
+  const reportInput = document.getElementById('view-report-input');
+  if (reportInput) {
+    if (window.Telegram?.WebApp?.showPopup) {
+      window.Telegram.WebApp.showPopup({
+        title: '⚠️ Misión sin sellar',
+        message: 'Estás a punto de abandonar este reporte.\n\nSi sales ahora, tu avance NO se registrará y perderás los PC de esta victoria.\n\n¿Seguro que quieres rendirte?',
+        buttons: [
+          { id: 'abandon', type: 'destructive', text: 'Sí, abandonar misión' },
+          { id: 'stay',    type: 'default',     text: '¡No! Sellar mi victoria' }
+        ]
+      }, (buttonId) => {
+        if (buttonId === 'abandon') navigateTo('report');
+      });
+    } else {
+      // Fallback navegadores sin Telegram
+      const ok = window.confirm('⚠️ Misión sin sellar\n\nSi sales ahora tu avance NO se registrará.\n\n¿Seguro que quieres abandonar sin reportar?');
+      if (ok) navigateTo('report');
+    }
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+    }
+    return;
+  }
+
+  // 5. Navegación normal App
   if (currentView !== 'home') {
     navigateTo('home');
   } else {
