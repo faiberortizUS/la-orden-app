@@ -172,48 +172,51 @@ function navigateTo(view, params) {
     el.classList.toggle('active', el.dataset.view === view);
   });
 
+  // Haptic feedback on navigation
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.selectionChanged();
+  }
+
+  // Double Push popstate para friction
+  history.pushState({ view: view, params: params }, '', '');
+
   const container = document.getElementById('viewContainer');
   let html = '';
 
-  switch (view) {
-    case 'home':
-      html = renderHome(appData);
-      break;
-    case 'report':
-      html = renderReport(appData, params);
-      break;
-    case 'stats':
-      html = renderStats(appData);
-      break;
-    case 'oath':
-      html = renderOath(appData);
-      break;
-    case 'celula':
-      html = renderCelula(appData);
-      break;
-    case 'add_habit':
-      html = renderAddHabit(appData);
-      break;
-    case 'command_center': {
-      const isFirst = localStorage.getItem('laorden_first_visit') === '1';
-      html = renderCommandCenter(appData, isFirst);
-      if (isFirst) localStorage.removeItem('laorden_first_visit');
-      break;
-    }
-    default:
-      html = renderHome(appData);
-  }
+  // Transición suave al cambiar vista
+  container.style.opacity = '0.4';
+  container.style.transition = 'opacity 0.15s ease-out';
 
-  container.innerHTML = html;
-  container.scrollTop = 0;
-
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     switch (view) {
-      case 'home':      initHomeAnimations();  break;
-      case 'stats':     initStatsAnimations(); break;
-      case 'add_habit': initAddHabitView();    break;
+      case 'home':      html = renderHome(appData); break;
+      case 'report':    html = renderReport(appData, params); break;
+      case 'stats':     html = renderStats(appData); break;
+      case 'oath':      html = renderOath(appData); break;
+      case 'celula':    html = renderCelula(appData); break;
+      case 'add_habit': html = renderAddHabit(appData); break;
+      case 'command_center': {
+        const isFirst = localStorage.getItem('laorden_first_visit') === '1';
+        html = renderCommandCenter(appData, isFirst);
+        if (isFirst) localStorage.removeItem('laorden_first_visit');
+        break;
+      }
+      default:          html = renderHome(appData);
     }
-  });
+  
+    container.innerHTML = html;
+    container.scrollTop = 0;
+    container.style.opacity = '1';
+  
+    requestAnimationFrame(() => {
+      switch (view) {
+        case 'home':      if (typeof initHomeAnimations === 'function') initHomeAnimations();  break;
+        case 'stats':     if (typeof initStatsAnimations === 'function') initStatsAnimations(); break;
+        case 'add_habit': if (typeof initAddHabitView === 'function') initAddHabitView();    break;
+        case 'command_center': if (typeof initCommandCenterAnimations === 'function') initCommandCenterAnimations(); break;
+      }
+    });
+  }, 100);
 }
 
 // --- EFECTO MISTICO (CHISPAS DE LA ORDEN) ----------------------
