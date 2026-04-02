@@ -44,7 +44,7 @@ function renderObWelcome() {
         </div>
 
         <!-- Botón — visible por defecto, sin depender de animaciones -->
-        <button id="ob-cta" onclick="obWelcomeProceed()"
+        <button id="ob-cta" class="tappable" onclick="obWelcomeProceed()"
           style="width:100%;padding:18px 24px;
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
             border:none;border-radius:var(--r-lg);cursor:pointer;
