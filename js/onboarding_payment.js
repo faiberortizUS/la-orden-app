@@ -82,7 +82,7 @@ function renderObPayment() {
           <div style="margin-top:10px;">${_renderBeneficios('var(--gold)')}</div>
         </details>
         <div style="padding:0 18px 18px;">
-          <button onclick="openStripePayment('MENSUAL')"
+          <button class="tappable" onclick="openStripePayment('MENSUAL')"
             style="width:100%;padding:13px;border:1px solid var(--border);border-radius:var(--r-lg);
               cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:800;
               background:var(--bg-overlay);color:var(--text-1);">
@@ -113,7 +113,7 @@ function renderObPayment() {
           <div style="margin-top:10px;">${_renderBeneficios('var(--gold)')}</div>
         </details>
         <div style="padding:0 18px 18px;">
-          <button onclick="openStripePayment('SEMESTRAL')"
+          <button class="tappable" onclick="openStripePayment('SEMESTRAL')"
             style="width:100%;padding:16px;border:none;border-radius:var(--r-lg);
               cursor:pointer;font-family:var(--font-head);font-size:15px;font-weight:800;
               background:linear-gradient(135deg,var(--gold-dim),var(--gold));
@@ -140,7 +140,7 @@ function renderObPayment() {
           <div style="margin-top:10px;">${_renderBeneficios('var(--electric)')}</div>
         </details>
         <div style="padding:0 18px 18px;">
-          <button onclick="openStripePayment('ANUAL')"
+          <button class="tappable" onclick="openStripePayment('ANUAL')"
             style="width:100%;padding:13px;border:1px solid var(--electric);border-radius:var(--r-lg);
               cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:800;
               background:rgba(123,97,255,0.12);color:var(--text-1);">
