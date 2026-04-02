@@ -379,7 +379,14 @@ function renderStats(data) {
       <!-- ═══════════════════════════════════════════════════════ -->
       <!-- 7. CONTRATO ACTIVO (si existe)                          -->
       <!-- ═══════════════════════════════════════════════════════ -->
-      ${contrato ? `
+      ${contrato ? (() => {
+        // Días con reporte real (del historial global), no diferencia de fechas
+        const globalHist = historial ? (historial.GLOBAL || []) : [];
+        const diasConReporteContrato = globalHist.filter(n => n > 0).length;
+        const progresoReal = diasConReporteContrato > 0
+          ? Math.min(100, Math.round((diasConReporteContrato / contrato.diasTotales) * 100))
+          : 0;
+        return `
         <div class="card" style="margin-top:10px;">
           <div class="section-title" style="margin-bottom:12px;">📜 Contrato Activo</div>
           <div style="display:flex; align-items:center; gap:14px;">
@@ -394,17 +401,18 @@ function renderStats(data) {
                 <span>${contrato.diasTotales} días totales</span>
               </div>
               <div style="background:var(--bg-elevated); border-radius:99px; height:5px; overflow:hidden;">
-                <div style="height:5px; border-radius:99px; width:${100 - Math.round((diasRestantes / contrato.diasTotales)*100)}%;
+                <div style="height:5px; border-radius:99px; width:${progresoReal}%;
                   background:${diasRestantes <= 5 ? 'var(--fire)' : 'linear-gradient(90deg,var(--gold-dim),var(--gold))'};
                   transition:width 1s ease;"></div>
               </div>
               <div style="font-size:10px; color:var(--text-3); margin-top:4px; text-align:right;">
-                ${100 - Math.round((diasRestantes / contrato.diasTotales)*100)}% transcurrido
+                ${diasConReporteContrato > 0 ? progresoReal + '% · ' + diasConReporteContrato + ' días con reporte' : 'Sin reportes aún — progreso en 0%'}
               </div>
             </div>
           </div>
         </div>
-      ` : ''}
+        `;
+      })() : ''}
 
     </div>
   `;
