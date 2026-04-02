@@ -40,7 +40,8 @@ function renderOath(data) {
   const { numero, inicio, fin, diasTotales, diasRestantes, renovaciones } = contrato;
 
   // Días reportados = días con al menos un log (nivel > 0 en historial)
-  const diasConReporte = (historial || []).filter(n => n > 0).length;
+  const globalHist = historial ? (historial.GLOBAL || []) : [];
+  const diasConReporte = globalHist.filter(n => n > 0).length;
 
   // Progreso real = solo si hay reportes
   const diasEjecutados       = diasConReporte;
