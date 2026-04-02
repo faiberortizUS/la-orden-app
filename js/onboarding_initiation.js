@@ -13,7 +13,7 @@ const INITIATION_SLIDES = [
   {
     icon: '📊',
     title: 'TU ICD Y LA CAÍDA',
-    text: `El activo más valioso aquí es tu <b>ICD (Índice de Consistencia Disciplinada)</b>.<br><br>Este número mide quién eres cuando nadie mira. Romper tu compromiso un día te restará puntos. Romperlo dos días seguidos te castigará brutalmente debido a la aversión a la pérdida. <i>La intensidad importa poco si no hay consistencia.</i>`,
+    text: `El activo más valioso aquí es tu <b>ICD (Índice de Consistencia Disciplinada)</b>.<br><br>Este número mide quién eres cuando nadie te observa. Si rompes tu compromiso un día, <b>perderás puntos acumulados que te costaron semanas construir</b>. Romperlo dos días seguidos activa una penalización brutal — el sistema te castiga de forma exponencial porque la debilidad repetida destruye identidad.<br><br><i>La intensidad importa poco si no hay consistencia.</i>`,
     button: 'Acepto las reglas'
   },
   {
@@ -69,7 +69,7 @@ async function renderObInitiationAsync(container) {
          </div>
 
          <!-- CTA -->
-         <button id="init-next-btn" class="btn-premium" style="width:100%;margin-top:20px;height:56px;display:flex;align-items:center;justify-content:center;font-size:16px;letter-spacing:1px;" onclick="nextInitiationSlide()">
+         <button id="init-next-btn" style="width:100%;margin-top:20px;height:56px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-1);border-radius:var(--r-xl);transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="nextInitiationSlide()">
            ${INITIATION_SLIDES[0].button}
          </button>
       </div>
@@ -115,10 +115,11 @@ function nextInitiationSlide() {
         btn.innerHTML = INITIATION_SLIDES[currentSlideIndex].button;
         btn.style.opacity = '1';
         
-        // Estilización de botón para la última diapositiva (Pagar)
-        if(currentSlideIndex === INITIATION_SLIDES.length - 1) {
+        // Botón dorado premium desde el slide 1 en adelante
+        if (currentSlideIndex >= 1) {
            btn.style.background = 'linear-gradient(135deg, var(--gold-dim), var(--gold))';
            btn.style.color = '#0A0A0F';
+           btn.style.border = 'none';
            btn.style.boxShadow = '0 0 30px rgba(212,168,67,0.4)';
         }
       }, 200);
