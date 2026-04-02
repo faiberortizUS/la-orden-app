@@ -90,13 +90,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── TRAMPA PARA EL BOTÓN FÍSICO DE RETROCESO (Android) ──
-  // Empujamos un estado falso al historial. Cuando el usuario aprieta
-  // "Atrás" en el celular, el navegador vuelve a este estado (popstate)
-  // en lugar de cerrar la app. Nosotros interceptamos y manejamos la lógica.
-  history.pushState({ laorden: true }, '');
-  window.addEventListener('popstate', () => {
-    // Volver a poner el estado trampa para la próxima pulsación
-    history.pushState({ laorden: true }, '');
+  // Forzamos un historial infinito para que el botón atrás de hardware 
+  // NUNCA cierre la app nativamente, sino que pase por nuestra fricción.
+  history.pushState({ laorden: 'trap' }, '', window.location.href);
+  window.addEventListener('popstate', (e) => {
+    // Volver a poner el estado trampa de inmediato
+    history.pushState({ laorden: 'trap' }, '', window.location.href);
     _handleBackAction();
   });
 
@@ -318,19 +317,29 @@ function stopConfetti() {
 // Función unificada de "acción atrás" — usada tanto por el
 // BackButton de Telegram como por el botón físico del celular.
 function _handleBackAction() {
-  // Si hay un onboarding activo, retroceder dentro del onboarding
-  const obContainer = document.getElementById('onboardingContainer');
-  if (obContainer && obContainer.style.display !== 'none') {
-    obPrev();
-    return;
-  }
-  // Si hay un modal abierto, cerrarlo
+  // 1. Si hay modal abierto, se cierra
   const modal = document.getElementById('interactiveModal');
   if (modal) { modal.remove(); return; }
-  // Si hay un locked dashboard activo, no hacer nada (solo el CTA puede salir)
+
+  // 2. Si el Locked Dashboard está activo (Usuarios morosos), no lo dejamos salir sin fricción
   const ld = document.getElementById('lockedDashboard');
-  if (ld && ld.style.display !== 'none') { return; }
-  // Navegación normal del dashboard
+  if (ld && ld.style.display !== 'none') { 
+    _mostrarPopupSalida(); 
+    return; 
+  }
+
+  // 3. Onboarding
+  const obContainer = document.getElementById('onboardingContainer');
+  if (obContainer && obContainer.style.display !== 'none') {
+    if (typeof OB !== 'undefined' && OB.step > 0) {
+      obPrev();
+    } else {
+      _mostrarPopupSalida(); // Si está en el primer paso y presiona atrás
+    }
+    return;
+  }
+
+  // 4. Navegación normal App
   if (currentView !== 'home') {
     navigateTo('home');
   } else {
@@ -358,11 +367,11 @@ function _mostrarPopupSalida() {
   const tg = window.Telegram?.WebApp;
   if (tg && tg.showPopup) {
     tg.showPopup({
-      title: '¿Abandonar la base?',
-      message: 'Tus objetivos no se cumplen solos. ¿Seguro que quieres retirarte?',
+      title: '⚠️ PRUEBA DE IDENTIDAD',
+      message: 'Los turistas huyen cuando aparece la fricción. Los arquitectos del 1% se quedan y construyen.\n\n¿Estás seguro que deseas abandonar el sistema ahora mismo y romper tu racha?',
       buttons: [
-        {id: 'close', type: 'destructive', text: 'Retirarme'},
-        {id: 'stay', type: 'default', text: 'Continuar luchando'}
+        {id: 'close', type: 'destructive', text: 'Salir (Rendirme)'},
+        {id: 'stay', type: 'default', text: 'Forjar mi legado (Quedarme)'}
       ]
     }, (buttonId) => {
       if (buttonId === 'close') tg.close();
