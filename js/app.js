@@ -209,8 +209,9 @@ function navigateTo(view, params) {
 
   requestAnimationFrame(() => {
     switch (view) {
-      case 'home':  initHomeAnimations();  break;
-      case 'stats': initStatsAnimations(); break;
+      case 'home':      initHomeAnimations();  break;
+      case 'stats':     initStatsAnimations(); break;
+      case 'add_habit': initAddHabitView();    break;
     }
   });
 }
@@ -379,6 +380,12 @@ function _mostrarPopupSalida() {
     }, (buttonId) => {
       if (buttonId === 'close') tg.close();
     });
+  } else {
+    // Fallback para navegadores sin Telegram WebApp (desarrollo / iOS sin popup API)
+    const confirm = window.confirm('⚠️ PRUEBA DE IDENTIDAD\n\nLos turistas huyen cuando aparece la fricción. Los arquitectos del 1% se quedan y construyen.\n\n¿Estás seguro que deseas abandonar el sistema y romper tu racha?');
+    // No hacemos nada si el usuario quiere quedarse; si quiere salir, vuelve uno en el historial
+    // (en Telegram WebApp la página no se cierra sola con history.back())
+    if (confirm && tg) tg.close();
   }
 }
 
