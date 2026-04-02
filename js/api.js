@@ -162,7 +162,31 @@ async function postReport(compromisoId, valor) {
   }
 }
 
+/* ─── CIERRE DE DÍA (auto-sellado cuando se completan todas las misiones) ─── */
+async function closeDay() {
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  if (!tg) return { ok: true };
+  try {
+    const body = { action: 'CLOSE_DAY' };
+    if (tg.initData) body.initData = tg.initData;
+    else if (tg.initDataUnsafe && tg.initDataUnsafe.user) body.tid = String(tg.initDataUnsafe.user.id);
+
+    const resp = await fetch(GAS_API_URL, {
+      method:   'POST',
+      redirect: 'follow',
+      headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+      body:     JSON.stringify(body),
+    });
+    if (!resp.ok) return { ok: false };
+    return await resp.json();
+  } catch(e) {
+    console.warn('[LaOrden] closeDay falló (no crítico):', e.message);
+    return { ok: false };
+  }
+}
+
 /* ─── ONBOARDING API ─────────────────────────────────────── */
+
 
 /** Catálogo de compromisos para un área */
 async function fetchCatalog(areaId) {
