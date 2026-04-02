@@ -101,36 +101,36 @@ function renderCommandCenter(data, isFirstTime) {
 
       <!-- Stats rápidos del usuario (si tiene datos) -->
       ${user.icd !== undefined ? `
-        <div style="display:flex;gap:10px;padding:0 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 16px 16px;">
           <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);
-            border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
             onclick="showInteractiveModal('🎯 ICD — Tu Activo Más Frágil', 'El ICD no sube de golpe. Cae en horas. Sube en semanas.<br><br>Cada día sin reportar, el sistema registra 0% de cumplimiento y ese cero se promedia sobre 28 días.<br><br><b>Lo que pierdes al fallar:</b><br>• 1 día → hasta −4 puntos<br>• 2 días seguidos → penalización exponencial<br>• Caer de 85 a 70 toma 3 semanas recuperar<br><br>El sistema no olvida. Tú tampoco puedes permitirte olvidar.', '🎯')">
-            <div style="font-size:20px;font-weight:900;color:var(--gold);font-family:var(--font-head);">${user.icd || 0}</div>
-            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ICD</div>
+            <div style="font-size:18px;font-weight:900;color:var(--gold);font-family:var(--font-head);line-height:1.2;">${user.icd || 0}</div>
+            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">ICD</div>
           </div>
           <div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
-            border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
             onclick="showInteractiveModal('Linea Activa (Fuego)', 'Tu racha actual. Un mal dia? Salva todo cumpliendo tan solo 1 pilar de tu pacto.', '🔥')">
-            <div style="font-size:20px;font-weight:900;color:var(--fire);font-family:var(--font-head);">${user.lineaActiva || 0}🔥</div>
-            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">RACHA</div>
+            <div style="font-size:18px;font-weight:900;color:var(--fire);font-family:var(--font-head);line-height:1.2;">${user.lineaActiva || 0}🔥</div>
+            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">RACHA</div>
           </div>
           <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);
-            border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
             onclick="showInteractiveModal('Escudos Protectores', 'Salvan tu racha cuando fracasas rotundamente al reportar todo un dia. Ganalos manteniendo un fuego largo e ininterrumpido.', '🛡️')">
-            <div style="font-size:20px;font-weight:900;color:#EAB308;font-family:var(--font-head);">${user.escudos || 0}🛡️</div>
-            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">ESCUDOS</div>
+            <div style="font-size:18px;font-weight:900;color:#EAB308;font-family:var(--font-head);line-height:1.2;">${user.escudos || 0}🛡️</div>
+            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">ESCUDOS</div>
           </div>
           <div style="background:rgba(123,97,255,0.08);border:1px solid rgba(123,97,255,0.2);
-            border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
             onclick="showInteractiveModal('Puntos PC', 'Divisa interna. Usalos como comprobante empirico de que honraste cada meta diaria.', '⚡')">
-            <div style="font-size:20px;font-weight:900;color:var(--electric);font-family:var(--font-head);">${Number(user.pcTotal||0).toLocaleString('es-CO')}</div>
-            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">PC</div>
+            <div style="font-size:18px;font-weight:900;color:var(--electric);font-family:var(--font-head);line-height:1.2;">${Number(user.pcTotal||0).toLocaleString('es-CO')}</div>
+            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">PC</div>
           </div>
           <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);
-            border-radius:var(--r-md);padding:12px 14px;min-width:80px;text-align:center;flex-shrink:0;cursor:pointer;" 
+            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
             onclick="showInteractiveModal('Rango', 'Demuestra quien eres dentro de tu Celula de rendimiento. Escala posiciones logrando ascensos tacticos.', '👑')">
-            <div style="font-size:20px;font-weight:900;color:#A855F7;font-family:var(--font-head);">${(user.rango||'🌱').split(' ')[0]}</div>
-            <div style="font-size:10px;color:var(--text-3);letter-spacing:0.1em;">RANGO</div>
+            <div style="font-size:18px;font-weight:900;color:#A855F7;font-family:var(--font-head);line-height:1.2;">${(user.rango||'🌱').split(' ')[0]}</div>
+            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">RANGO</div>
           </div>
         </div>
       ` : ''}
