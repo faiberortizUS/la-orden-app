@@ -69,7 +69,7 @@ async function renderObInitiationAsync(container) {
          </div>
 
          <!-- CTA -->
-         <button id="init-next-btn" style="width:100%;margin-top:20px;height:56px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-1);border-radius:var(--r-xl);transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="nextInitiationSlide()">
+         <button id="init-next-btn" class="tappable" style="width:100%;margin-top:20px;height:56px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-1);border-radius:var(--r-xl);transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="nextInitiationSlide()">
            ${INITIATION_SLIDES[0].button}
          </button>
       </div>
