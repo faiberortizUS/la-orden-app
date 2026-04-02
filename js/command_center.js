@@ -80,6 +80,8 @@ const CC_ZONES = [
 function renderCommandCenter(data, isFirstTime) {
   data = data || window._appData || {};
   const user = data.user || {};
+  const icd = user.icd || 0;
+  const pcFmt = Number(user.pcTotal||0).toLocaleString('es-CO');
 
   return `
     <div class="view" id="view-command-center">
@@ -101,49 +103,44 @@ function renderCommandCenter(data, isFirstTime) {
 
       <!-- Stats rápidos del usuario (si tiene datos) -->
       ${user.icd !== undefined ? `
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 16px 16px;">
-          <div style="background:rgba(212,168,67,0.08);border:1px solid var(--border-gold);
-            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
+        <div class="stagger-up stagger-1" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 16px 16px;">
+          <div class="cc-stat-chip tappable ${icd > 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" 
             onclick="showInteractiveModal('🎯 ICD — Tu Activo Más Frágil', 'El ICD no sube de golpe. Cae en horas. Sube en semanas.<br><br>Cada día sin reportar, el sistema registra 0% de cumplimiento y ese cero se promedia sobre 28 días.<br><br><b>Lo que pierdes al fallar:</b><br>• 1 día → hasta −4 puntos<br>• 2 días seguidos → penalización exponencial<br>• Caer de 85 a 70 toma 3 semanas recuperar<br><br>El sistema no olvida. Tú tampoco puedes permitirte olvidar.', '🎯')">
-            <div style="font-size:18px;font-weight:900;color:var(--gold);font-family:var(--font-head);line-height:1.2;">${user.icd || 0}</div>
-            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">ICD</div>
+            <div class="cc-stat-val" style="color:var(--gold);">${icd}</div>
+            <div class="cc-stat-lbl">ICD</div>
           </div>
-          <div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
-            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
+          <div class="cc-stat-chip tappable" 
             onclick="showInteractiveModal('Linea Activa (Fuego)', 'Tu racha actual. Un mal dia? Salva todo cumpliendo tan solo 1 pilar de tu pacto.', '🔥')">
-            <div style="font-size:18px;font-weight:900;color:var(--fire);font-family:var(--font-head);line-height:1.2;">${user.lineaActiva || 0}🔥</div>
-            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">RACHA</div>
+            <div class="cc-stat-val" style="color:var(--fire);">${user.lineaActiva || 0}🔥</div>
+            <div class="cc-stat-lbl">RACHA</div>
           </div>
-          <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);
-            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
+          <div class="cc-stat-chip tappable" 
             onclick="showInteractiveModal('Escudos Protectores', 'Salvan tu racha cuando fracasas rotundamente al reportar todo un dia. Ganalos manteniendo un fuego largo e ininterrumpido.', '🛡️')">
-            <div style="font-size:18px;font-weight:900;color:#EAB308;font-family:var(--font-head);line-height:1.2;">${user.escudos || 0}🛡️</div>
-            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">ESCUDOS</div>
+            <div class="cc-stat-val" style="color:#EAB308;">${user.escudos || 0}🛡️</div>
+            <div class="cc-stat-lbl">ESCUDOS</div>
           </div>
-          <div style="background:rgba(123,97,255,0.08);border:1px solid rgba(123,97,255,0.2);
-            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
+          <div class="cc-stat-chip tappable" 
             onclick="showInteractiveModal('Puntos PC', 'Divisa interna. Usalos como comprobante empirico de que honraste cada meta diaria.', '⚡')">
-            <div style="font-size:18px;font-weight:900;color:var(--electric);font-family:var(--font-head);line-height:1.2;">${Number(user.pcTotal||0).toLocaleString('es-CO')}</div>
-            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">PC</div>
+            <div class="cc-stat-val" style="color:var(--electric);">${pcFmt}</div>
+            <div class="cc-stat-lbl">PC</div>
           </div>
-          <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);
-            border-radius:var(--r-md);padding:10px 6px;text-align:center;cursor:pointer;" 
+          <div class="cc-stat-chip tappable" 
             onclick="showInteractiveModal('Rango', 'Demuestra quien eres dentro de tu Celula de rendimiento. Escala posiciones logrando ascensos tacticos.', '👑')">
-            <div style="font-size:18px;font-weight:900;color:#A855F7;font-family:var(--font-head);line-height:1.2;">${(user.rango||'🌱').split(' ')[0]}</div>
-            <div style="font-size:9px;color:var(--text-3);letter-spacing:0.08em;margin-top:2px;">RANGO</div>
+            <div class="cc-stat-val" style="color:#A855F7;">${(user.rango||'🌱').split(' ')[0]}</div>
+            <div class="cc-stat-lbl">RANGO</div>
           </div>
         </div>
       ` : ''}
 
       <!-- Zonas del mapa -->
-      <div style="padding:0 20px 120px;" id="ccZones">
+      <div class="cc-grid stagger-up stagger-2" style="padding:0 20px 120px;" id="ccZones">
         ${CC_ZONES.map((z, i) => `
           <div id="cc-zone-${z.id}"
+            class="cc-card tappable"
             onclick="toggleCCZone('${z.id}')"
             style="background:var(--bg-elevated);border:1px solid var(--border);
               border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden;
-              transition:all 0.3s ease;cursor:pointer;
-              animation:cc-reveal 0.5s ease ${i * 0.12}s both;">
+              transition:all 0.3s ease;cursor:pointer;">
 
             <div style="display:flex;align-items:center;gap:12px;padding:16px;">
               <div style="width:48px;height:48px;border-radius:var(--r-md);
