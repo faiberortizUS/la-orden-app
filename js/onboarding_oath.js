@@ -61,7 +61,7 @@ function renderObOath() {
         </div>
 
         <!-- Botón de firma -->
-        <button id="oath-btn" onclick="signOath()"
+        <button id="oath-btn" class="tappable" onclick="signOath()"
           style="margin-top:24px;width:100%;max-width:360px;padding:20px 24px;
             border:none;border-radius:var(--r-lg);cursor:pointer;
             font-family:var(--font-head);font-size:16px;font-weight:900;
@@ -141,7 +141,16 @@ function initOathAnimation() {
   }, 1200);
 }
 
+let isSigning = false;
+
 async function signOath() {
+  if (isSigning) return;
+
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+  }
+
+  isSigning = true;
   const btn = document.getElementById('oath-btn');
   if (btn) { 
     btn.disabled = true; 
