@@ -6,6 +6,8 @@
 function renderHome(data) {
   const { user, compromisos } = data;
   const total        = (compromisos || []).length;
+  // activos = aplican hoy (aplicaHoy true ó undefined/null = por defecto sí aplica)
+  // inactivos = explícitamente marcados como false (no aplica hoy)
   const activos      = (compromisos || []).filter(c => c.aplicaHoy !== false);
   const inactivos    = (compromisos || []).filter(c => c.aplicaHoy === false);
   const doneCount    = activos.filter(c => c.hecho).length;
@@ -58,7 +60,7 @@ function renderHome(data) {
       ` : ''}
 
       <!-- ICD HERO CARD -->
-      <div class="card card--glass card--gold" style="cursor:pointer;" onclick="showInteractiveModal('Índice de Consistencia Disciplinada (ICD)', 'El ICD mide tu confiabilidad matemática. Se calcula analizando tus últimos 28 días de cumplimiento de 0 a 100.<br><br><b>✨ Regla del Oro:</b> Protege tu ICD como tu vida. Entrar a la <i>Zona Élite</i> (85+) requiere constancia brutal.', '🎯')">
+      <div class="card card--glass card--gold" style="cursor:pointer;" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
         <div class="gauge-wrap">
           <svg class="gauge-svg" viewBox="0 0 180 180">
             <defs>
@@ -117,12 +119,12 @@ function renderHome(data) {
 
       <!-- STATS ROW -->
       <div class="stat-row">
-        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escalera de Rangos', 'Tu rango demuestra nivel de jerarquía.<br><br><b>🌱 Aspirante:</b> El inicio.<br><b>🛡️ Escudero:</b> +50 ICD y 7 días.<br><b>⚔️ Gladiador:</b> +70 ICD y 21 días.<br><b>🏛️ Custodio:</b> +85 ICD y 60 días.<br><br>Solo el 1% sostiene su posición en Custodio.', '${rangoEmoji}')">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escalera de Rangos de La Orden', 'Tu rango define tu identidad dentro del círculo. <b>Cada día sin reportar deteriora tu ICD</b> y te aleja del siguiente nivel.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Solo el 1% alcanza Custodio. Sin acción diaria, el sistema te retrograda automáticamente.', '${rangoEmoji}')">
           <div class="stat-val stat-val--gold">${rangoEmoji}</div>
           <div class="stat-lbl">${rangoNombre}</div>
           <div class="stat-delta">${user.tendencia || '→'}</div>
         </div>
-        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escudos de Protección', 'Al cumplir 14 días ininterrumpidos protegiendo la línea ganas 1 Escudo.<br><br>Si fallas un día por completo, el sistema consumirá un escudo automáticamente en lugar de destruir tu racha a cero. Es tu seguro de vida.', '🛡️')">
+        <div class="stat-chip" style="cursor:pointer;" onclick="showInteractiveModal('Escudos de Protección', 'Al cumplir 14 días ininterrumpidos protegiendo la línea ganas 1 Escudo.<br><br>Si fallas un día por completo, el sistema consumirá un escudo automáticamente en lugar de destruir tu racha a cero. Es tu seguro de vida.<br><br>⚠️ <b>Sin escudos, 1 día fallado = racha a cero.</b> Acumúlalos antes de que los necesites.', '🛡️')">
           <div class="stat-val">🛡️ ${user.escudos || 0}</div>
           <div class="stat-lbl">Escudos activos</div>
           <div class="stat-delta">Cada 14 días</div>
@@ -167,6 +169,12 @@ function renderHome(data) {
                 <span class="mission-check" style="color: var(--text-3);">⟩</span>
               </div>
             `).join('')}
+          </div>
+          
+          <div style="margin-top:24px;">
+            <button onclick="navigateTo('add_habit')" style="width:100%;height:50px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.2);color:var(--text-3);cursor:pointer;font-family:var(--font-head);font-weight:700;transition:all 0.3s ease;text-transform:uppercase;letter-spacing:0.05em;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+              <span>➕ FORJAR NUEVA MISIÓN</span>
+            </button>
           </div>
         </div>
 
