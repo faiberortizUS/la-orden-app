@@ -774,3 +774,88 @@ html, body {
   from { opacity: 0; transform: scale(0.88) translateY(24px); }
   to   { opacity: 1; transform: scale(1)    translateY(0);    }
 }
+
+/* ===========================================================
+   SISTEMA TÁCTIL Y ANIMACIONES PREMIUM ($10K UX)
+   =========================================================== */
+
+/* ── Destello Psicológico de Urgencia ── */
+.screen-flash-danger {
+  position: fixed;
+  inset: 0;
+  background: rgba(239,68,68,0.3);
+  z-index: 9999;
+  pointer-events: none;
+  animation: flashOut 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes flashOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Feedback Físico (Hardware Feel) ── */
+.tappable {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce tactil */
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: center;
+}
+.tappable:active {
+  transform: scale(0.96); /* Sensación de presión de botón */
+  filter: brightness(0.9);
+}
+
+/* ── Entrada en Cascada (Stagger Fade Up) ── */
+.stagger-up {
+  opacity: 0;
+  animation: staggerFadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.15s; }
+.stagger-3 { animation-delay: 0.25s; }
+.stagger-4 { animation-delay: 0.35s; }
+.stagger-5 { animation-delay: 0.45s; }
+
+@keyframes staggerFadeUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Respiración Biológica (Alertas neuromarketing) ── */
+.breathe-gold {
+  animation: breatheGoldPulse 3s ease-in-out infinite;
+}
+@keyframes breatheGoldPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(212,168,67,0.15), inset 0 0 0px rgba(212,168,67,0); }
+  50%      { box-shadow: 0 0 25px rgba(212,168,67,0.4), inset 0 0 15px rgba(212,168,67,0.1); }
+}
+
+.breathe-danger {
+  animation: breatheDangerPulse 2.5s ease-in-out infinite;
+}
+@keyframes breatheDangerPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.2); }
+  50%      { box-shadow: 0 0 20px rgba(239,68,68,0.4); border-color: rgba(239,68,68,0.6); }
+}
+
+/* Tooltips Temporales Flotantes */
+.interactive-tooltip {
+  position: absolute;
+  background: rgba(10,10,15,0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--gold);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 15px rgba(212,168,67,0.2);
+  z-index: 100;
+  pointer-events: none;
+  animation: tooltipPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tooltipPop {
+  from { opacity: 0; transform: translateY(10px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
