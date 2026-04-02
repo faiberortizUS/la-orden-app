@@ -323,20 +323,23 @@ function _handleBackAction() {
 
   // 2. Si el Locked Dashboard está activo (Usuarios morosos), no lo dejamos salir sin fricción
   const ld = document.getElementById('lockedDashboard');
-  if (ld && ld.style.display !== 'none') { 
-    _mostrarPopupSalida(); 
-    return; 
+  if (ld && getComputedStyle(ld).display !== 'none') {
+    _mostrarPopupSalida();
+    return;
   }
 
-  // 3. Onboarding
+  // 3. Onboarding — verificar tanto display:flex como display:block (no 'none')
   const obContainer = document.getElementById('onboardingContainer');
-  if (obContainer && obContainer.style.display !== 'none') {
-    if (typeof OB !== 'undefined' && OB.step > 0) {
-      obPrev();
-    } else {
-      _mostrarPopupSalida(); // Si está en el primer paso y presiona atrás
+  if (obContainer) {
+    const obDisplay = obContainer.style.display || getComputedStyle(obContainer).display;
+    if (obDisplay && obDisplay !== 'none') {
+      if (typeof OB !== 'undefined' && OB.step > 0) {
+        obPrev();
+      } else {
+        _mostrarPopupSalida(); // primer paso → fricción de salida
+      }
+      return;
     }
-    return;
   }
 
   // 4. Navegación normal App
