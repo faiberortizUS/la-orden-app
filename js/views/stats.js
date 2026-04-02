@@ -97,12 +97,13 @@ function renderStats(data) {
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 1. KPI COMMAND BAR                                   -->
       <!-- ════════════════════════════════════════════════════ -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+      <div class="stagger-up stagger-1" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
 
         <!-- ICD -->
-        <div onclick="showInteractiveModal('Indice de Consistencia Disciplinada','El ICD mide tu confiabilidad matematica en los ultimos 28 dias. 100 es perfeccion absoluta. Cada dia sin reportar lo reduce exponencialmente.','🎯')"
+        <div class="tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" 
+          onclick="showInteractiveModal('Indice de Consistencia Disciplinada','El ICD mide tu confiabilidad matematica en los ultimos 28 dias. 100 es perfeccion absoluta. Cada dia sin reportar lo reduce exponencialmente.','🎯')"
           style="background:${icdZona.bg}; border:1px solid ${icdZona.color}40;
-            border-radius:var(--r-lg); padding:16px 14px; cursor:pointer; position:relative; overflow:hidden;">
+            border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
           <div style="font-size:10px; letter-spacing:0.15em; color:${icdZona.color}; text-transform:uppercase; font-weight:700; margin-bottom:6px;">ICD</div>
           <div style="font-family:var(--font-head); font-size:34px; font-weight:900; color:var(--text-1); line-height:1;">${icd}</div>
           <div style="font-size:11px; color:${icdZona.color}; margin-top:4px; font-weight:600;">${icdZona.label}</div>
@@ -111,9 +112,9 @@ function renderStats(data) {
         </div>
 
         <!-- RACHA -->
-        <div onclick="showInteractiveModal('Linea Activa','Dias consecutivos cumpliendo al menos 1 compromiso. La racha es el arma mas poderosa de la disciplina. No la rompas.','🔥')"
+        <div class="tappable" onclick="showInteractiveModal('Linea Activa','Dias consecutivos cumpliendo al menos 1 compromiso. La racha es el arma mas poderosa de la disciplina. No la rompas.','🔥')"
           style="background:rgba(255,107,53,0.06); border:1px solid rgba(255,107,53,0.25);
-            border-radius:var(--r-lg); padding:16px 14px; cursor:pointer; position:relative; overflow:hidden;">
+            border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--fire); text-transform:uppercase; font-weight:700; margin-bottom:6px;">RACHA</div>
           <div style="font-family:var(--font-head); font-size:34px; font-weight:900; color:var(--text-1); line-height:1;">${lineaActiva}<span style="font-size:18px;margin-left:2px;">🔥</span></div>
           <div style="font-size:11px; color:var(--fire); margin-top:4px; font-weight:600;">dias consecutivos</div>
@@ -121,18 +122,18 @@ function renderStats(data) {
         </div>
 
         <!-- PC TOTALES -->
-        <div onclick="showInteractiveModal('Puntos de Poder (PC)','Moneda del sistema. Se acumulan por cada victoria registrada. +20 PC bonus si superas el 150% de tu meta.','⚡')"
+        <div class="tappable" onclick="showInteractiveModal('Puntos de Poder (PC)','Moneda del sistema. Se acumulan por cada victoria registrada. +20 PC bonus si superas el 150% de tu meta.','⚡')"
           style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.25);
-            border-radius:var(--r-lg); padding:16px 14px; cursor:pointer;">
+            border-radius:var(--r-lg); padding:16px 14px;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; font-weight:700; margin-bottom:6px;">PC TOTALES</div>
           <div style="font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--gold); line-height:1;">${pcTotal.toLocaleString('es-CO')}</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:8px;">puntos de poder</div>
         </div>
 
         <!-- DIAS ACTIVOS -->
-        <div onclick="showInteractiveModal('Dias Activos','Total historico de dias en los que has honrado el pacto. No se reinicia con la racha. Es tu huella permanente.','📅')"
+        <div class="tappable" onclick="showInteractiveModal('Dias Activos','Total historico de dias en los que has honrado el pacto. No se reinicia con la racha. Es tu huella permanente.','📅')"
           style="background:rgba(123,97,255,0.06); border:1px solid rgba(123,97,255,0.25);
-            border-radius:var(--r-lg); padding:16px 14px; cursor:pointer;">
+            border-radius:var(--r-lg); padding:16px 14px;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--electric); text-transform:uppercase; font-weight:700; margin-bottom:6px;">DIAS ACTIVOS</div>
           <div style="font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--electric); line-height:1;">${diasActivos}</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:8px;">dias en total</div>
@@ -143,7 +144,7 @@ function renderStats(data) {
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 2. HEATMAP 28 DIAS                                   -->
       <!-- ════════════════════════════════════════════════════ -->
-      <div class="card" style="margin-bottom:10px;">
+      <div class="card stagger-up stagger-2" style="margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <div class="section-title" style="margin:0;">Historial 28 dias</div>
           <div style="font-size:11px; color:var(--text-3);">${diasConReporte28} dias con reporte</div>
@@ -153,7 +154,7 @@ function renderStats(data) {
           ${days.map(d => `<div class="heatmap-day-label">${d}</div>`).join('')}
         </div>
         <div class="heatmap">
-          ${heatArr.map((level, i) => `<div class="heatmap-day" data-level="${level}" title="Nivel ${level}"></div>`).join('')}
+          ${heatArr.map((level, i) => `<div class="heatmap-day tappable" data-level="${level}" onclick="showHeatmapTooltip(this, ${level})"></div>`).join('')}
         </div>
         <div style="display:flex; gap:6px; margin-top:10px; align-items:center; justify-content:flex-end;">
           <span style="font-size:10px; color:var(--text-3);">Menos</span>
@@ -165,7 +166,7 @@ function renderStats(data) {
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 3. GRAFICA SEMANAL PREMIUM                           -->
       <!-- ════════════════════════════════════════════════════ -->
-      <div class="card" style="margin-bottom:10px; padding:20px;">
+      <div class="card stagger-up stagger-3" style="margin-bottom:10px; padding:20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <div>
             <div class="section-title" style="margin:0;">Rendimiento Semanal</div>
@@ -203,7 +204,7 @@ function renderStats(data) {
               : pct >= 50 ? '0 -4px 8px rgba(123,97,255,0.25)'
               : 'none';
             return `
-              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; z-index:1;">
+              <div class="tappable" onclick="showChartTooltip(this, ${pct}, '${diasLabels[i]}')" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; z-index:1; padding-top:10px;">
                 ${pct > 0
                   ? `<div style="font-size:10px; font-weight:800; color:${esHoy?'#FFD700':pct>=85?'var(--success)':'var(--text-3)'}; letter-spacing:-0.02em;">${pct}%</div>`
                   : `<div style="font-size:10px; color:var(--text-3);">-</div>`}
@@ -227,7 +228,7 @@ function renderStats(data) {
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 4. INTELIGENCIA DE RACHA + ICD                       -->
       <!-- ════════════════════════════════════════════════════ -->
-      <div class="card" style="margin-bottom:10px;">
+      <div class="card stagger-up stagger-4" style="margin-bottom:10px;">
         <div class="section-title" style="margin-bottom:14px;">🔥 Analisis de Racha</div>
 
         <!-- Barra de progreso hacia proximo hito -->
@@ -271,7 +272,7 @@ function renderStats(data) {
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 5. PANEL ICD — Zonas y Proyeccion                    -->
       <!-- ════════════════════════════════════════════════════ -->
-      <div class="card" style="border-color:${icdZona.color}40; background:${icdZona.bg}; margin-bottom:10px;">
+      <div class="card stagger-up stagger-4" style="border-color:${icdZona.color}40; background:${icdZona.bg}; margin-bottom:10px;">
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
 
           <!-- Mini Gauge ICD -->
@@ -345,7 +346,7 @@ function renderStats(data) {
           ? Math.min(100, Math.round((diasConReporteContrato / contrato.diasTotales) * 100))
           : 0;
         return `
-        <div class="card" style="margin-bottom:10px;">
+        <div class="card stagger-up stagger-5" style="margin-bottom:10px;">
           <div class="section-title" style="margin-bottom:12px;">📜 Contrato Activo</div>
           <div style="display:flex; align-items:center; gap:14px;">
             <div style="text-align:center; flex-shrink:0;">
@@ -376,7 +377,7 @@ function renderStats(data) {
       <!-- 7. MISIONES DE HOY — al final como contexto          -->
       <!-- ════════════════════════════════════════════════════ -->
       ${compromisosList.length > 0 ? `
-        <div class="card" style="margin-top:10px;">
+        <div class="card stagger-up stagger-5" style="margin-top:10px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
             <div>
               <div class="section-title" style="margin:0;">Misiones de Hoy</div>
@@ -402,7 +403,7 @@ function renderStats(data) {
             const valorFmt = Number(c.valorHoy || 0).toLocaleString('es-CO');
             const metaFmt  = Number(c.meta || 0).toLocaleString('es-CO');
             return `
-              <div style="display:flex; align-items:center; gap:10px; padding:12px 0;
+              <div class="tappable" style="display:flex; align-items:center; gap:10px; padding:12px 0;
                 border-bottom:1px solid var(--border);" onclick="selectMission('${c.id}')">
                 <div style="font-size:26px; flex-shrink:0;">${c.emoji}</div>
                 <div style="flex:1; min-width:0;">
@@ -458,7 +459,78 @@ function changeStatsFilter(val) {
   const data = window._appData;
   if (data) {
     appData = data;
-    document.getElementById('viewContainer').innerHTML = renderStats(data);
-    initStatsAnimations();
+    // Transición suave: fade out, render, fade in
+    const container = document.getElementById('viewContainer');
+    container.style.opacity = '0.5';
+    container.style.transition = 'opacity 0.2s';
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.selectionChanged();
+    }
+    setTimeout(() => {
+      container.innerHTML = renderStats(data);
+      container.style.opacity = '1';
+      initStatsAnimations();
+    }, 150);
   }
 }
+
+// Interacciones flotantes (tooltips)
+function _createTooltip(element, text) {
+  const existing = document.getElementById('stats-tooltip');
+  if (existing) existing.remove();
+
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+  }
+
+  const rect = element.getBoundingClientRect();
+  const tooltip = document.createElement('div');
+  tooltip.id = 'stats-tooltip';
+  tooltip.className = 'interactive-tooltip';
+  tooltip.innerHTML = text;
+  
+  document.body.appendChild(tooltip);
+
+  // Posicionar arriba del elemento
+  const tRect = tooltip.getBoundingClientRect();
+  let top = rect.top - tRect.height - 10;
+  let left = rect.left + (rect.width / 2) - (tRect.width / 2);
+
+  // Bounds check
+  if (left < 10) left = 10;
+  if (left + tRect.width > window.innerWidth - 10) left = window.innerWidth - tRect.width - 10;
+
+  tooltip.style.top = top + 'px';
+  tooltip.style.left = left + 'px';
+
+  // Desaparecer después de 2.5s
+  setTimeout(() => {
+    if (tooltip.parentNode) {
+      tooltip.style.opacity = '0';
+      tooltip.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => tooltip.remove(), 300);
+    }
+  }, 2500);
+}
+
+function showChartTooltip(element, pct, label) {
+  let text = '';
+  if (pct === 0) text = `<span style="color:var(--text-2);font-weight:600;">Día ${label}: <br/>Inactivo (0%)</span>`;
+  else if (pct >= 100) text = `<span style="color:var(--success);font-weight:800;">Día ${label}: <br/>Cumplimiento ${pct}% 🌟</span>`;
+  else if (pct >= 85) text = `<span style="color:var(--gold);font-weight:700;">Día ${label}: <br/>Excelente ${pct}%</span>`;
+  else text = `<span style="font-weight:600;">Día ${label}: <br/>Progreso ${pct}%</span>`;
+  
+  _createTooltip(element, text);
+}
+
+function showHeatmapTooltip(element, level) {
+  const messages = [
+    '<span style="color:var(--text-2);">0 Misiones</span>',
+    'Avance leve (Nivel 1)',
+    'Buen esfuerzo (Nivel 2)',
+    '<span style="color:var(--gold);">Día Fuerte (Nivel 3)</span>',
+    '<span style="color:var(--electric);font-weight:800;">Día de Poder (Nivel 4)⚡</span>'
+  ];
+  _createTooltip(element, messages[level]);
+}
+
