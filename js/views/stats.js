@@ -145,7 +145,7 @@ function renderStats(data) {
       <!-- 2. HEATMAP 28 DIAS                                   -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-2" style="margin-bottom:10px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;" class="tappable" onclick="showInteractiveModal('Historial de 28 Días', 'El mapa de calor registra empíricamente tu patrón de acción.<br><br><b>Niveles de Energía:</b><br><span style=&quot;color:var(--text-3)&quot;>Vacío</span> — Día Perdido<br><span style=&quot;color:rgba(123,97,255,1)&quot;>Púrpura</span> — Esfuerzo Incompleto<br><span style=&quot;color:var(--success)&quot;>Esmeralda</span> — Día Fuerte<br><span style=&quot;color:var(--gold)&quot;>Dorado</span> — Victoria Absoluta<br><br>El sistema analiza solo 28 días porque ese es el periodo científico para cementar la neuroplasticidad. Lo que hagas hoy dictará quién serás mañana.', '🗺️')">
           <div class="section-title" style="margin:0;">Historial 28 dias</div>
           <div style="font-size:11px; color:var(--text-3);">${diasConReporte28} dias con reporte</div>
         </div>
@@ -167,7 +167,7 @@ function renderStats(data) {
       <!-- 3. GRAFICA SEMANAL PREMIUM                           -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-3" style="margin-bottom:10px; padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;" class="tappable" onclick="showInteractiveModal('Rendimiento Semanal', 'Tu promedio de ejecución implacable en los últimos 7 días.<br><br>¿Tu gráfica tiene altibajos extremos? Eres inestable. Mantenerse consistentemente por encima de la línea del 75% separa a los aficionados de los guerreros élite.', '📊')">
           <div>
             <div class="section-title" style="margin:0;">Rendimiento Semanal</div>
             <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Ejecucion de los ultimos 7 dias</div>
@@ -229,7 +229,7 @@ function renderStats(data) {
       <!-- 4. INTELIGENCIA DE RACHA + ICD                       -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-4" style="margin-bottom:10px;">
-        <div class="section-title" style="margin-bottom:14px;">🔥 Analisis de Racha</div>
+        <div class="section-title tappable" style="margin-bottom:14px; width:max-content;" onclick="showInteractiveModal('Análisis de Fuego (Racha)', 'El sistema predictivo proyecta tu velocidad hacia el próximo Escudo Protector.<br><br>Llenar esta barra demanda presentarte todos los días sin falta, sin excepciones emocionales.', '🔥')">🔥 Analisis de Racha</div>
 
         <!-- Barra de progreso hacia proximo hito -->
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-3); margin-bottom:6px;">
@@ -299,7 +299,7 @@ function renderStats(data) {
               font-family="Inter,sans-serif" font-size="9" fill="#5A5A72">ICD</text>
           </svg>
 
-          <div style="flex:1;">
+          <div style="flex:1;" class="tappable" onclick="showInteractiveModal('Tu Posición Operativa', 'El oráculo te ubica en una jerarquía exacta según tu ICD real.<br><br>La <b>Proyección 7d</b> predice matemáticamente dónde caerás o subirás en tan solo 1 semana si mantienes idéntico el mismo patrón de comportamiento de hoy.', '🧭')">
             <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-3); margin-bottom:4px;">Tu posicion</div>
             <div style="font-family:var(--font-head); font-size:17px; font-weight:800; color:${icdZona.color}; margin-bottom:6px;">${icdZona.label}</div>
             ${icdProyectado !== null ? `
