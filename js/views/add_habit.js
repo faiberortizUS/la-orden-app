@@ -185,7 +185,7 @@ function updateActivitySuggestions() {
           <div onclick="selectSuggestedActivity('${c.nombre.replace(/'/g,"\\'")}','${c.unidad}',${c.meta},'${c.info.replace(/'/g,"\\'")}')"
             style="display:flex; align-items:center; gap:10px; padding:12px 14px;
               background:var(--bg-elevated); border:1px solid var(--border);
-              border-radius:var(--r-md); cursor:pointer; transition:all 0.2s ease;"
+              border-radius:var(--r-md); transition:all 0.2s ease;" class="tappable"
             onmouseover="this.style.borderColor='var(--border-gold)';this.style.background='rgba(212,168,67,0.06)'"
             onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-elevated)'">
             <div style="flex:1;">
@@ -193,7 +193,7 @@ function updateActivitySuggestions() {
               <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Meta sugerida: ${c.meta} ${c.unidad}</div>
             </div>
             <div style="display:flex; gap:6px; align-items:center;">
-              <div onclick="event.stopPropagation(); showInteractiveModal('${c.nombre}','${c.info}','🧠')"
+              <div onclick="event.stopPropagation(); showInteractiveModal('${c.nombre}','${c.info}','🧠')" class="tappable"
                 style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);
                   background:rgba(212,168,67,0.1);font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
               <span style="font-size:16px; color:var(--text-3);">⟩</span>
