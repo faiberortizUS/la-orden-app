@@ -60,46 +60,48 @@ function renderHome(data) {
       ` : ''}
 
       <!-- ICD HERO CARD -->
-      <div class="card card--glass card--gold stagger-up stagger-1 tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
-        <div class="gauge-wrap">
-          <svg class="gauge-svg" viewBox="0 0 180 180">
-            <defs>
-              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%"   stop-color="#7B61FF"/>
-                <stop offset="50%"  stop-color="#D4A843"/>
-                <stop offset="100%" stop-color="#FF6B35"/>
-              </linearGradient>
-            </defs>
-            <circle class="gauge-circle gauge-bg" cx="90" cy="90" r="${R}"
-              stroke="var(--bg-elevated)" stroke-width="10"
-              stroke-dasharray="${C}" stroke-dashoffset="0"
-              transform="rotate(-90 90 90)" />
-            <circle class="gauge-circle gauge-fill" cx="90" cy="90" r="${R}"
-              id="icdArc" stroke="url(#gaugeGrad)" stroke-width="10"
-              style="stroke-dasharray: 0 ${C}; transition: stroke-dasharray 1.5s cubic-bezier(0.4,0,0.2,1);"
-              data-filled="${filled}" data-gap="${gap}"
-              transform="rotate(-90 90 90)" />
-            <text class="gauge-text-group">
-              <tspan class="gauge-score" x="90" y="82">${icd}</tspan>
-              <tspan class="gauge-label" x="90" y="100">ICD · CONSISTENCIA</tspan>
-              <tspan class="gauge-zone ${zonaClass}" x="90" y="116">${zona}</tspan>
-            </text>
-          </svg>
+      <div>
+        <div class="card card--glass card--gold tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
+          <div class="gauge-wrap">
+            <svg class="gauge-svg" viewBox="0 0 180 180">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%"   stop-color="#7B61FF"/>
+                  <stop offset="50%"  stop-color="#D4A843"/>
+                  <stop offset="100%" stop-color="#FF6B35"/>
+                </linearGradient>
+              </defs>
+              <circle class="gauge-circle gauge-bg" cx="90" cy="90" r="${R}"
+                stroke="var(--bg-elevated)" stroke-width="10"
+                stroke-dasharray="${C}" stroke-dashoffset="0"
+                transform="rotate(-90 90 90)" />
+              <circle class="gauge-circle gauge-fill" cx="90" cy="90" r="${R}"
+                id="icdArc" stroke="url(#gaugeGrad)" stroke-width="10"
+                style="stroke-dasharray: 0 ${C}; transition: stroke-dasharray 1.5s cubic-bezier(0.4,0,0.2,1);"
+                data-filled="${filled}" data-gap="${gap}"
+                transform="rotate(-90 90 90)" />
+              <text class="gauge-text-group">
+                <tspan class="gauge-score" x="90" y="82">${icd}</tspan>
+                <tspan class="gauge-label" x="90" y="100">ICD · CONSISTENCIA</tspan>
+                <tspan class="gauge-zone ${zonaClass}" x="90" y="116">${zona}</tspan>
+              </text>
+            </svg>
 
-          <div class="flex gap-3" style="flex-direction:column;align-items:center;gap:8px;">
-            <div style="font-size:14px;font-weight:700;color:var(--text-1);font-family:var(--font-head);letter-spacing:0.05em;">
-              ${user.nombre || 'Aspirante'}
-            </div>
-            <div class="flex gap-3">
-              <span class="badge-chip badge-chip--gold">⚡ ${Number(user.pcTotal || 0).toLocaleString('es-CO')} PC</span>
-              <span class="badge-chip badge-chip--electric">${user.diasActivos || 0} días activo</span>
+            <div class="flex gap-3" style="flex-direction:column;align-items:center;gap:8px;">
+              <div style="font-size:14px;font-weight:700;color:var(--text-1);font-family:var(--font-head);letter-spacing:0.05em;">
+                ${user.nombre || 'Aspirante'}
+              </div>
+              <div class="flex gap-3">
+                <span class="badge-chip badge-chip--gold">⚡ ${Number(user.pcTotal || 0).toLocaleString('es-CO')} PC</span>
+                <span class="badge-chip badge-chip--electric">${user.diasActivos || 0} días activo</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- STREAK CARD -->
-      <div class="card card--fire stagger-up stagger-2 tappable" style="padding:var(--s4);" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
+      <div class="card card--fire tappable" style="padding:var(--s4);" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
         <div class="streak-card" style="padding:0;">
           <div class="streak-fire">🔥</div>
           <div class="streak-info">
@@ -119,7 +121,7 @@ function renderHome(data) {
       </div>
 
       <!-- STATS ROW -->
-      <div class="stat-row stagger-up stagger-3">
+      <div class="stat-row">
         <div class="stat-chip tappable" onclick="showInteractiveModal('Escalera de Rangos de La Orden', 'Tu rango define tu identidad dentro del círculo. <b>Cada día sin reportar deteriora tu ICD</b> y te aleja del siguiente nivel.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Solo el 1% alcanza Custodio. Sin acción diaria, el sistema te retrograda automáticamente.', '${rangoEmoji}')">
           <div class="stat-val stat-val--gold">${rangoEmoji}</div>
           <div class="stat-lbl">${rangoNombre}</div>
@@ -134,7 +136,7 @@ function renderHome(data) {
 
       <!-- MISIONES DEL DÍA (solo si hay compromisos) -->
       ${!sinCompromisos ? `
-        <div class="stagger-up stagger-4">
+        <div>
           <div class="missions-header">
             <span class="section-title">Misiones de hoy</span>
             <span class="missions-count">${doneCount}/${activos.length}</span>
