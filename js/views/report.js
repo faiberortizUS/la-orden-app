@@ -115,7 +115,7 @@ function renderReportInput(c) {
     <div class="view" id="view-report-input">
 
       <!-- ENCABEZADO STICKY PARA VOLVER -->
-      <div style="position: sticky; top: -20px; background: rgba(10,10,15,0.95); backdrop-filter: blur(8px); 
+      <div style="position: sticky; top: -20px; background: rgba(10,10,15,0.95); 
            padding: 16px 0; margin: -20px -20px 16px -20px; z-index: 50; display: flex; align-items: center; 
            gap: 8px; cursor: pointer; border-bottom: 1px solid var(--border);" 
            onclick="showCancelReportFriction()">
