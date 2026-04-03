@@ -215,8 +215,6 @@ html, body {
 }
 .card--glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 .card--gold {
   border-color: var(--border-gold);
@@ -450,8 +448,6 @@ html, body {
 /* ── OATH VIEW ── */
 .oath-card {
   background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-gold);
   border-radius: var(--r-xl); padding: var(--s6);
   box-shadow: var(--glow-gold);
@@ -586,7 +582,6 @@ html, body {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   padding: 32px 24px; background: rgba(20,20,25,0.7);
   border: 1px solid rgba(212,168,67,0.1); border-radius: var(--r-xl);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   opacity: 0; transform: translateY(40px) scale(0.95);
   pointer-events: none; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex; flex-direction: column; justify-content: center; text-align: center;
@@ -696,8 +691,6 @@ html, body {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(10,10,15,0.52);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
   border-radius: 20px; padding: 24px;
 }
 
