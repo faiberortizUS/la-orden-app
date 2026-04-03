@@ -138,8 +138,9 @@ function renderObCommitments(area, catalog) {
           const isSel = selected.includes(c.id);
           const comp  = already.find(x => x.compromisoId === c.id);
           const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-          const defaultInfo = 'Actividad táctica de La Orden. Meta recomendada: ' + c.metaDef + ' ' + c.unidad + '. Comprometerte y cumplir diariamente forja consistencia real.';
-          const safeInfo = (c.info || defaultInfo).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          const rawInfo = c.info || 'Actividad táctica diseñada para erradicar la mediocridad. Su ejecución diaria engrana tu mente al estándar del 1%.';
+          const tooltipHtml = `<div style="margin-bottom:14px; font-size:13px; color:var(--text-1); line-height:1.6;">${rawInfo}</div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">Calibración Táctica</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">${c.metaDef.toLocaleString('es-CO')} ${c.unidad}</span></div></div>`;
+          const safeInfo = tooltipHtml.replace(/'/g, "\\'").replace(/"/g, "&quot;");
           return `
             <div id="comp-${c.id}" style="background:var(--bg-elevated);border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
               border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden;
@@ -157,7 +158,7 @@ function renderObCommitments(area, catalog) {
                     <div style="font-weight:600;font-size:14px;color:${isSel ? 'var(--gold)' : 'var(--text-1)'};">${c.nombre}</div>
                     <div style="font-size:11px;color:var(--text-3);">Meta sugerida: ${c.metaDef.toLocaleString('es-CO')} ${c.unidad} · +${c.pcBase} PC</div>
                   </div>
-                  <div onclick="event.stopPropagation(); showInteractiveModal('🧠 ${safeNombre}','${safeInfo}<br><br><b>Meta sugerida:</b> ${c.metaDef.toLocaleString('es-CO')} ${c.unidad}','🧠')" style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);background:rgba(212,168,67,0.1);margin-left:8px;font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
+                  <div onclick="event.stopPropagation(); showInteractiveModal('🧠 ${safeNombre}', '${safeInfo}', '🧠')" style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);background:rgba(212,168,67,0.1);margin-left:8px;font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
                 </div>
               </div>
 
