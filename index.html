@@ -25,12 +25,12 @@
 
     <!-- HEADER -->
     <header class="header" id="header">
-      <div class="header__left">
+      <div class="header__left tappable" onclick="navigateTo('command_center')">
         <span class="header__symbol">🏛️</span>
         <span class="header__title">La Orden</span>
       </div>
       <div class="header__right">
-        <div class="header__rank" id="headerRank">⚔️ Iniciado</div>
+        <div class="header__rank tappable" id="headerRank" onclick="if(typeof showInteractiveModal==='function') showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas.', '🏛️')">⚔️ Iniciado</div>
       </div>
     </header>
 
