@@ -449,7 +449,9 @@ html, body {
 
 /* ── OATH VIEW ── */
 .oath-card {
-  background: linear-gradient(145deg, #12121A, #0F0F1A);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-gold);
   border-radius: var(--r-xl); padding: var(--s6);
   box-shadow: var(--glow-gold);
