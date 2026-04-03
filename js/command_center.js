@@ -103,31 +103,42 @@ function renderCommandCenter(data, isFirstTime) {
 
       <!-- Stats rápidos del usuario (si tiene datos) -->
       ${user.icd !== undefined ? `
-        <div class="stagger-up stagger-1" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 16px 16px;">
-          <div class="cc-stat-chip tappable ${icd > 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" 
-            onclick="showInteractiveModal('🎯 ICD — Tu Activo Más Frágil', 'El ICD no sube de golpe. Cae en horas. Sube en semanas.<br><br>Cada día sin reportar, el sistema registra 0% de cumplimiento y ese cero se promedia sobre 28 días.<br><br><b>Lo que pierdes al fallar:</b><br>• 1 día → hasta −4 puntos<br>• 2 días seguidos → penalización exponencial<br>• Caer de 85 a 70 toma 3 semanas recuperar<br><br>El sistema no olvida. Tú tampoco puedes permitirte olvidar.', '🎯')">
-            <div class="cc-stat-val" style="color:var(--gold);">${icd}</div>
-            <div class="cc-stat-lbl">ICD</div>
+        <div class="stagger-up stagger-1" style="display:flex; flex-wrap:wrap; gap:10px; padding:0 20px 20px;">
+          <!-- FILA 1: ICD (100% full width hero) -->
+          <div class="stat-chip tappable ${icd > 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" 
+            onclick="showInteractiveModal('🎯 ICD — Tu Activo Más Frágil', 'El ICD no sube de golpe. Cae en horas. Sube en semanas.\\n\\nCada día sin reportar, el sistema registra 0% de cumplimiento y ese cero se promedia sobre 28 días.\\n\\n<b>Lo que pierdes al fallar:</b>\\n• 1 día → hasta −4 puntos\\n• 2 días seguidos → penalización exponencial\\n• Caer de 85 a 70 toma 3 semanas recuperar\\n\\nEl sistema no olvida. Tú tampoco puedes permitirte olvidar.', '🎯')"
+            style="flex: 1 1 100%; display:flex; align-items:center; justify-content:space-between; padding:16px 20px;">
+            <div style="text-align:left;">
+                <div class="stat-lbl" style="font-size:12px; margin-bottom:4px;">ÍNDICE DE CONSISTENCIA</div>
+                <div class="stat-val" style="color:var(--gold); font-size:32px;">${icd} <span style="font-size:16px;color:var(--text-3);font-weight:600;">/100</span></div>
+            </div>
+            <div style="font-size:32px; filter:grayscale(1) opacity(0.2);">🎯</div>
           </div>
-          <div class="cc-stat-chip tappable" 
+          
+          <!-- FILA 2: Racha y Escudos (50/50 block) -->
+          <div class="stat-chip tappable" style="flex: 1 1 calc(50% - 10px); display:flex; flex-direction:column; align-items:center; padding:16px 10px;" 
             onclick="showInteractiveModal('Linea Activa (Fuego)', 'Tu racha actual. Un mal dia? Salva todo cumpliendo tan solo 1 pilar de tu pacto.', '🔥')">
-            <div class="cc-stat-val" style="color:var(--fire);">${user.lineaActiva || 0}🔥</div>
-            <div class="cc-stat-lbl">RACHA</div>
+            <div class="stat-val" style="color:var(--fire); font-size:24px;">${user.lineaActiva || 0}🔥</div>
+            <div class="stat-lbl" style="font-size:11px; margin-top:6px; letter-spacing:0.05em;">RACHA ACTIVA</div>
           </div>
-          <div class="cc-stat-chip tappable" 
+          
+          <div class="stat-chip tappable" style="flex: 1 1 calc(50% - 10px); display:flex; flex-direction:column; align-items:center; padding:16px 10px;" 
             onclick="showInteractiveModal('Escudos Protectores', 'Salvan tu racha cuando fracasas rotundamente al reportar todo un dia. Ganalos manteniendo un fuego largo e ininterrumpido.', '🛡️')">
-            <div class="cc-stat-val" style="color:#EAB308;">${user.escudos || 0}🛡️</div>
-            <div class="cc-stat-lbl">ESCUDOS</div>
+            <div class="stat-val" style="color:#EAB308; font-size:24px;">${user.escudos || 0}🛡️</div>
+            <div class="stat-lbl" style="font-size:11px; margin-top:6px; letter-spacing:0.05em;">ESCUDOS</div>
           </div>
-          <div class="cc-stat-chip tappable" 
+
+          <!-- FILA 3: PC y Rango (50/50 block) -->
+          <div class="stat-chip tappable" style="flex: 1 1 calc(50% - 10px); display:flex; flex-direction:column; align-items:center; padding:16px 10px;" 
             onclick="showInteractiveModal('Puntos PC', 'Divisa interna. Usalos como comprobante empirico de que honraste cada meta diaria.', '⚡')">
-            <div class="cc-stat-val" style="color:var(--electric);">${pcFmt}</div>
-            <div class="cc-stat-lbl">PC</div>
+            <div class="stat-val" style="color:var(--electric); font-size:24px;">${pcFmt}</div>
+            <div class="stat-lbl" style="font-size:11px; margin-top:6px; letter-spacing:0.05em;">PUNTOS PODER</div>
           </div>
-          <div class="cc-stat-chip tappable" 
+          
+          <div class="stat-chip tappable" style="flex: 1 1 calc(50% - 10px); display:flex; flex-direction:column; align-items:center; padding:16px 10px;" 
             onclick="showInteractiveModal('Rango', 'Demuestra quien eres dentro de tu Celula de rendimiento. Escala posiciones logrando ascensos tacticos.', '👑')">
-            <div class="cc-stat-val" style="color:#A855F7;">${(user.rango||'🌱').split(' ')[0]}</div>
-            <div class="cc-stat-lbl">RANGO</div>
+            <div class="stat-val" style="color:#A855F7; font-size:24px;">${(user.rango||'🌱').split(' ')[0]}</div>
+            <div class="stat-lbl" style="font-size:11px; margin-top:6px; letter-spacing:0.05em;">RANGO</div>
           </div>
         </div>
       ` : ''}
