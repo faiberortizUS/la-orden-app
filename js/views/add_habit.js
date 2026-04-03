@@ -250,6 +250,24 @@ async function saveNewHabit() {
     return;
   }
 
+  // CHECK LOGIC: Duplicate evaluation
+  const list = window._appData?.compromisos || [];
+  const duplicado = list.find(c => c.nombre.trim().toLowerCase() === nombre.toLowerCase());
+  
+  if (duplicado) {
+    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+    if (window.Telegram?.WebApp && window.Telegram.WebApp.showPopup) {
+      window.Telegram.WebApp.showPopup({
+        title: '⛔ Infracción Táctica',
+        message: `El pilar "${nombre}" ya existe vigentemente en tu contrato actual.\n\nLas misiones no pueden duplicarse o se anula su peso estructural. Combina tu agresividad y concentración ejecutando e incrementando la métrica de la ya existente.`,
+        buttons: [{ id: 'ok', type: 'default', text: 'Entendido' }]
+      });
+    } else {
+      alert(`El pilar "${nombre}" ya existe en tu contrato actual. Las misiones no pueden duplicarse.`);
+    }
+    return;
+  }
+
   const compromiso = {
     areaId: areaSelect.value,
     nombre: nombre,
