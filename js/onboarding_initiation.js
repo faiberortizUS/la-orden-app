@@ -29,6 +29,18 @@ const INITIATION_SLIDES = [
     button: 'Honor a mi Célula'
   },
   {
+    icon: '🦅',
+    title: 'TU GUÍA PERSONAL',
+    text: `El 99% fracasa cuando su voluntad se quiebra en silencio. Para blindar tu éxito, nuestro <b>Sistema Antiabandono</b> te conectará con un <b>Guía Personal</b>.<br><br>Este mentor marchará a tu lado en cada actividad. Te inyectará foco al despertar con su primer mensaje y te arrinconará al caer la noche si intentas desaparecer sin reportar.<br><br><i>Una conexión humana, íntima e inquebrantable, diseñada para sostenerte en tu momento más oscuro.</i>`,
+    button: 'Acepto a mi Guía'
+  },
+  {
+    icon: '📈',
+    title: 'AUDITORÍA DE ÉLITE',
+    text: `Para conquistar tu territorio, necesitas inteligencia táctica superior.<br><br>Cada semana, recibirás un <b>Informe de Desempeño Personalizado</b> elaborado a partir de tus acciones. Un análisis frío y quirúrgico de tus métricas que revelará tus patrones de sabotaje invisibles y calibrará tu próxima semana.<br><br><i>El mismo nivel de precisión y exigencia de un Coaching premium de $10,000, ahora guiando tu destino.</i>`,
+    button: 'Reclamo mi poder'
+  },
+  {
     icon: '💎',
     title: 'EL PRECIO DE ENTRADA',
     text: `Tanto el dolor de la disciplina como el dolor del arrepentimiento cobran una tarifa. Tú eliges qué precio quieres pagar.<br><br>Cruzarás ahora el umbral final. Invierte en tu transformación para sellar irrevocablemente tu <b>Juramento</b>. Lo gratuito rara vez impone respeto.`,
@@ -40,9 +52,9 @@ let currentSlideIndex = 0;
 
 async function renderObInitiationAsync(container) {
   currentSlideIndex = 0;
-  
+
   const nombreFmt = OB.nombre || 'Arquitecto';
-  
+
   const html = `
     <div id="ob-initiation" style="min-height:100vh;display:flex;flex-direction:column;
       background:radial-gradient(circle at top right, #17110e, #0A0A0F);
@@ -54,13 +66,13 @@ async function renderObInitiationAsync(container) {
          
          <!-- Progress Dots -->
          <div id="initiation-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:40px;margin-top:20px;">
-           ${INITIATION_SLIDES.map((_, i) => `<div class="init-dot ${i===0?'active':''}"></div>`).join('')}
+           ${INITIATION_SLIDES.map((_, i) => `<div class="init-dot ${i === 0 ? 'active' : ''}"></div>`).join('')}
          </div>
          
          <!-- Cards Wrapper -->
          <div id="init-cards-wrapper" style="position:relative;flex:1;width:100%;">
             ${INITIATION_SLIDES.map((s, i) => `
-               <div class="init-card ${i===0?'active':''}" id="init-card-${i}" style="overflow-y:auto;justify-content:flex-start;padding-top:40px;">
+               <div class="init-card ${i === 0 ? 'active' : ''}" id="init-card-${i}" style="overflow-y:auto;justify-content:flex-start;padding-top:40px;">
                  <div class="init-card-icon">${s.icon}</div>
                  <div class="init-card-title">${s.title}</div>
                  <div class="init-card-text">${s.text.replace('{nombre}', nombreFmt)}</div>
@@ -79,7 +91,7 @@ async function renderObInitiationAsync(container) {
     </div>
   `;
   container.innerHTML = html;
-  
+
   // Pequeña aparición al entrar
   setTimeout(() => {
     const card0 = document.getElementById('init-card-0');
@@ -89,43 +101,43 @@ async function renderObInitiationAsync(container) {
 
 function nextInitiationSlide() {
   const currentCard = document.getElementById('init-card-' + currentSlideIndex);
-  
+
   if (currentSlideIndex < INITIATION_SLIDES.length - 1) {
     if (currentCard) {
       currentCard.classList.remove('active');
       currentCard.classList.add('exit');
     }
-    
+
     const dots = document.querySelectorAll('.init-dot');
     if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.remove('active');
-    
+
     currentSlideIndex++;
-    
+
     const nextCard = document.getElementById('init-card-' + currentSlideIndex);
     if (nextCard) {
       nextCard.classList.add('active');
     }
-    
+
     if (dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active');
-    
+
     const btn = document.getElementById('init-next-btn');
     if (btn) {
       btn.style.opacity = '0';
       setTimeout(() => {
         btn.innerHTML = INITIATION_SLIDES[currentSlideIndex].button;
         btn.style.opacity = '1';
-        
+
         // Botón dorado premium desde el slide 1 en adelante
         if (currentSlideIndex >= 1) {
-           btn.style.background = 'linear-gradient(135deg, var(--gold-dim), var(--gold))';
-           btn.style.color = '#0A0A0F';
-           btn.style.border = 'none';
-           btn.style.boxShadow = '0 0 30px rgba(212,168,67,0.4)';
+          btn.style.background = 'linear-gradient(135deg, var(--gold-dim), var(--gold))';
+          btn.style.color = '#0A0A0F';
+          btn.style.border = 'none';
+          btn.style.boxShadow = '0 0 30px rgba(212,168,67,0.4)';
         }
       }, 200);
     }
-    
-    if(window.Telegram?.WebApp?.HapticFeedback) {
+
+    if (window.Telegram?.WebApp?.HapticFeedback) {
       window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
     }
   } else {
