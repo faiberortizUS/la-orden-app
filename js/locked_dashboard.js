@@ -307,6 +307,9 @@ function _startLiveCounter() {
 
 /* --- ACCION: ACTIVAR -------------------------------------- */
 function lockedActivarNow() {
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+  }
   _hideLdModal();
   if (_ldLiveIv) { clearInterval(_ldLiveIv); _ldLiveIv = null; }
 
