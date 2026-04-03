@@ -168,7 +168,7 @@ function renderObPayment() {
 
     <!-- MODAL INVASIVO "PAY LATER" -->
     <div id="payLaterModal" style="display:none;position:fixed;inset:0;z-index:999;
-      background:rgba(0,0,0,0.92);backdrop-filter:blur(6px);
+      background:rgba(0,0,0,0.92);
       display:none;align-items:center;justify-content:center;padding:24px;">
       <div style="background:var(--bg-elevated);border:1px solid rgba(255,107,53,0.5);
         border-radius:var(--r-lg);padding:28px 24px;max-width:360px;width:100%;
