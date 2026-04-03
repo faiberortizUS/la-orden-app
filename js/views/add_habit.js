@@ -183,7 +183,9 @@ function updateActivitySuggestions() {
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${catalog.map(c => {
           const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-          const safeInfo = (c.info || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          const rawInfo = c.info || 'Actividad táctica diseñada para erradicar la mediocridad. Su ejecución diaria engrana tu mente al estándar del 1%.';
+          const tooltipHtml = `<div style="margin-bottom:14px; font-size:13px; color:var(--text-1); line-height:1.6;">${rawInfo}</div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">Calibración Táctica</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">${c.meta.toLocaleString('es-CO')} ${c.unidad}</span></div></div>`;
+          const safeInfo = tooltipHtml.replace(/'/g, "\\'").replace(/"/g, "&quot;");
           return `
           <div onclick="selectSuggestedActivity('${safeNombre}','${c.unidad}',${c.meta},'${safeInfo}')"
             style="display:flex; align-items:center; gap:10px; padding:12px 14px;
