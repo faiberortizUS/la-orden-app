@@ -73,7 +73,7 @@ function renderObAreas() {
         <button onclick="obAreasProceed()"
           id="areasBtn" class="btn-premium tappable"
           style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;
-            border-radius:var(--r-xl);font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:0.04em;
+            border:none;border-radius:var(--r-xl);font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:0.04em;
             transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             ${selected.length > 0
               ? 'background:linear-gradient(135deg, var(--gold-dim), var(--gold)); color:#0A0A0F; box-shadow:0 8px 24px rgba(212,168,67,0.3); transform:translateY(0);'
