@@ -87,10 +87,12 @@ async function renderObCommitmentsAsync(container) {
   const areaId = OB.areas[OB.areaIndex];
   const area   = AREAS_CATALOG.find(a => a.id === areaId);
 
-  // Intentar cargar del backend, fallback al catálogo local
+  // Intentar cargar del backend, fallback al catálogo local de manera ultrarrápida
   if (!_catalogCache[areaId]) {
     try {
-      const data = await fetchCatalog(areaId);
+      const fetchPromise = fetchCatalog(areaId);
+      const timeoutPromise = new Promise(r => setTimeout(() => r(null), 250));
+      const data = await Promise.race([fetchPromise, timeoutPromise]);
       _catalogCache[areaId] = (data && data.length > 0) ? data : CATALOG_LOCAL[areaId] || [];
     } catch(e) {
       _catalogCache[areaId] = CATALOG_LOCAL[areaId] || [];
@@ -196,11 +198,13 @@ function renderObCommitments(area, catalog) {
       <div style="position:fixed;bottom:0;left:0;right:0;padding:16px 20px;
         background:linear-gradient(to top,var(--bg-base) 70%,transparent);">
         <button onclick="obCommitmentsProceed()"
-          id="commitmentsBtn"
-          style="width:100%;padding:16px;border:none;border-radius:var(--r-lg);cursor:pointer;
-            font-family:var(--font-head);font-size:15px;font-weight:800;
+          id="commitmentsBtn" class="btn-premium tappable"
+          style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;
+            border:none;border-radius:var(--r-xl);cursor:pointer;
+            font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:0.04em;
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
-            color:#0A0A0F;box-shadow:0 0 20px rgba(212,168,67,0.3);">
+            color:#0A0A0F;box-shadow:0 8px 24px rgba(212,168,67,0.3);
+            transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
           ${areaIdx < totalAreas - 1
             ? `⟩ Siguiente área: ${AREAS_CATALOG.find(a => a.id === OB.areas[areaIdx+1])?.nombre || ''}`
             : '⚔️ TODOS MIS COMPROMISOS ESTÁN SELLADOS'}
