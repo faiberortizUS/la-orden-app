@@ -60,7 +60,7 @@ async function renderObInitiationAsync(container) {
          <!-- Cards Wrapper -->
          <div id="init-cards-wrapper" style="position:relative;flex:1;width:100%;">
             ${INITIATION_SLIDES.map((s, i) => `
-               <div class="init-card ${i===0?'active':''}" id="init-card-${i}">
+               <div class="init-card ${i===0?'active':''}" id="init-card-${i}" style="overflow-y:auto;justify-content:flex-start;padding-top:40px;">
                  <div class="init-card-icon">${s.icon}</div>
                  <div class="init-card-title">${s.title}</div>
                  <div class="init-card-text">${s.text.replace('{nombre}', nombreFmt)}</div>
