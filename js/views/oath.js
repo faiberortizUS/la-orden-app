@@ -98,7 +98,7 @@ function renderOath(data) {
       <!-- COMPROMISOS SELLADOS -->
       <div class="card stagger-up stagger-2">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--s4);">
-          <div class="section-title" style="margin:0;">Compromisos sellados</div>
+          <div class="section-title tappable" style="margin:0;" onclick="showInteractiveModal('Compromisos Sellados', 'Estas no son simples tareas opcionales. Son pilares inquebrantables anexos directamente a tu contrato firme.<br><br>No cumplirlos destruye la integridad del sistema y mancha tu legajo de Arquitecto.', '⚖️')">Compromisos sellados</div>
           <button onclick="navigateTo('add_habit')" class="tappable" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;padding:4px 0;">+ AÑADIR</button>
         </div>
         ${compromisos.length > 0 ? compromisos.map(c => `
@@ -116,7 +116,7 @@ function renderOath(data) {
 
       <!-- STATS DEL CONTRATO -->
       <div class="card card--glass stagger-up stagger-3">
-        <div class="section-title" style="margin-bottom:var(--s3);">Este contrato</div>
+        <div class="section-title tappable" style="margin-bottom:var(--s3); width:max-content;" onclick="showInteractiveModal('Contrato Vigente', 'Un ciclo blindado de presión técnica durante 30 días.<br><br>Tu objetivo primario no es ser intenso por curiosidad 3 días, sino sobrevivir e imponerte al periodo completo para lograr la renovación con un desempeño sobresaliente.', '📜')">Este contrato</div>
         <div class="stat-row">
           <div class="stat-chip tappable" onclick="showInteractiveModal('Días Ejecutados', 'De los 30 días fijados en este contrato cerrado, este número certifica el peso real de tu esfuerzo.<br><br><b>🎯 Objetivo base:</b> Renovar tus contratos al final del periodo contabilizando al menos 25 días ejecutados para reclamar el éxito táctico y certificar tu disciplina.', '📜')">
             <div class="stat-val stat-val--gold" style="font-family:var(--font-head);">${diasEjecutados}</div>
@@ -130,7 +130,7 @@ function renderOath(data) {
       </div>
 
       <!-- FRASE DEL JURAMENTO -->
-      <div class="card" style="background:linear-gradient(145deg,rgba(212,168,67,0.06),rgba(123,97,255,0.03));border-color:var(--border-gold);text-align:center;padding:var(--s6);">
+      <div class="card tappable" style="background:linear-gradient(145deg,rgba(212,168,67,0.06),rgba(123,97,255,0.03));border-color:var(--border-gold);text-align:center;padding:var(--s6);" onclick="showInteractiveModal('El Juramento de Acero', 'Recuerda periódicamente las palabras definitivas que declaraste al iniciar tu viaje.<br><br>La motivación es una emoción barata y traicionera que desaparece a los 3 días de empezar. El compromiso férreo en cambio es la fuerza bruta que te empuja a la acción incluso cuando estás exhausto.', '⚔️')">
         <div style="font-size:28px;margin-bottom:12px;">⚔️</div>
         <div class="fw-600" style="font-size:15px;color:var(--text-1);line-height:1.6;font-style:italic;">
           "El compromiso es la decisión de honrar una promesa mucho después de que el entusiasmo inicial haya desaparecido."
