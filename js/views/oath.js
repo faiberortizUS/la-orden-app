@@ -64,39 +64,41 @@ function renderOath(data) {
       ${urgencia ? '<div class="screen-flash-danger"></div>' : ''}
 
       <!-- PACTO ACTIVO -->
-      <div class="oath-card stagger-up stagger-1 ${urgencia ? 'breathe-danger' : 'breathe-gold'}">
-        <div class="oath-contract-num">⚔️ Contrato #${numero} · ${renovaciones + 1}ª ejecución</div>
-        <div class="flex" style="gap:16px; align-items:flex-end; margin-bottom:8px;">
-          <div>
-            <div class="oath-days-left" style="color:${urgencia ? 'var(--fire)' : 'var(--text-1)'};">${diasRestantes}</div>
-            <div class="oath-days-label">${urgencia ? '⚠️ días para cierre' : 'días restantes'}</div>
-          </div>
-          <div style="flex:1; padding-bottom:6px;">
-            <div class="flex between text-xs text-muted" style="margin-bottom:4px;">
-              <span>${inicioFmt}</span>
-              <span>${finFmt}</span>
+      <div>
+        <div class="oath-card ${urgencia ? 'breathe-danger' : 'breathe-gold'}">
+          <div class="oath-contract-num">⚔️ Contrato #${numero} · ${renovaciones + 1}ª ejecución</div>
+          <div class="flex" style="gap:16px; align-items:flex-end; margin-bottom:8px;">
+            <div>
+              <div class="oath-days-left" style="color:${urgencia ? 'var(--fire)' : 'var(--text-1)'};">${diasRestantes}</div>
+              <div class="oath-days-label">${urgencia ? '⚠️ días para cierre' : 'días restantes'}</div>
             </div>
-            <div class="prog-bar-wrap">
-              <div class="prog-bar-fill ${urgencia ? '' : 'prog-bar-fill--gold'}"
-                style="width:${porcentajeTranscurrido}%; background: ${urgencia ? 'linear-gradient(90deg, var(--fire-dim), var(--fire))' : ''};">
+            <div style="flex:1; padding-bottom:6px;">
+              <div class="flex between text-xs text-muted" style="margin-bottom:4px;">
+                <span>${inicioFmt}</span>
+                <span>${finFmt}</span>
+              </div>
+              <div class="prog-bar-wrap">
+                <div class="prog-bar-fill ${urgencia ? '' : 'prog-bar-fill--gold'}"
+                  style="width:${porcentajeTranscurrido}%; background: ${urgencia ? 'linear-gradient(90deg, var(--fire-dim), var(--fire))' : ''};">
+                </div>
+              </div>
+              <div class="text-xs text-muted" style="margin-top:4px; text-align:right;">
+                ${diasConReporte > 0 ? porcentajeTranscurrido + '% de días con reporte' : 'Sin reportes aún'}
               </div>
             </div>
-            <div class="text-xs text-muted" style="margin-top:4px; text-align:right;">
-              ${diasConReporte > 0 ? porcentajeTranscurrido + '% de días con reporte' : 'Sin reportes aún'}
-            </div>
           </div>
-        </div>
 
-        ${urgencia ? `
-          <div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:10px 14px;margin-top:8px;">
-            <div class="text-sm fw-600" style="color:var(--fire);">📅 Cierre en ${diasRestantes} días</div>
-            <div class="text-xs text-muted" style="margin-top:4px;">El sistema calculará tu ICD final y generará tu siguiente contrato.</div>
-          </div>
-        ` : ''}
+          ${urgencia ? `
+            <div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r-md);padding:10px 14px;margin-top:8px;">
+              <div class="text-sm fw-600" style="color:var(--fire);">📅 Cierre en ${diasRestantes} días</div>
+              <div class="text-xs text-muted" style="margin-top:4px;">El sistema calculará tu ICD final y generará tu siguiente contrato.</div>
+            </div>
+          ` : ''}
+        </div>
       </div>
 
       <!-- COMPROMISOS SELLADOS -->
-      <div class="card stagger-up stagger-2">
+      <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--s4);">
           <div class="section-title tappable" style="margin:0;" onclick="showInteractiveModal('Compromisos Sellados', 'Estas no son simples tareas opcionales. Son pilares inquebrantables anexos directamente a tu contrato firme.<br><br>No cumplirlos destruye la integridad del sistema y mancha tu legajo de Arquitecto.', '⚖️')">Compromisos sellados</div>
           <button onclick="navigateTo('add_habit')" class="tappable" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;padding:4px 0;">+ AÑADIR</button>
@@ -115,7 +117,7 @@ function renderOath(data) {
       </div>
 
       <!-- STATS DEL CONTRATO -->
-      <div class="card card--glass stagger-up stagger-3">
+      <div class="card card--glass">
         <div class="section-title tappable" style="margin-bottom:var(--s3); width:max-content;" onclick="showInteractiveModal('Contrato Vigente', 'Un ciclo blindado de presión técnica durante 30 días.<br><br>Tu objetivo primario no es ser intenso por curiosidad 3 días, sino sobrevivir e imponerte al periodo completo para lograr la renovación con un desempeño sobresaliente.', '📜')">Este contrato</div>
         <div class="stat-row">
           <div class="stat-chip tappable" onclick="showInteractiveModal('Días Ejecutados', 'De los 30 días fijados en este contrato cerrado, este número certifica el peso real de tu esfuerzo.<br><br><b>🎯 Objetivo base:</b> Renovar tus contratos al final del periodo contabilizando al menos 25 días ejecutados para reclamar el éxito táctico y certificar tu disciplina.', '📜')">
@@ -139,7 +141,7 @@ function renderOath(data) {
       </div>
 
       <!-- RANGO ACTUAL -->
-      <div class="card flex stagger-up stagger-4 tappable" style="align-items:center;gap:var(--s4);" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
+      <div class="card flex tappable" style="align-items:center;gap:var(--s4);" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
         <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
         <div>
           <div class="text-xs text-muted uppercase ls-wide" style="margin-bottom:3px;">Tu Rango</div>
@@ -151,7 +153,7 @@ function renderOath(data) {
       </div>
 
       <!-- ACCIÓN PRINCIPAL DEL PACTO -->
-      <div class="stagger-up stagger-5" style="padding:8px 0 24px;">
+      <div style="padding:8px 0 24px;">
         <button onclick="navigateTo('add_habit')" class="tappable"
           style="width:100%;padding:18px 24px;border:none;border-radius:var(--r-lg);
             font-family:var(--font-head);font-size:15px;font-weight:900;color:#0A0A0F;letter-spacing:0.06em;
