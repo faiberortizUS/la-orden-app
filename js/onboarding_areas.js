@@ -63,7 +63,6 @@ function renderObAreas() {
       <!-- Footer sticky con blur -->
       <div style="position:fixed;bottom:0;left:0;right:0;padding:20px 24px 24px;
         background:linear-gradient(to top, rgba(10,10,15,1) 50%, rgba(10,10,15,0) 100%);
-        backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
         display:flex;flex-direction:column;gap:12px;z-index:20;">
 
         <div style="text-align:center;font-size:12px;color:var(--text-3);font-weight:600;" id="areasCounter">
