@@ -61,15 +61,15 @@ function renderObOath() {
         </div>
 
         <!-- Botón de firma -->
-        <button id="oath-btn" class="tappable" onclick="signOath()"
-          style="margin-top:24px;width:100%;max-width:360px;padding:20px 24px;
-            border:none;border-radius:var(--r-lg);cursor:pointer;
-            font-family:var(--font-head);font-size:16px;font-weight:900;
-            color:#0A0A0F;letter-spacing:0.06em;
+        <button id="oath-btn" class="btn-premium tappable" onclick="signOath()"
+          style="margin-top:24px;width:100%;max-width:360px;height:56px;display:flex;align-items:center;justify-content:center;
+            border:none;border-radius:var(--r-xl);cursor:pointer;
+            font-family:var(--font-head);font-size:15px;font-weight:900;
+            color:#0A0A0F;letter-spacing:0.04em;
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
-            box-shadow:0 0 30px rgba(212,168,67,0.2);
+            box-shadow:0 8px 24px rgba(212,168,67,0.3);
             opacity:0;transform:translateY(30px);
-            transition:opacity 0.6s ease, transform 0.6s ease;">
+            transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1);">
           🖋️ FIRMO MI PACTO DE ACERO
         </button>
 
@@ -196,6 +196,7 @@ async function signOath() {
     }, 2500);
 
   } catch(e) {
+    isSigning = false; // Permitir reintento
     if(btn?.dataset?.dotIv) clearInterval(btn.dataset.dotIv);
     if (btn) { btn.disabled = false; btn.innerHTML = '❌ ERROR: REINTENTAR FIRMA'; }
     if (window.Telegram?.WebApp) window.Telegram.WebApp.showAlert('No pudimos sellar el pacto en Google Sheets. Error: ' + e.message);
