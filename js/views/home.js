@@ -71,10 +71,11 @@ function renderHome(data) {
               </linearGradient>
             </defs>
             <circle class="gauge-circle gauge-bg" cx="90" cy="90" r="${R}"
+              stroke="var(--bg-elevated)" stroke-width="10"
               stroke-dasharray="${C}" stroke-dashoffset="0"
               transform="rotate(-90 90 90)" />
             <circle class="gauge-circle gauge-fill" cx="90" cy="90" r="${R}"
-              id="icdArc"
+              id="icdArc" stroke="url(#gaugeGrad)" stroke-width="10"
               style="stroke-dasharray: 0 ${C}; transition: stroke-dasharray 1.5s cubic-bezier(0.4,0,0.2,1);"
               data-filled="${filled}" data-gap="${gap}"
               transform="rotate(-90 90 90)" />
