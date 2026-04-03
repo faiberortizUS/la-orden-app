@@ -417,6 +417,9 @@ function _mostrarPopupSalida() {
 }
 
 function showCancelReportFriction() {
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+  }
   window.Telegram.WebApp.showPopup({
     title: '¿Retirada táctica?',
     message: 'Estás a punto de cancelar este reporte. El 1% no se rinde ante la incomodidad.',
