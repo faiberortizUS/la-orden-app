@@ -137,6 +137,9 @@ function renderObCommitments(area, catalog) {
         ${catalog.map(c => {
           const isSel = selected.includes(c.id);
           const comp  = already.find(x => x.compromisoId === c.id);
+          const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          const defaultInfo = 'Actividad táctica de La Orden. Meta recomendada: ' + c.metaDef + ' ' + c.unidad + '. Comprometerte y cumplir diariamente forja consistencia real.';
+          const safeInfo = (c.info || defaultInfo).replace(/'/g, "\\'").replace(/"/g, "&quot;");
           return `
             <div id="comp-${c.id}" style="background:var(--bg-elevated);border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
               border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden;
@@ -144,7 +147,7 @@ function renderObCommitments(area, catalog) {
               transition:all 0.2s ease;">
 
               <!-- Header del compromiso -->
-              <div onclick="toggleCommitment('${c.id}','${area.id}','${c.nombre}','${c.unidad}',${c.pcBase},${c.metaDef})"
+              <div onclick="toggleCommitment('${c.id}','${area.id}','${safeNombre}','${c.unidad}',${c.pcBase},${c.metaDef})"
                 style="display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;">
                 <div style="width:24px;height:24px;border-radius:50%;border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
                   background:${isSel ? 'var(--gold)' : 'transparent'};display:flex;align-items:center;justify-content:center;
@@ -154,7 +157,7 @@ function renderObCommitments(area, catalog) {
                     <div style="font-weight:600;font-size:14px;color:${isSel ? 'var(--gold)' : 'var(--text-1)'};">${c.nombre}</div>
                     <div style="font-size:11px;color:var(--text-3);">Meta sugerida: ${c.metaDef.toLocaleString('es-CO')} ${c.unidad} · +${c.pcBase} PC</div>
                   </div>
-                  <div onclick="event.stopPropagation(); showInteractiveModal('🧠 ' + '${c.nombre}','${(c.info || 'Actividad táctica de La Orden. Meta recomendada: ' + c.metaDef + ' ' + c.unidad + '. Comprometerte y cumplir diariamente forja consistencia real.').replace(/'/g, "&apos;")}<br><br><b>Meta sugerida:</b> ${c.metaDef.toLocaleString('es-CO')} ${c.unidad}','🧠')" style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);background:rgba(212,168,67,0.1);margin-left:8px;font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
+                  <div onclick="event.stopPropagation(); showInteractiveModal('🧠 ${safeNombre}','${safeInfo}<br><br><b>Meta sugerida:</b> ${c.metaDef.toLocaleString('es-CO')} ${c.unidad}','🧠')" style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);background:rgba(212,168,67,0.1);margin-left:8px;font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
                 </div>
               </div>
 
