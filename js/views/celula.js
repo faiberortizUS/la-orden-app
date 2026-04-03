@@ -44,7 +44,7 @@ function renderCelula(data) {
 
       <!-- Tabla de la Célula -->
       <div class="card stagger-up stagger-3" style="padding:var(--s4);">
-        <div class="section-title" style="margin-bottom:var(--s4);">${user.celula}</div>
+        <div class="section-title tappable" style="margin-bottom:var(--s4); width:max-content;" onclick="showInteractiveModal('Rango Celular', 'El peso y aporte exacto de cada miembro. Mídele el pulso a tu competencia inmediata.', '⚔️')">${user.celula}</div>
 
         ${sorted.map((m, i) => {
           const pos = i + 1;
@@ -71,7 +71,7 @@ function renderCelula(data) {
       </div>
 
       <!-- Motivación de la célula -->
-      <div class="card stagger-up stagger-4" style="border-color:var(--border-gold); background:linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02));">
+      <div class="card stagger-up stagger-4 tappable" style="border-color:var(--border-gold); background:linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02));" onclick="showInteractiveModal('Prueba Social y Efecto de Grupo', 'Neurológicamente estamos cableados para adaptarnos por supervivencia al comportamiento de nuestra tribu.<br><br>Cuando el resto de tu Célula de guerreros empuja su ICD sobre 85 en equipo, la constante presión silenciosa forzará tu cerebro a rechazar la pereza y alinearse con la élite.', '🧠')">
         <div class="fw-700" style="color:var(--gold); font-size:14px; margin-bottom:8px;">🤝 Ley de la Célula</div>
         <div class="text-sm text-muted" style="line-height:1.6;">
           Tu Célula ve tu progreso. Tu negligencia los afecta. Tu excelencia los eleva.
