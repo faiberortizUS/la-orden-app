@@ -26,7 +26,7 @@ function showInteractiveModal(title, text, badge) {
   overlay.style.cssText = `
     position: fixed; inset: 0; z-index: 1000;
     display: flex; flex-direction: column; justify-content: flex-end;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.85);
     animation: modalBgIn 0.3s ease forwards;
   `;
 
