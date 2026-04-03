@@ -299,13 +299,20 @@ async function submitReport() {
       if (result.lineaActiva !== undefined) window._appData.user.lineaActiva = result.lineaActiva;
       if (result.diasActivos !== undefined) window._appData.user.diasActivos = result.diasActivos;
     }
+    // Sincronizar variable global usada en la navegación
+    // eslint-disable-next-line no-undef
+    if (typeof appData !== 'undefined') appData = window._appData;
   }
 
   // ── Pedir silenciosamente una actualización al servidor mientras la animación se muestra
   // para asegurar consistencia perfecta (Rango, Historial Semanal, etc) si vuelven al inicio.
   if (typeof fetchUserData === 'function') {
     fetchUserData().then(fresh => {
-       if (fresh && fresh.user) window._appData = fresh;
+       if (fresh && fresh.user) {
+         window._appData = fresh;
+         // eslint-disable-next-line no-undef
+         if (typeof appData !== 'undefined') appData = fresh;
+       }
     });
   }
 
