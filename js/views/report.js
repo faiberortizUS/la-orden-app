@@ -89,7 +89,7 @@ function renderReport(data, params) {
       <p class="text-sm text-muted" style="margin-bottom:8px;">Elige qué victoria vas a registrar ahora</p>
       <div class="commitment-selector">
         ${pendientes.map(c => `
-          <div class="commitment-pick-item" onclick="openReportInput('${c.id}')">
+          <div class="commitment-pick-item tappable" onclick="openReportInput('${c.id}')">
             <span style="font-size:28px;">${c.emoji}</span>
             <div style="flex:1;">
               <div class="fw-600" style="font-size:15px;">${c.nombre}</div>
@@ -146,10 +146,10 @@ function renderReportInput(c) {
       </div>
 
       <div class="input-controls">
-        <button class="ctrl-btn" onclick="adjustValue(-10)">−10</button>
-        <button class="ctrl-btn" onclick="adjustValue(-1)">−1</button>
-        <button class="ctrl-btn plus" onclick="adjustValue(1)">+1</button>
-        <button class="ctrl-btn plus" onclick="adjustValue(10)">+10</button>
+        <button class="ctrl-btn tappable" onclick="adjustValue(-10)">−10</button>
+        <button class="ctrl-btn tappable" onclick="adjustValue(-1)">−1</button>
+        <button class="ctrl-btn plus tappable" onclick="adjustValue(1)">+1</button>
+        <button class="ctrl-btn plus tappable" onclick="adjustValue(10)">+10</button>
       </div>
 
       <input type="number" id="customInput" min="0"
@@ -187,6 +187,11 @@ function adjustValue(delta) {
   if (!c) return;
   reportState.currentValue = Math.max(0, reportState.currentValue + delta);
   updateInputDisplay();
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    if (delta > 0) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    else window.Telegram.WebApp.HapticFeedback.impactOccurred('rigid');
+  }
 }
 
 function setCustomValue(v) {
