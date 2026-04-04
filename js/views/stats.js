@@ -102,13 +102,13 @@ function renderStats(data) {
   });
 
 
-  // ── Filtro selector
+  // ── Filtro selector (Estilo minimalista para incrustar)
   const filterHtml = `
     <select id="statsFilterSelect" onchange="changeStatsFilter(this.value)"
-      style="width:100%; padding:11px 14px; background:var(--bg-overlay);
-             border:1px solid var(--border); border-radius:var(--r-md);
-             color:var(--text-1); font-family:var(--font-head); font-size:13px;
-             font-weight:600; outline:none; cursor:pointer; margin-bottom:14px;">
+      style="width:100%; padding:8px 10px; background:var(--bg-overlay);
+             border:1px solid rgba(212,168,67,0.4); border-radius:var(--r-md);
+             color:var(--gold); font-family:var(--font-head); font-size:13px;
+             font-weight:800; outline:none; cursor:pointer;">
       <option value="GLOBAL" ${currentStatsFilter === 'GLOBAL' ? 'selected' : ''}>🌍 Todas las misiones (Global)</option>
       ${compromisosList.map(c => `
         <option value="${c.id}" ${currentStatsFilter === c.id ? 'selected' : ''}>${c.emoji} ${c.nombre}</option>
@@ -202,14 +202,42 @@ function renderStats(data) {
       </div>
 
       <!-- ════════════════════════════════════════════════════ -->
+      <!-- NUEVO: TARJETA DE CARGA (AHORA COMO FILTRO MAESTRO)  -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <div class="card stagger-up stagger-2" style="margin-bottom:10px; padding:16px; border-color:var(--border-gold); background:linear-gradient(145deg, rgba(212,168,67,0.08), rgba(0,0,0,0.4));">
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
+           <div style="display:flex; align-items:center; justify-content:space-between;">
+             <div style="display:flex; align-items:center; gap:8px;">
+               <span style="font-family:var(--font-head); font-weight:800; color:var(--text-1); font-size:14px; letter-spacing:0.02em;">Filtrar Carga Operativa</span>
+               <div onclick="showInteractiveModal('Volumen Operativo', 'Suma cuantitativa del esfuerzo invertido.\\n\\nSelecciona una misión específica en el menú superior para aislar tu gráfica semanal y mapa de calor exclusivamente hacia esa métrica.\\n\\nMientras la gráfica evalúa si cumpliste o no, <b>el Volumen mide cuánto peso levantaste</b> (minutos, kms, repeticiones).', '🧊')" style="background:rgba(212,168,67,0.2); border-radius:50%; width:18px;height:18px;display:flex;justify-content:center;align-items:center;color:var(--gold);font-size:10px;font-weight:800;cursor:pointer;">?</div>
+             </div>
+             <span style="font-size:14px; opacity:0.8;">🧊</span>
+           </div>
+           
+           ${filterHtml}
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1; background:rgba(0,0,0,0.4); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.03);">
+            <div style="font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Volumen Semanal</div>
+            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:var(--gold); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volSemana.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:10px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
+          </div>
+          <div style="flex:1; background:rgba(0,0,0,0.4); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.03);">
+            <div style="font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Volumen Mensual</div>
+            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:var(--gold); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volMes.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:10px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════ -->
       <!-- 2. HEATMAP 28 DIAS                                   -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-2" style="margin-bottom:10px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;" class="tappable" onclick="showInteractiveModal('Historial de 28 Días', 'El mapa de calor registra empíricamente tu patrón de acción.<br><br><b>Niveles de Energía:</b><br><span style=&quot;color:var(--text-3)&quot;>Vacío</span> — Día Perdido<br><span style=&quot;color:rgba(123,97,255,1)&quot;>Púrpura</span> — Esfuerzo Incompleto<br><span style=&quot;color:var(--success)&quot;>Esmeralda</span> — Día Fuerte<br><span style=&quot;color:var(--gold)&quot;>Dorado</span> — Victoria Absoluta<br><br>El sistema analiza solo 28 días porque ese es el periodo científico para cementar la neuroplasticidad. Lo que hagas hoy dictará quién serás mañana.', '🗺️')">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;" class="tappable" onclick="showInteractiveModal('Historial de 28 Días', 'El mapa de calor registra empíricamente tu patrón de acción en la misión seleccionada.<br><br><b>Niveles de Energía:</b><br><span style=&quot;color:var(--text-3)&quot;>Vacío</span> — Día Perdido<br><span style=&quot;color:rgba(123,97,255,1)&quot;>Púrpura</span> — Esfuerzo Incompleto<br><span style=&quot;color:var(--success)&quot;>Esmeralda</span> — Día Fuerte<br><span style=&quot;color:var(--gold)&quot;>Dorado</span> — Victoria Absoluta<br><br>El sistema analiza solo 28 días porque ese es el periodo científico para cementar la neuroplasticidad.', '🗺️')">
           <div class="section-title" style="margin:0;">Historial 28 dias</div>
           <div style="font-size:11px; color:var(--text-3);">${diasConReporte28} dias con reporte</div>
         </div>
-        ${filterHtml}
+        
         <div class="heatmap-labels">
           ${['D','L','M','M','J','V','S'].map(d => `<div class="heatmap-day-label">${d}</div>`).join('')}
         </div>
@@ -223,26 +251,6 @@ function renderStats(data) {
           <span style="font-size:10px; color:var(--text-3);">Menos</span>
           ${[0,1,2,3,4].map(l => `<div style="width:11px;height:11px;border-radius:2px;" class="heatmap-day" data-level="${l}"></div>`).join('')}
           <span style="font-size:10px; color:var(--text-3);">Mas</span>
-        </div>
-      </div>
-
-      <!-- ════════════════════════════════════════════════════ -->
-      <!-- NUEVO: TARJETA DE VOLUMEN OPERATIVO                  -->
-      <!-- ════════════════════════════════════════════════════ -->
-      <div class="card stagger-up stagger-2 tappable" style="margin-bottom:10px; padding:18px; border-color:var(--border-gold); background:linear-gradient(145deg, rgba(212,168,67,0.06), rgba(0,0,0,0.3));" onclick="showInteractiveModal('Volumen Operativo', 'Suma cuantitativa del esfuerzo invertido.<br><br>Mientras la gráfica evalúa si cumpliste o no, <b>el Volumen mide cuánto peso levantaste</b> (minutos, kms, repeticiones). Si ayer reportaste 10 mins y hoy 100 mins, tu promedio será estático pero tu volumen explotará.', '🧊')">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-           <span style="font-family:var(--font-head); font-weight:800; color:var(--gold); font-size:15px; letter-spacing:0.02em;">Carga Física de Datos</span>
-           <span style="font-size:16px;">🧊</span>
-        </div>
-        <div style="display:flex; gap:12px;">
-          <div style="flex:1; background:rgba(0,0,0,0.3); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.02);">
-            <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Últimos 7 días</div>
-            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:26px; font-weight:900; color:var(--text-1); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volSemana.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:11px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
-          </div>
-          <div style="flex:1; background:rgba(0,0,0,0.3); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.02);">
-            <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Últimos 28 días</div>
-            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:26px; font-weight:900; color:var(--text-1); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volMes.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:11px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
-          </div>
         </div>
       </div>
 
@@ -692,10 +700,10 @@ function showHeatmapTooltip(element, level, valor, count, total, isGlobal) {
 
   const messages = [
     '<span style="color:var(--text-2);">0 Actividad</span>' + extraInfo,
-    'Avance leve (Nivel 1)' + extraInfo,
-    'Buen esfuerzo (Nivel 2)' + extraInfo,
-    '<span style="color:var(--gold);">Día Fuerte (Nivel 3)</span>' + extraInfo,
-    '<span style="color:var(--electric);font-weight:800;">Día de Poder (Nivel 4)⚡</span>' + extraInfo
+    'Soporte Vital (1)' + extraInfo,
+    'Cumplimiento Parcial (2)' + extraInfo,
+    '<span style="color:var(--gold);">Día Ganado (3)</span>' + extraInfo,
+    '<span style="color:var(--electric);font-weight:800;">Ejecución Élite (4) ⚡</span>' + extraInfo
   ];
   _createTooltip(element, messages[level]);
 }
