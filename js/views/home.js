@@ -105,7 +105,7 @@ function renderHome(data) {
         <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.18em; color:var(--fire); margin-bottom:6px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
            <span style="font-size:14px; animation: heartbeat 1.5s infinite;">⏳</span> CIERRE DE LÍNEA TEMPORAL
         </div>
-        <div id="midnightClock" style="font-family:monospace; font-size:32px; font-weight:900; color:var(--text-1); letter-spacing:0.12em; text-shadow:0 0 15px rgba(255,107,53,0.5);">
+        <div id="midnightClock" style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:36px; font-weight:900; color:var(--text-1); letter-spacing:0.05em; text-shadow:0 0 15px rgba(255,107,53,0.5);">
           --:--:--
         </div>
       </div>
