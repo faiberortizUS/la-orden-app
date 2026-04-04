@@ -143,13 +143,57 @@ window.addEventListener('DOMContentLoaded', async () => {
       const appEl = document.getElementById('app');
       if (appEl) appEl.classList.remove('hidden');
 
-      // ¿Primera visita post-juramento? -> Centro de Comandos
+      // 💥 PROTOCOLO DE DEGRADACIÓN (El Sistema Reacciona a la Indisciplina)
+      const isCritical = Number(appData.user.icd) < 50 && Number(appData.user.icd) > 0;
+      if (isCritical) {
+        document.body.classList.add('system-degraded');
+        if (!document.getElementById('degradation-css')) {
+          const style = document.createElement('style');
+          style.id = 'degradation-css';
+          style.innerHTML = `
+            .system-degraded {
+              filter: saturate(0.5) contrast(1.15) sepia(0.2) hue-rotate(-15deg);
+            }
+            .system-degraded::after {
+              content: ''; position: fixed; inset: 0;
+              background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,50,50,0.04) 2px, rgba(200,50,50,0.04) 4px);
+              pointer-events: none; z-index: 9999;
+              animation: glitch-overlay 10s infinite alternate;
+            }
+            @keyframes glitch-overlay {
+              0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; }
+            }
+            .system-degraded nav.bottom-nav { border-top: 1px solid rgba(239,68,68,0.5); background: rgba(10,5,5,0.95); }
+          `;
+          document.head.appendChild(style);
+        }
+      } else {
+        document.body.classList.remove('system-degraded');
+      }
+
+      // ── MÚLTIPLE VISTA COMPARTIDA: Mensaje del Guía Diario ──
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (appData.mensajeGuia && localStorage.getItem('laorden_last_guide') !== todayStr) {
+        // Formatear markdown básico (*negrita*, _cursiva_)
+        const formattedMsg = appData.mensajeGuia
+          .replace(/\*(.*?)\*/g, '<strong style="color:var(--text-1);">$1</strong>')
+          .replace(/_(.*?)_/g, '<em style="color:var(--text-2);">$1</em>')
+          .replace(/\n/g, '<br>');
+        
+        // Retrasamos un instante para no pisar animaciones de vista
+        setTimeout(() => {
+          showInteractiveModal('Mensaje de La Orden', formattedMsg, '🏛️');
+          localStorage.setItem('laorden_last_guide', todayStr);
+        }, 800);
+      }
+
+      // ¿Primera visita post-juramento? -> Tutorial inmersivo
       if (localStorage.getItem('laorden_first_visit') === '1') {
-        navigateTo('command_center');
+        navigateTo('tutorial');
       } else {
         const urlParams = new URLSearchParams(window.location.search);
         const targetView = urlParams.get('view');
-        if (targetView && ['home', 'report', 'stats', 'oath', 'celula', 'add_habit', 'command_center'].includes(targetView)) {
+        if (targetView && ['home', 'report', 'stats', 'oath', 'celula', 'add_habit', 'command_center', 'tutorial'].includes(targetView)) {
           navigateTo(targetView);
         } else {
           navigateTo('home');
@@ -195,6 +239,7 @@ function navigateTo(view, params) {
       case 'oath':      html = renderOath(appData); break;
       case 'celula':    html = renderCelula(appData); break;
       case 'add_habit': html = renderAddHabit(appData); break;
+      case 'tutorial':  html = renderTutorial(appData); break;
       case 'command_center': {
         const isFirst = localStorage.getItem('laorden_first_visit') === '1';
         html = renderCommandCenter(appData, isFirst);
