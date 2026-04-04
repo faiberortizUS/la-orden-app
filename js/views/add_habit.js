@@ -101,6 +101,7 @@ function onAddHabitInterrupt() {
       window.Telegram.WebApp.showConfirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.', function (confirmed) {
         if (confirmed) {
           _isAddHabitDirty = false;
+          _removeAddHabitBackButton();
           navigateTo('oath');
         }
       });
@@ -110,7 +111,15 @@ function onAddHabitInterrupt() {
     }
   }
   _isAddHabitDirty = false;
+  _removeAddHabitBackButton();
   navigateTo('oath');
+}
+
+function _removeAddHabitBackButton() {
+  if (window.Telegram?.WebApp?.BackButton) {
+    window.Telegram.WebApp.BackButton.offClick(onAddHabitInterrupt);
+    window.Telegram.WebApp.BackButton.hide();
+  }
 }
 
 
@@ -118,6 +127,11 @@ function initAddHabitView() {
   _isAddHabitDirty = false;
   _selectedSuggestedActivity = null;
   // La vista inicializa sin selecciones, guiando al usuario paso a paso
+
+  if (window.Telegram?.WebApp?.BackButton) {
+    window.Telegram.WebApp.BackButton.show();
+    window.Telegram.WebApp.BackButton.onClick(onAddHabitInterrupt);
+  }
 }
 
 // Catálogo de sugerencias por área con descripción científica
