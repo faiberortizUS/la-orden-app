@@ -5,7 +5,7 @@ function renderAddHabit(data) {
       <div style="position: sticky; top: -20px; background: rgba(10,10,15,0.95); 
            padding: 16px 0; margin: -20px -20px 16px -20px; z-index: 50; display: flex; align-items: center; 
            gap: 8px; cursor: pointer; border-bottom: 1px solid var(--border);" 
-           onclick="navigateTo('oath')">
+           onclick="onAddHabitInterrupt()">
         <div style="padding: 0 20px; display: flex; align-items: center; gap: 8px; width: 100%;">
           <span style="font-size:20px;color:var(--gold);">←</span>
           <span style="font-size:14px; font-weight:700; color:var(--text-1); letter-spacing:0.04em;">Atrás / Cancelar Misión</span>
@@ -21,8 +21,9 @@ function renderAddHabit(data) {
       <div class="card">
         <div style="margin-bottom:var(--s4);">
           <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">1. Territorio de Impacto</label>
-          <select id="newHabitArea" class="form-input" onchange="updateActivitySuggestions()"
+          <select id="newHabitArea" class="form-input" onchange="markAddHabitDirty(); updateActivitySuggestions();"
             style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;">
+            <option value="" disabled selected>-- Elige un área militar --</option>
             <option value="SALUD_FISICA">🏃 Salud Física</option>
             <option value="SALUD_MENTAL">🧠 Salud Mental</option>
             <option value="ANTI_ADICCION">🚫 Recuperación y Sobriedad</option>
@@ -33,59 +34,90 @@ function renderAddHabit(data) {
             <option value="CARRERA">🚀 Carrera y Negocio</option>
             <option value="ENTORNO">🏠 Entorno y Orden</option>
             <option value="ESPIRITUALIDAD">🙏 Espiritualidad</option>
-            <option value="PERSONALIZADO">🎯 Personalizado</option>
+            <option value="PERSONALIZADO">🎯 Personalizado (Operación Táctica)</option>
           </select>
         </div>
 
-        <!-- Actividades sugeridas del área -->
-        <div id="activitySuggestions" style="margin-bottom:var(--s4);">
-          <!-- Se rellena dinámicamente por updateActivitySuggestions() -->
+        <!-- 2. Actividades sugeridas del área (Aparición condicional) -->
+        <div id="activitySuggestions" style="margin-bottom:var(--s4); display:none;">
+          <!-- Se rellena dinámicamente -->
         </div>
 
-        <div style="margin-bottom:var(--s4);">
-          <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">2. Nombre de la Misión</label>
-          <input type="text" id="newHabitName" placeholder="Ej. Meditar, Correr 5K, Leer..." class="form-input"
-            style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--gold); padding:14px; font-size:15px; outline:none;" autocomplete="off">
-        </div>
-
-        <div style="display:flex; gap:12px; margin-bottom:var(--s4);">
-          <div style="flex:1;">
-            <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">3. Meta Diaria (Número)</label>
-            <input type="number" id="newHabitMeta" placeholder="Ej. 10" inputmode="numeric" pattern="[0-9]*" class="form-input"
-              style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;">
+        <!-- 3. Formulario cautivo (Aparición condicional) -->
+        <div id="habitFormWrapper" style="display:none; transition: all 0.3s ease;">
+          <div style="margin-bottom:var(--s4);">
+            <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">Nombre de la Misión</label>
+            <input type="text" id="newHabitName" placeholder="Ej. Meditar, Correr 5K, Leer..." class="form-input"
+              style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-elevated); color:var(--gold); padding:14px; font-size:15px; outline:none;" autocomplete="off" oninput="markAddHabitDirty()">
           </div>
-          <div style="flex:1;">
-            <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">Unidad</label>
-            <input type="text" id="newHabitUnidad" placeholder="min, reps, pág..." class="form-input"
-              style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;">
-          </div>
-        </div>
 
-        <div style="margin-bottom:var(--s4);">
-          <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">4. Frecuencia Estratégica</label>
-          <select id="newHabitFreq" class="form-input"
-            style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;">
-            <option value="DIARIO">Diario (Alta Disciplina)</option>
-            <option value="L_V">Lunes a Viernes</option>
-            <option value="FDS">Fin de Semana (Sáb-Dom)</option>
-          </select>
+          <div style="display:flex; gap:12px; margin-bottom:var(--s4);">
+            <div style="flex:1;">
+              <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">Meta Diaria (Número)</label>
+              <input type="number" id="newHabitMeta" placeholder="Ej. 10" inputmode="numeric" pattern="[0-9]*" class="form-input"
+                style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;" oninput="markAddHabitDirty()">
+            </div>
+            <div style="flex:1;">
+              <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">Unidad</label>
+              <input type="text" id="newHabitUnidad" placeholder="min, reps, pág..." class="form-input"
+                style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-elevated); color:var(--text-1); padding:14px; font-size:15px; outline:none;" oninput="markAddHabitDirty()">
+            </div>
+          </div>
+
+          <div style="margin-bottom:var(--s4);">
+            <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">Frecuencia Estratégica</label>
+            <select id="newHabitFreq" class="form-input" onchange="markAddHabitDirty()"
+              style="width:100%; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-primary); color:var(--text-1); padding:14px; font-size:15px; outline:none;">
+              <option value="DIARIO" selected>Diario (Alta Disciplina)</option>
+              <option value="L_V">Lunes a Viernes</option>
+              <option value="FDS">Fin de Semana (Sáb-Dom)</option>
+            </select>
+          </div>
+          
+          <button id="saveHabitBtn" onclick="saveNewHabit()" 
+            style="width:100%; margin-top:16px; padding:18px 24px; border:none; border-radius:var(--r-lg); cursor:pointer; 
+                   font-family:var(--font-head); font-size:16px; font-weight:900; color:#0A0A0F; letter-spacing:0.06em; 
+                   background:linear-gradient(135deg,var(--gold-dim),var(--gold)); box-shadow:0 0 30px rgba(212,168,67,0.2);">
+            ➕ INTEGRAR AL PACTO
+          </button>
         </div>
-        
-      <button id="saveHabitBtn" onclick="saveNewHabit()" 
-          style="width:100%; margin-top:16px; padding:18px 24px; border:none; border-radius:var(--r-lg); cursor:pointer; 
-                 font-family:var(--font-head); font-size:16px; font-weight:900; color:#0A0A0F; letter-spacing:0.06em; 
-                 background:linear-gradient(135deg,var(--gold-dim),var(--gold)); box-shadow:0 0 30px rgba(212,168,67,0.2);">
-          ➕ INTEGRAR AL PACTO
-        </button>
       </div>
 
     </div>
   `;
 }
 
+// Variables de estado
+let _isAddHabitDirty = false;
+let _selectedSuggestedActivity = null;
+
+function markAddHabitDirty() {
+  _isAddHabitDirty = true;
+}
+
+function onAddHabitInterrupt() {
+  if (_isAddHabitDirty) {
+    if (window.Telegram?.WebApp?.showConfirm) {
+      window.Telegram.WebApp.showConfirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.', function (confirmed) {
+        if (confirmed) {
+          _isAddHabitDirty = false;
+          navigateTo('oath');
+        }
+      });
+      return;
+    } else {
+      if (!confirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.')) return;
+    }
+  }
+  _isAddHabitDirty = false;
+  navigateTo('oath');
+}
+
+
 function initAddHabitView() {
-  // Inicializar sugerencias con el area por defecto al cargar la vista
-  requestAnimationFrame(() => updateActivitySuggestions());
+  _isAddHabitDirty = false;
+  _selectedSuggestedActivity = null;
+  // La vista inicializa sin selecciones, guiando al usuario paso a paso
 }
 
 // Catálogo de sugerencias por área con descripción científica
@@ -104,11 +136,12 @@ const ADD_HABIT_CATALOG = {
     { nombre: 'Detox digital',           unidad: 'hrs', meta: 2, info: 'Cada hora menos de pantalla = 20% menos cortisol (APA, 2017). El scroll activa el mismo circuito de dopamina que las tragamonedas.' },
   ],
   ANTI_ADICCION: [
-    { nombre: 'Días de sobriedad',       unidad: 'días', meta: 1, info: 'NIDA: 90 días de abstinencia inician la reparación neuronal del circuito de recompensa. Cada día sin ceder es un ladrillo de reconstrucción cerebral.' },
-    { nombre: 'Minutos sin craving',     unidad: 'min', meta: 60, info: 'Técnica de surfing del craving (Marlatt). El impulso dura promedio 20 min: no lo satisfagas, obsérvaio pasar como una ola.' },
-    { nombre: 'Actividad sustituta',     unidad: 'min', meta: 30, info: 'Protocolo CBT: reemplazar la conducta adictiva con actividad incompatible reduce la frecuencia de recaída un 35% (NIDA).' },
-    { nombre: 'Conexión social sana',    unidad: 'conv', meta: 1, info: 'Johann Hari: "Lo opuesto a la adicción no es la sobriedad, es la conexión". Una conversación real por día es medicina preventiva.' },
-    { nombre: 'Meditación de atención plena', unidad: 'min', meta: 15, info: 'Mindfulness-Based Relapse Prevention (MBRP): reduce recaídas un 31% comparado con tratamiento estándar (Witkiewitz, 2014).' },
+    { nombre: 'Sobriedad: Alcohol',        unidad: 'días', meta: 1, info: 'Recuerda: se trabaja un día a la vez. Cada día suma a la reparación neuronal de tu circuito de recompensa.' },
+    { nombre: 'Sobriedad: Nicotina / Vape',unidad: 'días', meta: 1, info: 'Recuerda: se trabaja un día a la vez. Superar el craving de nicotina recablea tu tolerancia a la ansiedad y al estrés.' },
+    { nombre: 'Sobriedad: Pornografía',    unidad: 'días', meta: 1, info: 'Recuerda: se trabaja un día a la vez. La abstención resetea tus receptores dopaminérgicos y restaura tu vitalidad y atención.' },
+    { nombre: 'Sobriedad: Sustancias',     unidad: 'días', meta: 1, info: 'Recuerda: se trabaja un día a la vez. NIDA indica que la neuroplasticidad requiere semanas de constancia sin excepciones.' },
+    { nombre: 'Sobriedad: Apuestas',       unidad: 'días', meta: 1, info: 'Recuerda: se trabaja un día a la vez. Romper la trampa del azar devuelve el control absoluto a tus manos.' },
+    { nombre: 'Soportar un Craving',       unidad: 'eventos', meta: 1, info: 'Surfing the urge: el pico de abstinencia dura solo ~20 min. No lo satisfagas, obsérvalo pasar; así matas al monstruo.' },
   ],
   FINANZAS: [
     { nombre: 'Ahorro diario',           unidad: 'COP', meta: 10000, info: '$10K COP/día = $3.65M/año. El poder del compounding: a 7% anual, en 10 años son $50M. La riqueza se construye en silencio, día a día.' },
@@ -147,52 +180,57 @@ const ADD_HABIT_CATALOG = {
   ],
   PERSONALIZADO: [],
 };
-
 function updateActivitySuggestions() {
   const area = document.getElementById('newHabitArea')?.value;
   const container = document.getElementById('activitySuggestions');
-  if (!container || !area) return;
-  
-  const catalog = ADD_HABIT_CATALOG[area] || [];
-  if (catalog.length === 0) {
-    container.innerHTML = '';
-    // Limpiar para area personalizada
-    const nameInput = document.getElementById('newHabitName');
-    const uniInput  = document.getElementById('newHabitUnidad');
-    const metaInput = document.getElementById('newHabitMeta');
-    if (nameInput) nameInput.value = '';
-    if (uniInput)  uniInput.value  = '';
-    if (metaInput) metaInput.value = '';
-    return;
-  }
-
-  // Auto-rellenar con la primera actividad sugerida del area
-  const primera = catalog[0];
+  const formWrapper = document.getElementById('habitFormWrapper');
   const nameInput = document.getElementById('newHabitName');
   const uniInput  = document.getElementById('newHabitUnidad');
   const metaInput = document.getElementById('newHabitMeta');
-  if (nameInput) nameInput.value = primera.nombre;
-  if (uniInput)  uniInput.value  = primera.unidad;
-  if (metaInput) metaInput.value = primera.meta;
+
+  if (!container || !area) return;
   
+  if (area === 'PERSONALIZADO') {
+    container.style.display = 'none';
+    formWrapper.style.display = 'block';
+    
+    nameInput.value = '';
+    nameInput.readOnly = false;
+    uniInput.value = '';
+    uniInput.readOnly = false;
+    metaInput.value = '';
+    
+    // Clear styles
+    nameInput.style.background = 'var(--bg-primary)';
+    uniInput.style.background = 'var(--bg-primary)';
+    return;
+  }
+
+  const catalog = ADD_HABIT_CATALOG[area] || [];
+  
+  // Show list, hide form until selection
+  container.style.display = 'block';
+  formWrapper.style.display = 'none';
+  _selectedSuggestedActivity = null;
+
   container.innerHTML = `
-    <div style="margin-bottom:12px;">
-      <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-2); margin-bottom:8px;">
-        Actividades sugeridas — toca para seleccionar + ver la ciencia
+    <div style="margin-bottom:12px; margin-top:24px;">
+      <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin-bottom:12px;">
+        2. Selecciona tu Actividad Sugerida
       </label>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        ${catalog.map(c => {
+        ${catalog.map((c, i) => {
           const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
           const rawInfo = c.info || 'Actividad táctica diseñada para erradicar la mediocridad. Su ejecución diaria engrana tu mente al estándar del 1%.';
           const tooltipHtml = `<div style="margin-bottom:14px; font-size:13px; color:var(--text-1); line-height:1.6;">${rawInfo}</div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">Calibración Táctica</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">${c.meta.toLocaleString('es-CO')} ${c.unidad}</span></div></div>`;
           const safeInfo = tooltipHtml.replace(/'/g, "\\'").replace(/"/g, "&quot;");
           return `
-          <div onclick="selectSuggestedActivity('${safeNombre}','${c.unidad}',${c.meta},'${safeInfo}')"
+          <div id="suggested-item-${i}" onclick="selectSuggestedActivity('${safeNombre}','${c.unidad}',${c.meta},'${safeInfo}', ${i})"
             style="display:flex; align-items:center; gap:10px; padding:12px 14px;
               background:var(--bg-elevated); border:1px solid var(--border);
-              border-radius:var(--r-md); transition:all 0.2s ease;" class="tappable"
+              border-radius:var(--r-md); transition:all 0.2s ease;" class="tappable activity-item"
             onmouseover="this.style.borderColor='var(--border-gold)';this.style.background='rgba(212,168,67,0.06)'"
-            onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-elevated)'">
+            onmouseout="if (_selectedSuggestedActivity !== ${i}) { this.style.borderColor='var(--border)';this.style.background='var(--bg-elevated)'; }">
             <div style="flex:1;">
               <div style="font-size:13px; font-weight:700; color:var(--text-1);">${c.nombre}</div>
               <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Meta sugerida: ${c.meta} ${c.unidad}</div>
@@ -201,7 +239,6 @@ function updateActivitySuggestions() {
               <div onclick="event.stopPropagation(); showInteractiveModal('${safeNombre}','${safeInfo}','🧠')" class="tappable"
                 style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);
                   background:rgba(212,168,67,0.1);font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
-              <span style="font-size:16px; color:var(--text-3);">⟩</span>
             </div>
           </div>
         `}).join('')}
@@ -210,18 +247,49 @@ function updateActivitySuggestions() {
   `;
 }
 
+function selectSuggestedActivity(nombre, unidad, meta, info, index) {
+  _selectedSuggestedActivity = index;
+  markAddHabitDirty();
 
-function selectSuggestedActivity(nombre, unidad, meta, info) {
+  // Resetear estilos visuales de otros
+  document.querySelectorAll('.activity-item').forEach((el, i) => {
+    if (i === index) {
+      el.style.borderColor = 'var(--gold)';
+      el.style.background = 'rgba(212,168,67,0.15)';
+    } else {
+      el.style.borderColor = 'var(--border)';
+      el.style.background = 'var(--bg-elevated)';
+    }
+  });
+
   const nameInput = document.getElementById('newHabitName');
   const metaInput = document.getElementById('newHabitMeta');
   const uniInput = document.getElementById('newHabitUnidad');
-  if (nameInput) nameInput.value = nombre;
-  if (metaInput) metaInput.value = meta;
-  if (uniInput) uniInput.value = unidad;
-  
-  // Mostrar la info científica
-  showInteractiveModal(nombre, info, '🧠');
-  
+  const formWrapper = document.getElementById('habitFormWrapper');
+
+  formWrapper.style.display = 'block';
+
+  if (nameInput) {
+    nameInput.value = nombre;
+    nameInput.readOnly = true;
+    nameInput.style.background = 'var(--bg-base)';
+    nameInput.style.color = 'var(--text-2)';
+  }
+  if (uniInput) {
+    uniInput.value = unidad;
+    uniInput.readOnly = true;
+    uniInput.style.background = 'var(--bg-base)';
+    uniInput.style.color = 'var(--text-2)';
+  }
+  if (metaInput) {
+    metaInput.value = meta;
+    // Poner el foco en la meta para acelerar interacción
+    setTimeout(() => metaInput.focus(), 100);
+  }
+
+
+
+  // Mostrar la info científica como recompensa extra por explorar la actividad
   if (window.Telegram?.WebApp?.HapticFeedback) {
     window.Telegram.WebApp.HapticFeedback.selectionChanged();
   }
