@@ -105,7 +105,7 @@ function renderStats(data) {
           style="background:${icdZona.bg}; border:1px solid ${icdZona.color}40;
             border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
           <div style="font-size:10px; letter-spacing:0.15em; color:${icdZona.color}; text-transform:uppercase; font-weight:700; margin-bottom:6px;">ICD</div>
-          <div style="font-family:var(--font-head); font-size:34px; font-weight:900; color:var(--text-1); line-height:1;">${icd}</div>
+          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--text-1); line-height:1; letter-spacing:-0.02em;">${icd}</div>
           <div style="font-size:11px; color:${icdZona.color}; margin-top:4px; font-weight:600;">${icdZona.label}</div>
           <div style="position:absolute; top:10px; right:12px; font-size:18px; opacity:0.6;">${tendencia === '↑' ? '📈' : tendencia === '↓' ? '📉' : '➡️'}</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Tendencia: <strong style="color:${tendencia==='↑'?'var(--success)':tendencia==='↓'?'#EF4444':'var(--text-2)'}">${tendencia}</strong></div>
@@ -116,7 +116,7 @@ function renderStats(data) {
           style="background:rgba(255,107,53,0.06); border:1px solid rgba(255,107,53,0.25);
             border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--fire); text-transform:uppercase; font-weight:700; margin-bottom:6px;">RACHA</div>
-          <div style="font-family:var(--font-head); font-size:34px; font-weight:900; color:var(--text-1); line-height:1;">${lineaActiva}<span style="font-size:18px;margin-left:2px;">🔥</span></div>
+          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--text-1); line-height:1; letter-spacing:-0.02em;">${lineaActiva}<span style="font-size:16px;margin-left:4px;">🔥</span></div>
           <div style="font-size:11px; color:var(--fire); margin-top:4px; font-weight:600;">dias consecutivos</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Proximo hito: <strong style="color:var(--text-1)">${nextHito}d</strong></div>
         </div>
@@ -126,7 +126,7 @@ function renderStats(data) {
           style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.25);
             border-radius:var(--r-lg); padding:16px 14px;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; font-weight:700; margin-bottom:6px;">PC TOTALES</div>
-          <div style="font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--gold); line-height:1;">${pcTotal.toLocaleString('es-CO')}</div>
+          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--gold); line-height:1; letter-spacing:-0.02em;">${pcTotal.toLocaleString('es-CO')}</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:8px;">puntos de poder</div>
         </div>
 
@@ -135,7 +135,7 @@ function renderStats(data) {
           style="background:rgba(123,97,255,0.06); border:1px solid rgba(123,97,255,0.25);
             border-radius:var(--r-lg); padding:16px 14px;">
           <div style="font-size:10px; letter-spacing:0.15em; color:var(--electric); text-transform:uppercase; font-weight:700; margin-bottom:6px;">DIAS ACTIVOS</div>
-          <div style="font-family:var(--font-head); font-size:28px; font-weight:900; color:var(--electric); line-height:1;">${diasActivos}</div>
+          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--electric); line-height:1; letter-spacing:-0.02em;">${diasActivos}</div>
           <div style="font-size:10px; color:var(--text-3); margin-top:8px;">dias en total</div>
         </div>
 
@@ -166,7 +166,7 @@ function renderStats(data) {
 
         <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08); border-radius:var(--r-md); padding:12px; text-align:center; position:relative; z-index:2; box-shadow: inset 0 2px 15px rgba(0,0,0,0.6);">
           <div style="font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:6px;">Apertura del Sello de Evaluación en</div>
-          <div id="auditCountdownDisplay" style="font-family:monospace; font-size:22px; font-weight:700; letter-spacing:0.1em; color:var(--text-1); text-shadow:0 0 12px rgba(255,255,255,0.3);">
+          <div id="auditCountdownDisplay" style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:24px; font-weight:900; letter-spacing:0.05em; color:var(--text-1); text-shadow:0 0 12px rgba(255,255,255,0.3);">
             T-MINUS CALCULANDO...
           </div>
         </div>
@@ -204,7 +204,7 @@ function renderStats(data) {
             <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Ejecucion de los ultimos 7 dias</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-family:var(--font-head); font-size:26px; font-weight:900; color:${promedioSem>=85?'var(--success)':promedioSem>=50?'var(--gold)':'var(--text-2)'}; line-height:1;">${promedioSem}%</div>
+            <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:${promedioSem>=85?'var(--success)':promedioSem>=50?'var(--gold)':'var(--text-2)'}; line-height:1; letter-spacing:-0.02em;">${promedioSem}%</div>
             <div style="font-size:10px; color:var(--text-3); margin-top:2px;">Promedio</div>
           </div>
         </div>
@@ -381,7 +381,7 @@ function renderStats(data) {
           <div class="section-title" style="margin-bottom:12px;">📜 Contrato Activo</div>
           <div style="display:flex; align-items:center; gap:14px;">
             <div style="text-align:center; flex-shrink:0;">
-              <div style="font-family:var(--font-head); font-size:32px; font-weight:900;
+              <div style="font-family:var(--font-head); font-size:36px; font-weight:900; letter-spacing:-0.02em;
                 color:${diasRestantes <= 5 ? 'var(--fire)' : 'var(--text-1)'};">${diasRestantes}</div>
               <div style="font-size:10px; color:var(--text-3);">${diasRestantes <= 5 ? '⚠️ dias para cierre' : 'dias restantes'}</div>
             </div>
