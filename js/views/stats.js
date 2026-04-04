@@ -142,6 +142,37 @@ function renderStats(data) {
       </div>
 
       <!-- ════════════════════════════════════════════════════ -->
+      <!-- THE ORACLE: AUDITORIA OPERACIONAL SINCRONICA         -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <div class="card stagger-up stagger-1 d-flex flex-col tappable" style="margin-bottom:10px; background:linear-gradient(145deg, rgba(18,18,26,0.9), rgba(10,10,15,0.95)); border: 1px solid rgba(123,97,255,0.4); position:relative; overflow:hidden;" onclick="showAuditModal()">
+        
+        <div style="position:absolute; top:-40px; right:-20px; font-size:140px; opacity:0.04; filter:blur(3px); pointer-events:none;">👁️</div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; position:relative; z-index:2;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <div style="width:8px; height:8px; border-radius:50%; background:var(--electric); box-shadow:0 0 10px var(--electric); animation: pulseDot 2s infinite;"></div>
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.15em; color:var(--electric); font-weight:800;">Auditoría Operacional Sincrónica</div>
+            </div>
+            <div style="font-family:var(--font-head); font-size:18px; font-weight:900; color:var(--text-1);">El Oráculo te vigila</div>
+          </div>
+          <div style="font-size:24px; color:var(--electric); filter:drop-shadow(0 0 8px rgba(123,97,255,0.5));">📜</div>
+        </div>
+
+        <p style="font-size:13px; color:var(--text-2); line-height:1.5; margin-bottom:18px; position:relative; z-index:2; max-width: 90%;">
+          El sistema está evaluando tu arquitectura conductual en silencio. 
+          Al romperse el sello, tu calificación semanal será definitiva.
+        </p>
+
+        <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08); border-radius:var(--r-md); padding:12px; text-align:center; position:relative; z-index:2; box-shadow: inset 0 2px 15px rgba(0,0,0,0.6);">
+          <div style="font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:6px;">Apertura del Sello de Evaluación en</div>
+          <div id="auditCountdownDisplay" style="font-family:monospace; font-size:22px; font-weight:700; letter-spacing:0.1em; color:var(--text-1); text-shadow:0 0 12px rgba(255,255,255,0.3);">
+            T-MINUS CALCULANDO...
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════ -->
       <!-- 2. HEATMAP 28 DIAS                                   -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-2" style="margin-bottom:10px;">
@@ -452,6 +483,19 @@ function initStatsAnimations() {
       arc.style.strokeDasharray = `${arc.dataset.filled} ${arc.dataset.gap}`;
     }
   }, 200);
+
+  // KEYFRAME para el widget del Oráculo
+  if (!document.getElementById('oracle-pulse')) {
+    const s = document.createElement('style');
+    s.id = 'oracle-pulse';
+    s.innerHTML = `@keyframes pulseDot { 0% { transform: scale(1); opacity:1; box-shadow:0 0 5px var(--electric);} 50% { transform: scale(1.6); opacity:0.3; box-shadow:0 0 15px var(--electric);} 100% { transform: scale(1); opacity:1; box-shadow:0 0 5px var(--electric);} }`;
+    document.head.appendChild(s);
+  }
+
+  // Arrancar contador del Oraculo
+  updateAuditCountdown();
+  if (auditTimerInterval) clearInterval(auditTimerInterval);
+  auditTimerInterval = setInterval(updateAuditCountdown, 1000);
 }
 
 function changeStatsFilter(val) {
@@ -471,6 +515,61 @@ function changeStatsFilter(val) {
       container.style.opacity = '1';
       initStatsAnimations();
     }, 150);
+  }
+}
+
+// --- ORACLE TIMERS & MODAL ---
+let auditTimerInterval = null;
+
+function calculateNextSunday8PM() {
+  const now = new Date();
+  
+  // Buscar próximo domingo en zona horaria local
+  let target = new Date(now);
+  let diaSemana = target.getDay(); // 0=Dom, 1=Lun...
+  let diasFaltantes = (0 - diaSemana + 7) % 7; 
+  
+  // Si hoy es domingo pero ya pasaron las 8 PM, rotar 7 dias
+  if (diasFaltantes === 0 && (now.getHours() > 20 || (now.getHours() === 20 && now.getMinutes() >= 0))) {
+     diasFaltantes = 7; 
+  }
+  
+  target.setDate(target.getDate() + diasFaltantes);
+  target.setHours(20, 0, 0, 0); // 8:00 PM estricto
+  
+  const diffMs = target.getTime() - now.getTime();
+  
+  if (diffMs <= 0) return { d: 0, h: 0, m: 0, s: 0, ready: true };
+  
+  const totalS = Math.floor(diffMs / 1000);
+  const d = Math.floor(totalS / 86400);
+  const h = Math.floor((totalS % 86400) / 3600);
+  const m = Math.floor((totalS % 3600) / 60);
+  const s = totalS % 60;
+  
+  return { d, h, m, s, ready: false };
+}
+
+function updateAuditCountdown() {
+  const el = document.getElementById('auditCountdownDisplay');
+  if (!el) return;
+  const time = calculateNextSunday8PM();
+  
+  if (time.ready) {
+    el.innerHTML = '<span style="color:var(--gold); font-size:18px; letter-spacing:0.05em; border-bottom:1px solid var(--gold); padding-bottom:2px;">DISPONIBLE EN TELEGRAM</span>';
+    return;
+  }
+  
+  const pad = (n) => n.toString().padStart(2, '0');
+  el.textContent = `-${pad(time.d)}d : ${pad(time.h)}h : ${pad(time.m)}m : ${pad(time.s)}s`;
+}
+
+function showAuditModal() {
+  const time = calculateNextSunday8PM();
+  if (time.ready) {
+    showInteractiveModal('Auditoría Terminada', 'El Oráculo ha finalizado su veredicto semanal.<br><br><b>Sal de aquí. Ve a tu canal privado de Telegram para consultar tus sentencias y calificaciones.</b><br><br>El sello ha sido roto de forma permanente.', '📜');
+  } else {
+    showInteractiveModal('Acceso Restringido', 'El Oráculo está procesando tu patrón conductual en este exacto momento.<br><br>No puedes apresurar el veredicto. Tu única acción permitida es asegurar que tus métricas estén intactas y robustas antes de que el contador llegue a su doloroso cero.<br><br><b>¿Podrás sostener la línea?</b>', '👁️');
   }
 }
 
