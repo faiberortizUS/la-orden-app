@@ -101,7 +101,7 @@ function renderOath(data) {
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--s4);">
           <div class="section-title tappable" style="margin:0;" onclick="showInteractiveModal('Compromisos Sellados', 'Estas no son simples tareas opcionales. Son pilares inquebrantables anexos directamente a tu contrato firme.<br><br>No cumplirlos destruye la integridad del sistema y mancha tu legajo de Arquitecto.', '⚖️')">Compromisos sellados</div>
-          <button onclick="navigateTo('add_habit')" class="tappable" style="background:none;border:none;color:var(--gold);font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:0.05em;padding:4px 0;">+ AÑADIR</button>
+          <button onclick="navigateTo('add_habit')" class="tappable" style="background:rgba(212,168,67,0.1); border:1px solid rgba(212,168,67,0.3); color:var(--gold); font-family:var(--font-head); font-weight:800; font-size:12px; letter-spacing:0.05em; padding:6px 12px; border-radius:var(--r-full);">➕ NUEVO PILAR</button>
         </div>
         ${compromisos.length > 0 ? compromisos.map(c => `
           <div class="oath-commitment-item">
@@ -170,7 +170,7 @@ function renderOath(data) {
             background:linear-gradient(135deg,var(--gold-dim),var(--gold));
             box-shadow:0 0 30px rgba(212,168,67,0.25);
             display:flex;align-items:center;justify-content:center;gap:10px;">
-          ⚔️ FORJAR NUEVO COMPROMISO
+          ➕ FORJAR NUEVO PILAR
         </button>
         <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text-3);line-height:1.5;">
           Cada compromiso nuevo exige más de ti. Solo añade lo que puedas cumplir con honor.
