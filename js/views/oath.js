@@ -140,6 +140,16 @@ function renderOath(data) {
         <div class="text-xs text-muted" style="margin-top:12px;">— Tu Juramento, ${inicioFmt}</div>
       </div>
 
+      <!-- GUÍA INTERACTIVO (El Oráculo) -->
+      <div class="card card--glass flex tappable" style="align-items:center;gap:16px;border-color:rgba(123,97,255,0.3);margin-bottom:var(--s4);" onclick="showInteractiveModal('Mensaje del Guía', 'El sistema ha auditado tu estructura de compromisos. Tus misiones son suficientes para desafiarte, pero totalmente realistas.<br><br>Recuerda: <b>La perfección es enemiga de la consistencia</b>. Tu meta suprema de hoy no es ser perfecto... es ser <b>consistente</b>.', '👁️')">
+        <div style="font-size:36px;filter:drop-shadow(0 0 10px rgba(123,97,255,0.4));">👁️</div>
+        <div style="flex:1;">
+          <div class="fw-800" style="font-family:var(--font-head);color:var(--text-1);font-size:16px;margin-bottom:4px;">Auditoría del Guía</div>
+          <div class="text-sm text-muted" style="line-height:1.4;">"Toca aquí para leer el pergamino del Oráculo sobre tu pacto de acero..."</div>
+        </div>
+        <div style="color:var(--electric);">›</div>
+      </div>
+
       <!-- RANGO ACTUAL -->
       <div class="card flex tappable" style="align-items:center;gap:var(--s4);" onclick="showInteractiveModal('Escala de Dominio Jerárquico', 'Tu rango impone a la Célula cuánto peso y Puntos de Poder (PC) has acumulado triturando la debilidad.<br><br><b>🌱 Aspirante</b> — Punto de partida.<br><b>⚔️ Iniciado</b> — Acceso al sistema.<br><b>🛡️ Comprometido</b> — ICD ≥60 · 7 días.<br><b>🔱 Disciplinado</b> — ICD ≥70 · 14 días.<br><b>💎 Consistente</b> — ICD ≥80 · 30 días · 1 contrato.<br><b>🏛️ Arquitecto</b> — ICD ≥85 · 60 días · 2 contratos.<br><b>👁️ Custodio</b> — ICD ≥90 · 90 días · 3 contratos.<br><br>⚠️ Sin acción diaria el rango cae. El ICD que construiste hoy, lo pierdes mañana si no reportas. Sella tu próxima victoria para sostener el trono.', '🏛️')">
         <div style="font-size:40px;">${(user.rango || '🌱').split(' ')[0]}</div>
