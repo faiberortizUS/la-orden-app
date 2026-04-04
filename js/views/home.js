@@ -184,9 +184,10 @@ function renderHome(data) {
             `).join('')}
           </div>
           
-          <div style="margin-top:24px;">
-            <button onclick="navigateTo('add_habit')" class="tappable" style="width:100%;height:50px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.2);color:var(--text-3);border:none;font-family:var(--font-head);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">
-              <span>➕ FORJAR NUEVA MISIÓN</span>
+          <div style="margin-top:20px;">
+            <button onclick="navigateTo('add_habit')" class="tappable" 
+              style="width:100%; padding:14px; border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.3); color:var(--gold); font-family:var(--font-head); font-weight:800; text-transform:uppercase; letter-spacing:0.08em; transition:all 0.2sease;">
+              <span>➕ Forjar Nuevo Pilar</span>
             </button>
           </div>
         </div>
