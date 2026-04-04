@@ -86,10 +86,49 @@ function renderTutorial(data) {
         <div style="font-size:60px;margin-bottom:20px;">🗺️</div>
         <h2 style="font-family:var(--font-head);font-weight:900;font-size:26px;color:var(--gold);margin-bottom:16px;line-height:1.2;">TERRITORIO (MAPA)</h2>
         <div style="width:40px;height:2px;background:var(--gold);margin:0 auto 20px;"></div>
-        <p style="font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:40px;">
+        <p style="font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:30px;">
           <b>La escala hacia el 1%.</b> Explora las mecánicas avanzadas del sistema: Zonas de Poder, Jerarquías de Rangos y la arquitectura de tu Célula de Rendimiento.
         </p>
-        <button onclick="finishTutorial()" class="badge-chip tappable" style="width:100%;padding:18px;font-size:16px;border:none;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;font-family:var(--font-head);font-weight:800;letter-spacing:0.05em;border-radius:var(--r-md);">SABER ES PODER. INICIAR.</button>
+        
+        <!-- CÓDICE DE TÁCTICAS -->
+        <div style="background:var(--bg-elevated); border:1px solid var(--border-gold); border-radius:var(--r-lg); padding:16px; margin-bottom:40px; text-align:left;">
+           <div style="font-family:var(--font-head);font-weight:900;font-size:16px;color:var(--gold);margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+             📖 CÓDICE DE TÁCTICAS
+           </div>
+           <div style="font-size:13px; color:var(--text-3); margin-bottom:16px; line-height:1.5;">
+             Glosario estratégico de La Orden. Pulsa cada término para visualizar su ciencia.
+           </div>
+           
+           <div style="display:flex; flex-direction:column; gap:8px;">
+             <!-- Deep Work -->
+             <div class="tappable" onclick="showInteractiveModal('Deep Work (Trabajo Profundo)', 'Actividad profesional realizada en estado de concentración sin distracciones, llevando las capacidades cognitivas a su límite. Este estado produce un valor masivo e irreplicable en menos tiempo.', '🧠')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px;">
+               <span>Deep Work</span> <span style="color:var(--gold);">?</span>
+             </div>
+             <!-- Craving -->
+             <div class="tappable" onclick="showInteractiveModal('Craving', 'Es el deseo imperioso o necesidad irresistible de consumir una sustancia o repetir un hábito destructivo. Biológicamente es un pico de dopamina pidiendo ser saciado. Dura promedio 20 minutos; si resistes la oleada sin ceder, el pico colapsa.', '🌊')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px;">
+               <span>Craving</span> <span style="color:var(--gold);">?</span>
+             </div>
+             <!-- Detox Digital -->
+             <div class="tappable" onclick="showInteractiveModal('Detox Digital', 'Periodo táctico de abstinencia de pantallas o redes sociales (mínimo 2 a 4 horas). Diseñado ex profeso para reducir los niveles basales de cortisol y desenchufar a la amígdala del bucle de recompensa variable (el scroll infinito).', '📱')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px;">
+               <span>Detox Digital</span> <span style="color:var(--gold);">?</span>
+             </div>
+             <!-- 8000 Pasos -->
+             <div class="tappable" onclick="showInteractiveModal('8,000 Pasos', 'Considerada dosis mínima asintomática para la salud metabólica. La investigación ha demostrado un quiebre radical de la mortalidad en la barrera de los 8,000 pasos en comparación con personas sedentarias.', '👣')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px;">
+               <span>Los 8,000 Pasos</span> <span style="color:var(--gold);">?</span>
+             </div>
+             <!-- Upskilling -->
+             <div class="tappable" onclick="showInteractiveModal('Upskilling', 'El proceso continuo de aprender sistemáticamente nuevas habilidades o mejorar las que ya posees. Antídoto forzoso contra un mercado laboral que envejece los conocimientos un 40% cada cinco años.', '⚡')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px;">
+               <span>Upskilling</span> <span style="color:var(--gold);">?</span>
+             </div>
+           </div>
+        </div>
+
+        <button onclick="finishTutorial()" class="badge-chip tappable" style="width:100%;padding:18px;font-size:16px;border:none;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;font-family:var(--font-head);font-weight:800;letter-spacing:0.05em;border-radius:var(--r-md);">SABER ES PODER. CAMINAR AL FRENTE.</button>
       </div>
 
     </div>
