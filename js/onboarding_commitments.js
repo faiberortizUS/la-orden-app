@@ -20,11 +20,12 @@ const CATALOG_LOCAL = {
     { id: 'SM_DIGITAL', nombre: 'Detox digital',            unidad: 'hrs',   pcBase: 25, metaDef: 2,   info: 'Cada hora menos de pantalla = 20% menos cortisol (APA, 2017). El scroll es tragamonedas para el cerebro.' },
   ],
   ANTI_ADICCION:  [
-    { id: 'AA_SOBRIED',  nombre: 'Días de sobriedad',          unidad: 'días', pcBase: 40, metaDef: 1,   info: 'NIDA: 90 días de abstinencia inician la reparación neuronal. Cada día sin ceder es un ladrillo de reconstrucción cerebral.' },
-    { id: 'AA_CRAVING',  nombre: 'Minutos sin craving cedido', unidad: 'min',  pcBase: 35, metaDef: 60,  info: 'Técnica de surfing del craving (Marlatt): el impulso dura ~20 min. No lo satisfagas, obsérvalo pasar como una ola.' },
-    { id: 'AA_SUSTIT',   nombre: 'Actividad sustituta',        unidad: 'min',  pcBase: 30, metaDef: 30,  info: 'Protocolo CBT: reemplazar la conducta adictiva con actividad incompatible reduce recaída un 35% (NIDA).' },
-    { id: 'AA_SOCIAL',   nombre: 'Conexión social sana',       unidad: 'conv', pcBase: 30, metaDef: 1,   info: 'Johann Hari: "Lo opuesto a la adicción no es la sobriedad, es la conexión". Una conversación real es medicina.' },
-    { id: 'AA_MINDFUL',  nombre: 'Meditación de atención plena',unidad: 'min', pcBase: 30, metaDef: 15,  info: 'MBRP: Mindfulness-Based Relapse Prevention reduce recaídas un 31% vs tratamiento estándar (Witkiewitz, 2014).' },
+    { id: 'AA_ALCOHOL',  nombre: 'Sobriedad: Alcohol',        unidad: 'días', pcBase: 40, metaDef: 1, info: 'Recuerda: se trabaja un día a la vez. Cada día suma a la reparación neuronal de tu circuito de recompensa.' },
+    { id: 'AA_NICOTINA', nombre: 'Sobriedad: Nicotina / Vape',unidad: 'días', pcBase: 40, metaDef: 1, info: 'Recuerda: se trabaja un día a la vez. Superar el craving de nicotina recablea tu tolerancia a la ansiedad y al estrés.' },
+    { id: 'AA_PORNO',    nombre: 'Sobriedad: Pornografía',    unidad: 'días', pcBase: 40, metaDef: 1, info: 'Recuerda: se trabaja un día a la vez. La abstención resetea tus receptores dopaminérgicos y restaura tu vitalidad y atención.' },
+    { id: 'AA_DROGAS',   nombre: 'Sobriedad: Sustancias',     unidad: 'días', pcBase: 40, metaDef: 1, info: 'Recuerda: se trabaja un día a la vez. NIDA indica que la neuroplasticidad requiere semanas de constancia sin excepciones.' },
+    { id: 'AA_APUESTAS', nombre: 'Sobriedad: Apuestas',       unidad: 'días', pcBase: 40, metaDef: 1, info: 'Recuerda: se trabaja un día a la vez. Romper la trampa del azar devuelve el control absoluto a tus manos.' },
+    { id: 'AA_CRAVING',  nombre: 'Soportar un Craving',       unidad: 'eventos', pcBase: 35, metaDef: 1, info: 'Surfing the urge: el pico de abstinencia dura solo ~20 min. No lo satisfagas, obsérvalo pasar; así matas al monstruo.' },
   ],
   FINANZAS:       [
     { id: 'FIN_AHORRO', nombre: 'Ahorro diario',             unidad: 'COP',   pcBase: 30, metaDef: 10000, info: '$10K COP/día = $3.65M/año. A 7% anual, en 10 años son $50M. La riqueza se construye en silencio.' },
