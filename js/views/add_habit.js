@@ -95,13 +95,14 @@ function markAddHabitDirty() {
   _isAddHabitDirty = true;
 }
 
+// Llamada desde el botón "Cancelar" del UI (no desde el BackButton físico).
+// El BackButton físico/Telegram es manejado por _handleBackAction en app.js.
 function onAddHabitInterrupt() {
   if (_isAddHabitDirty) {
     if (window.Telegram?.WebApp?.showConfirm) {
       window.Telegram.WebApp.showConfirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.', function (confirmed) {
         if (confirmed) {
           _isAddHabitDirty = false;
-          _removeAddHabitBackButton();
           navigateTo('oath');
         }
       });
@@ -111,27 +112,19 @@ function onAddHabitInterrupt() {
     }
   }
   _isAddHabitDirty = false;
-  _removeAddHabitBackButton();
   navigateTo('oath');
 }
 
 function _removeAddHabitBackButton() {
-  if (window.Telegram?.WebApp?.BackButton) {
-    window.Telegram.WebApp.BackButton.offClick(onAddHabitInterrupt);
-    window.Telegram.WebApp.BackButton.hide();
-  }
+  // No-op: el BackButton lo gestiona app.js de forma centralizada.
 }
 
 
 function initAddHabitView() {
   _isAddHabitDirty = false;
   _selectedSuggestedActivity = null;
-  // La vista inicializa sin selecciones, guiando al usuario paso a paso
-
-  if (window.Telegram?.WebApp?.BackButton) {
-    window.Telegram.WebApp.BackButton.show();
-    window.Telegram.WebApp.BackButton.onClick(onAddHabitInterrupt);
-  }
+  // La vista inicializa sin selecciones, guiando al usuario paso a paso.
+  // El BackButton de Telegram lo gestiona _handleBackAction en app.js.
 }
 
 // Catálogo de sugerencias por área con descripción científica
