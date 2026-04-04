@@ -166,12 +166,73 @@ function renderReportInput(c) {
         <span>con esta victoria</span>
       </div>
 
-      <button class="report-commit-btn" id="reportBtn" onclick="submitReport()">
-        ✍️ SELLAR MI VICTORIA
-      </button>
+      <div style="position:relative; width:100%; height:60px; margin-top:20px; border-radius:var(--r-md); overflow:hidden;">
+        <div id="holdBgEmpty" style="position:absolute; inset:0; background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); z-index:0;"></div>
+        <div id="holdProgressBar" style="position:absolute; top:0; left:0; height:100%; width:0%; background:linear-gradient(135deg, var(--gold-dim), var(--gold)); opacity:0.9; z-index:1;"></div>
+        
+        <button class="report-commit-btn" id="reportBtn" 
+          style="position:absolute; inset:0; width:100%; height:100%; z-index:2; background:transparent; border:none; font-family:var(--font-head); font-weight:900; font-size:15px; letter-spacing:0.05em; color:var(--text-1); display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;" 
+          onmousedown="startHoldConfirm()" onmouseup="endHoldConfirm()" onmouseleave="cancelHoldConfirm()" 
+          ontouchstart="startHoldConfirm()" ontouchend="endHoldConfirm()" ontouchcancel="cancelHoldConfirm()">
+           <span style="filter:drop-shadow(0 0 5px rgba(0,0,0,0.8));">🩸 MANTÉN PRESIONADO PARA SELLAR</span>
+        </button>
+      </div>
 
     </div>
   `;
+}
+
+// ── LÓGICA DE FIRMA MULTI-SENSORIAL (Hold-To-Confirm) ──
+let holdTimer = null;
+let holdStart = 0;
+let holdDuration = 1200; // 1.2s de friccion exigida
+
+function startHoldConfirm() {
+  if (reportState.currentValue <= 0) {
+    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+    return;
+  }
+  holdStart = Date.now();
+  holdTimer = setInterval(updateHoldProgress, 30);
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+  }
+}
+
+function updateHoldProgress() {
+  const bar = document.getElementById('holdProgressBar');
+  const btn = document.getElementById('reportBtn');
+  if (!bar || !holdStart) return;
+  
+  const diff = Date.now() - holdStart;
+  const pct = Math.min(100, (diff / holdDuration) * 100);
+  bar.style.width = pct + '%';
+  
+  // Tensión táctil creciente
+  if (diff > 0 && diff % 300 < 30) {
+     if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+  }
+
+  if (pct >= 100) {
+    clearInterval(holdTimer);
+    holdStart = 0;
+    btn.onmousedown = null;
+    btn.ontouchstart = null;
+    submitReport();
+  }
+}
+
+function endHoldConfirm() { cancelHoldConfirm(); }
+function cancelHoldConfirm() {
+  if (holdTimer) clearInterval(holdTimer);
+  holdTimer = null;
+  holdStart = 0;
+  const bar = document.getElementById('holdProgressBar');
+  if (bar) {
+    bar.style.transition = 'width 0.3s ease-out';
+    bar.style.width = '0%';
+    setTimeout(() => { if(!holdStart) bar.style.transition = 'none'; }, 300);
+  }
 }
 
 function openReportInput(id) {
@@ -251,13 +312,15 @@ async function submitReport() {
   const btn = document.getElementById('reportBtn');
   if (btn) { 
     btn.disabled = true; 
+    btn.style.color = '#0A0A0F';
+    btn.style.textShadow = 'none';
     if (!document.getElementById('loading-dots-style')) {
       const style = document.createElement('style');
       style.id = 'loading-dots-style';
       style.innerHTML = `@keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } } .loading-dots span { animation-name: blink; animation-duration: 1.4s; animation-iteration-count: infinite; animation-fill-mode: both; } .loading-dots span:nth-child(2) { animation-delay: .2s; } .loading-dots span:nth-child(3) { animation-delay: .4s; }`;
       document.head.appendChild(style);
     }
-    btn.innerHTML = 'Sellando victoria <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
+    btn.innerHTML = '<b>SELLANDO</b> <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
   }
 
   const result = await postReport(c.id, reportState.currentValue);
@@ -338,6 +401,7 @@ async function submitReport() {
   showVictoryOverlay({
     nombre:        c.nombre,
     emoji:         c.emoji,
+    area:          c.area,
     valor:         reportState.currentValue,
     unidad:        c.unidad,
     pcGanados:     pcGanados,
@@ -345,24 +409,33 @@ async function submitReport() {
     esDiaCompleto: esDiaCompleto,
     totalMisiones: compromisosTotales.length,
   });
-
-  if (window.Telegram?.WebApp?.HapticFeedback) {
-    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-  }
 }
 
-
-function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico, esDiaCompleto, totalMisiones }) {
+function showVictoryOverlay({ nombre, emoji, area, valor, unidad, pcGanados, esCritico, esDiaCompleto, totalMisiones }) {
   const overlay = document.createElement('div');
   overlay.className = 'victory-overlay';
   overlay.id = 'victoryOverlay';
 
-  const titles = [
-    'Un paso más que el 99%.',
-    'Consignado en tu legado.',
-    'La disciplina tiene nombre.',
-    'Tu yo futuro lo agradece.',
-  ];
+  // Colección inmersiva psicológica + copywriting de alto octanaje
+  const TITULOS_AREA = {
+    'SALUD_FISICA':  ['Sangre al músculo. El hierro no miente.', 'Tu cuerpo es tu templo y esta es tu ofrenda.', 'Endorfinas inyectadas. Tu avatar más fuerte.'],
+    'SALUD_MENTAL':  ['Higiene cognitiva alcanzada.', 'Sistema nervioso regulado y listo para el caos.', 'Ruido destruido. Tu mente pertenece al 1%.'],
+    'FINANZAS':      ['Interés compuesto activado.', 'Las excusas cuestan dinero, la disciplina lo atrae.', 'Patrimonio ascendiendo, ego controlado.'],
+    'PRODUCTIVIDAD': ['La fricción fue destrozada.', 'Eficiencia letal. Tensión cognitiva resuelta.', 'Tu output acaba de devorar a la competencia.'],
+    'CRECIMIENTO':   ['La ignorancia es el impuesto de los débiles.', 'Red neuronal expandida. Nuevo firmware.', 'El dolor de aprender es mucho menor que el de fallar.'],
+    'RELACIONES':    ['Solo los fuertes saben sostener conexiones.', 'Tu tribu lo siente. Estás totalmente presente.', 'La moneda más cara es tu atención. Invertida.'],
+    'ENTORNO':       ['Como es adentro, es afuera.', 'Caos dominado a la fuerza. Territorio asegurado.', 'Fricción de arranque reducida exactamente a cero.'],
+    'ESPIRITUALIDAD':['Silencio poderoso. Propósito cromo-anclado.', 'Más allá del ego. Conexión inquebrantable.', 'Software base defragmentado con éxito.'],
+    'CARRERA':       ['Tu nombre comienza a sonar donde importa.', 'Avanzando en la jerarquía a sangre fría.', 'La suerte no se exige, el respeto infinito se arranca.'],
+    'ANTI_ADICCION': ['El demonio pierde poder exacto en este segundo.', 'Un día más gobernando celosamente tu propia sangre.', 'Destrozando el bucle. Soberanía química recuperada.'],
+    'PERSONALIZADO': ['Victoria absoluta sellada a fuego.', 'Acaba de quedar grabado duro en la eternidad.', 'Tu identidad se alimenta insaciablemente de lo que haces hoy.']
+  };
+
+  const genericos = ['La disciplina se documenta implacablemente.', 'El 1% acciona. Tú lo estás haciendo real.', 'Forjando el pacto interior.'];
+  const arrayBase = TITULOS_AREA[area] || genericos;
+  const textoElegido = arrayBase[Math.floor(Math.random() * arrayBase.length)];
+
+  const fraseSubt = esCritico ? 'Recompensa de dopamina maximizada. Has sobrecumplido.' : textoElegido;
 
   if (esDiaCompleto) {
     // ── OVERLAY ESPECIAL: DÍA COMPLETO ─────────────────────────────
@@ -387,14 +460,14 @@ function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico
     // ── OVERLAY NORMAL: VICTORIA INDIVIDUAL ────────────────────────
     overlay.innerHTML = `
       <div class="victory-content">
-        <div class="victory-badge">${esCritico ? '💥' : emoji}</div>
-        <div class="victory-title">${esCritico ? '¡ATAQUE CRÍTICO!' : '¡VICTORIA SELLADA!'}</div>
-        <div class="victory-sub">${titles[Math.floor(Math.random() * titles.length)]}</div>
-        <div style="margin:8px 0;">
-          <div class="victory-pc">+${pcGanados} PC</div>
-          <div class="victory-pc-label">PUNTOS DE PODER GANADOS</div>
+        <div class="victory-badge" style="filter:drop-shadow(0 0 40px rgba(212,168,67,0.8)); font-size: 85px; margin-bottom: 24px; animation: popScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">${esCritico ? '💥' : emoji}</div>
+        <div class="victory-title" style="letter-spacing: 0.15em; color: ${esCritico ? 'var(--fire)' : 'var(--gold)'}; text-shadow: 0 0 25px ${esCritico ? 'rgba(255,107,53,0.7)' : 'rgba(212,168,67,0.7)'}; font-size: 28px;">${esCritico ? '¡ATAQUE CRÍTICO!' : '¡VICTORIA SELLADA!'}</div>
+        <div class="victory-sub" style="font-size: 15px; color: var(--text-2); margin-top: 14px; font-style: italic; max-width: 280px; margin-left:auto; margin-right:auto;">"${fraseSubt}"</div>
+        <div style="margin:20px 0 16px;">
+          <div class="victory-pc" style="font-size:32px; filter:drop-shadow(0 0 10px rgba(123,97,255,0.6)); color:var(--electric);">+${pcGanados} PC</div>
+          <div class="victory-pc-label" style="letter-spacing:0.1em; color:var(--text-3); font-size:11px;">PUNTOS DE PODER GANADOS</div>
         </div>
-        <div class="badge-chip badge-chip--gold" style="margin-top:4px;">
+        <div class="badge-chip badge-chip--gold" style="margin-top:10px; font-size:15px; padding:10px 20px; font-family:var(--font-head); font-weight:700;">
           ${nombre}: ${Number(valor).toLocaleString('es-CO')} ${unidad}
         </div>
       </div>
@@ -404,7 +477,38 @@ function showVictoryOverlay({ nombre, emoji, valor, unidad, pcGanados, esCritico
   document.body.appendChild(overlay);
   startConfetti();
 
-  const duracion = esDiaCompleto ? 3500 : 3000;
+  // 💥 EFECTO DESTRUCTOR NEUROSENSORIAL (Explosión Domapínica)
+  if (!document.getElementById('flash-style-victory')) {
+    const s = document.createElement('style');
+    s.id = 'flash-style-victory';
+    s.innerHTML = `
+      @keyframes megaFlash { 0%{opacity:1;background:#fff;} 15%{opacity:0.9;background:var(--gold);} 100%{opacity:0;background:rgba(0,0,0,0.8);} }
+      @keyframes popScale { 0%{transform:scale(0); opacity:0;} 50%{transform:scale(1.2); opacity:1; filter:brightness(2);} 100%{transform:scale(1); opacity:1; filter:brightness(1);} }
+      .screen-mega-flash { position:fixed;inset:0;z-index:99999;pointer-events:none;animation:megaFlash 0.9s cubic-bezier(0,1.2,.2,1) forwards; mix-blend-mode:color-dodge; }
+    `;
+    document.head.appendChild(s);
+  }
+  const flashEl = document.createElement('div');
+  flashEl.className = 'screen-mega-flash';
+  document.body.appendChild(flashEl);
+  setTimeout(() => flashEl.remove(), 1000);
+
+  // 📳 HAPTICS SECUENCIALES ("Batería sensorial")
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    const haptic = window.Telegram.WebApp.HapticFeedback;
+    haptic.impactOccurred('heavy');
+    setTimeout(() => haptic.impactOccurred('heavy'), 80);
+    setTimeout(() => haptic.notificationOccurred('success'), 300);
+    
+    // Extra boost para crítico o día completo
+    if (esCritico || esDiaCompleto) {
+        setTimeout(() => haptic.impactOccurred('heavy'), 500);
+        setTimeout(() => haptic.impactOccurred('heavy'), 650);
+        setTimeout(() => haptic.notificationOccurred('warning'), 850);
+    }
+  }
+
+  const duracion = esDiaCompleto ? 3500 : 3300;
 
   setTimeout(() => {
     overlay.style.opacity = '0';
