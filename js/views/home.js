@@ -100,6 +100,16 @@ function renderHome(data) {
         </div>
       </div>
 
+      <!-- EXISTENTIAL PROTOCOL: MIDNIGHT CLOCK -->
+      <div class="card stagger-up stagger-1 tappable" style="margin-top:10px; background:linear-gradient(145deg, #0A0A0F, #12121A); border:1px solid rgba(255,107,53,0.3); text-align:center; padding:16px; position:relative; overflow:hidden;" onclick="showInteractiveModal('El Tiempo no Retorna', 'En el universo del 1%, tu moneda más frágil no es el dinero ni los reportes, sino el tiempo en sí mismo.<br><br>Al filo estricto de la medianoche, se cerrará irrevocablemente la bóveda de este día. Si el contador llega a cero y no has interactuado, un día completo se borrará de tu línea de tiempo y afectará implacablemente tu estructura.<br><br><b>¿Qué estás haciendo con las horas restantes?</b>', '⏳')">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.18em; color:var(--fire); margin-bottom:6px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
+           <span style="font-size:14px; animation: heartbeat 1.5s infinite;">⏳</span> CIERRE DE LÍNEA TEMPORAL
+        </div>
+        <div id="midnightClock" style="font-family:monospace; font-size:32px; font-weight:900; color:var(--text-1); letter-spacing:0.12em; text-shadow:0 0 15px rgba(255,107,53,0.5);">
+          --:--:--
+        </div>
+      </div>
+
       <!-- STREAK CARD -->
       <div class="card card--fire tappable" style="padding:var(--s4);" onclick="showInteractiveModal('Línea Activa (Racha)', 'Son los días ininterrumpidos en los que cumples <b>al menos 1</b> victoria.<br><br><b>🧠 Día Mínimo Viable (Regla 2 min):</b> ¿Tuviste un día terrible? Hacer 1 de tus 5 compromisos salva la racha y mantiene tu inercia. Eso es construir identidad.', '🔥')">
         <div class="streak-card" style="padding:0;">
@@ -197,7 +207,37 @@ function renderHome(data) {
   `;
 }
 
+let midnightTimerInterval = null;
+function updateMidnightClock() {
+  const el = document.getElementById('midnightClock');
+  if (!el) return;
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight - now;
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  
+  el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+  
+  // Agregar keyframe si no existe
+  if (!document.getElementById('heartbeat-css')) {
+     const st = document.createElement('style');
+     st.id = 'heartbeat-css';
+     st.innerHTML = `@keyframes heartbeat { 0% { transform: scale(1); } 14% { transform: scale(1.2); } 28% { transform: scale(1); } 42% { transform: scale(1.2); } 70% { transform: scale(1); } }`;
+     document.head.appendChild(st);
+  }
+}
+
 function initHomeAnimations() {
+  // Arrancar Midnight Clock
+  updateMidnightClock();
+  if (midnightTimerInterval) clearInterval(midnightTimerInterval);
+  midnightTimerInterval = setInterval(updateMidnightClock, 1000);
+
   setTimeout(() => {
     const arc = document.getElementById('icdArc');
     if (arc) {
