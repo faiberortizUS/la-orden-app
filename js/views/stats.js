@@ -28,16 +28,26 @@ function renderStats(data) {
     currentStatsFilter = 'GLOBAL';
   }
 
-  // ── Datos del heatmap
+  // Helpers de compatibilidad por si el backend sigue enviando números planos
+  const getHeatData = (item) => typeof item === 'object' ? item : { nivel: item || 0, count:0, total:0, valor:0 };
+  const getSemData  = (item) => typeof item === 'object' ? item : { pct: item || 0, count:0, total:0, valor:0 };
+
   const histList = historial ? (historial[currentStatsFilter] || historial.GLOBAL || []) : [];
   const heatArr  = histList.length === 28 ? histList : Array(28).fill(0);
-  const days     = ['D','L','M','M','J','V','S'];
 
-  // ── Datos semanales
   const semList   = semana ? (semana[currentStatsFilter] || semana.GLOBAL || []) : [];
   const semanaArr = semList.length === 7 ? semList : Array(7).fill(0);
-  const diasLabels = ['L','M','M','J','V','S','D'];
-  const maxSem    = Math.max(...semanaArr.filter(v => v > 0), 1);
+
+  // Días dinámicos (termina hoy)
+  const diasLabels = [];
+  const nombresDias = ['D','L','M','M','J','V','S'];
+  const diaHoy = new Date().getDay();
+  for (let i = 6; i >= 0; i--) {
+    diasLabels.push(nombresDias[(diaHoy - i + 7) % 7]);
+  }
+
+  const maxSem = Math.max(...semanaArr.map(v => getSemData(v).pct).filter(p => p > 0), 1);
+
 
   // ── Zona ICD
   const icdZona  = icd >= 85 ? { label:'Zona Elite 🎯',    color:'var(--gold)',     bg:'rgba(212,168,67,0.08)' }
@@ -67,12 +77,30 @@ function renderStats(data) {
   const contrato = data.contrato;
   const diasRestantes = contrato ? (contrato.diasRestantes || 0) : null;
 
-  // ── Proyeccion ICD a 7 dias — si el usuario mantiene su tendencia actual
-  const diasSinReporte28 = heatArr.filter(v => v === 0).length;
+  // ── Proyeccion ICD a 7 dias
+  const diasSinReporte28 = heatArr.filter(v => getHeatData(v).nivel === 0).length;
   const diasConReporte28 = 28 - diasSinReporte28;
   const icdProyectado    = diasConReporte28 >= 7
     ? Math.min(100, Math.round(icd + (tendencia === '↑' ? 3 : tendencia === '↓' ? -3 : 0)))
     : null;
+
+  // ── Cálculo de Volumen Semanal y Mensual (Nuevo Request)
+  let volSemana = 0; let volMes = 0;
+  const isGlobal = currentStatsFilter === 'GLOBAL';
+  let unidadFiltro = 'Misiones';
+
+  if (!isGlobal) {
+    const compActivo = compromisosList.find(c => c.id === currentStatsFilter);
+    if (compActivo) unidadFiltro = compActivo.unidad || 'reps';
+  }
+
+  heatArr.forEach((item, idx) => {
+    const d = getHeatData(item);
+    const val = isGlobal ? (d.count || 0) : (d.valor || 0);
+    volMes += val;
+    if (idx >= 21) volSemana += val; // Últimos 7 días
+  });
+
 
   // ── Filtro selector
   const filterHtml = `
@@ -89,7 +117,8 @@ function renderStats(data) {
   `;
 
   // ── Promedio semanal calculado
-  const promedioSem = semanaArr.length > 0 ? Math.round(semanaArr.reduce((a,b) => a+b, 0) / semanaArr.length) : 0;
+  const promedioSem = semanaArr.length > 0 ? Math.round(semanaArr.reduce((a,b) => a + getSemData(b).pct, 0) / semanaArr.length) : 0;
+
 
   return `
     <div class="view" id="view-stats" style="padding-bottom: 32px;">
@@ -182,10 +211,13 @@ function renderStats(data) {
         </div>
         ${filterHtml}
         <div class="heatmap-labels">
-          ${days.map(d => `<div class="heatmap-day-label">${d}</div>`).join('')}
+          ${['D','L','M','M','J','V','S'].map(d => `<div class="heatmap-day-label">${d}</div>`).join('')}
         </div>
         <div class="heatmap">
-          ${heatArr.map((level, i) => `<div class="heatmap-day tappable" data-level="${level}" onclick="showHeatmapTooltip(this, ${level})"></div>`).join('')}
+          ${heatArr.map((item, i) => {
+            const d = getHeatData(item);
+            return `<div class="heatmap-day tappable" data-level="${d.nivel}" onclick="showHeatmapTooltip(this, ${d.nivel}, ${d.valor || 0}, ${d.count || 0}, ${d.total || 0}, ${isGlobal})"></div>`;
+          }).join('')}
         </div>
         <div style="display:flex; gap:6px; margin-top:10px; align-items:center; justify-content:flex-end;">
           <span style="font-size:10px; color:var(--text-3);">Menos</span>
@@ -193,6 +225,27 @@ function renderStats(data) {
           <span style="font-size:10px; color:var(--text-3);">Mas</span>
         </div>
       </div>
+
+      <!-- ════════════════════════════════════════════════════ -->
+      <!-- NUEVO: TARJETA DE VOLUMEN OPERATIVO                  -->
+      <!-- ════════════════════════════════════════════════════ -->
+      <div class="card stagger-up stagger-2 tappable" style="margin-bottom:10px; padding:18px; border-color:var(--border-gold); background:linear-gradient(145deg, rgba(212,168,67,0.06), rgba(0,0,0,0.3));" onclick="showInteractiveModal('Volumen Operativo', 'Suma cuantitativa del esfuerzo invertido.<br><br>Mientras la gráfica evalúa si cumpliste o no, <b>el Volumen mide cuánto peso levantaste</b> (minutos, kms, repeticiones). Si ayer reportaste 10 mins y hoy 100 mins, tu promedio será estático pero tu volumen explotará.', '🧊')">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+           <span style="font-family:var(--font-head); font-weight:800; color:var(--gold); font-size:15px; letter-spacing:0.02em;">Carga Física de Datos</span>
+           <span style="font-size:16px;">🧊</span>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <div style="flex:1; background:rgba(0,0,0,0.3); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.02);">
+            <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Últimos 7 días</div>
+            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:26px; font-weight:900; color:var(--text-1); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volSemana.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:11px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
+          </div>
+          <div style="flex:1; background:rgba(0,0,0,0.3); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.02);">
+            <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Últimos 28 días</div>
+            <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:26px; font-weight:900; color:var(--text-1); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${Number(volMes.toFixed(1)).toLocaleString('es-CO')} <span style="font-size:11px; font-weight:700; color:var(--text-3);">${unidadFiltro}</span></div>
+          </div>
+        </div>
+      </div>
+
 
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 3. GRAFICA SEMANAL PREMIUM                           -->
@@ -220,8 +273,11 @@ function renderStats(data) {
               </div>
             `).join('')}
           </div>
-          ${semanaArr.map((pct, i) => {
+          ${semanaArr.map((item, i) => {
+            const d      = getSemData(item);
+            const pct    = d.pct;
             const esHoy  = i === semanaArr.length - 1;
+
             const h      = pct > 0 ? Math.max(14, Math.round((pct / maxSem) * 120)) : 6;
             const color  = esHoy
               ? 'linear-gradient(180deg,#FFD700,#B8860B)'
@@ -273,12 +329,14 @@ function renderStats(data) {
             transition:width 1s ease; box-shadow:0 0 8px rgba(255,107,53,0.3);"></div>
         </div>
 
-        <!-- Grid de hitos -->
+        <!-- Grid de hitos (Candados interactivos) -->
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px;">
           ${[7,14,30,90].map(hito => {
             const alcanzado = lineaActiva >= hito;
+            const msgAlcanzado = alcanzado ? '¡Conquistado!' : `Faltan ${hito - lineaActiva} días.`;
             return `
-              <div style="text-align:center; padding:8px 4px; border-radius:var(--r-md);
+              <div class="tappable" onclick="showInteractiveModal('Hito de ${hito} Días', 'Los hitos son puntos de anclaje de tu identidad. ${alcanzado ? '<b>Ya aseguraste este nivel</b>, el próximo gran reto te espera.' : '<br><br><b>'+msgAlcanzado+'</b> Para romper este candado debes reportar sin falta.'}', '${alcanzado?'🏆':'🔒'}')"
+                style="text-align:center; padding:8px 4px; border-radius:var(--r-md);
                 background:${alcanzado?'rgba(212,168,67,0.1)':'var(--bg-elevated)'};
                 border:1px solid ${alcanzado?'var(--border-gold)':'var(--border)'};">
                 <div style="font-size:14px;">${alcanzado?'🏆':'🔒'}</div>
@@ -288,8 +346,9 @@ function renderStats(data) {
           }).join('')}
         </div>
 
-        <!-- Escudos disponibles -->
-        <div style="display:flex; align-items:center; gap:8px; padding:10px 12px;
+        <!-- Escudos disponibles interactivos -->
+        <div class="tappable" onclick="showInteractiveModal('Escudos Protectores de Combate', 'Los escudos protegen tu racha. Se consumen automáticamente si un día olvidas reportar absolutamente TODO.<br><br>Recuerda: <b>Regla de los 2 Minutos.</b> Hacer una misión a medias es mejor que usar un escudo. Guárdalos para emergencias reales (enfermedad o viajes).', '🛡️')"
+          style="display:flex; align-items:center; gap:8px; padding:10px 12px;
           background:rgba(123,97,255,0.06); border:1px solid rgba(123,97,255,0.2);
           border-radius:var(--r-md);">
           <span style="font-size:20px;">🛡️</span>
@@ -622,14 +681,23 @@ function showChartTooltip(element, pct, label) {
   _createTooltip(element, text);
 }
 
-function showHeatmapTooltip(element, level) {
+function showHeatmapTooltip(element, level, valor, count, total, isGlobal) {
+  let extraInfo = '';
+  if (isGlobal && total > 0) {
+    extraInfo = `<br><span style="font-size:11px;color:var(--text-3); font-weight:600;">${count} de ${total} misiones</span>`;
+  } else if (!isGlobal && valor > 0) {
+    // Aquí podrías agregar la unidad si quieres pasarla, pero valor ya aporta la cifra real.
+    extraInfo = `<br><span style="font-size:11px;color:rgba(212,168,67,1); font-weight:700;">Volumen: +${Number(valor).toLocaleString('es-CO')}</span>`;
+  }
+
   const messages = [
-    '<span style="color:var(--text-2);">0 Misiones</span>',
-    'Avance leve (Nivel 1)',
-    'Buen esfuerzo (Nivel 2)',
-    '<span style="color:var(--gold);">Día Fuerte (Nivel 3)</span>',
-    '<span style="color:var(--electric);font-weight:800;">Día de Poder (Nivel 4)⚡</span>'
+    '<span style="color:var(--text-2);">0 Actividad</span>' + extraInfo,
+    'Avance leve (Nivel 1)' + extraInfo,
+    'Buen esfuerzo (Nivel 2)' + extraInfo,
+    '<span style="color:var(--gold);">Día Fuerte (Nivel 3)</span>' + extraInfo,
+    '<span style="color:var(--electric);font-weight:800;">Día de Poder (Nivel 4)⚡</span>' + extraInfo
   ];
   _createTooltip(element, messages[level]);
 }
+
 
