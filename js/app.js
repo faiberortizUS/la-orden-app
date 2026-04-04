@@ -391,7 +391,30 @@ function _handleBackAction() {
     }
   }
 
-  // 4. ⚠️ REPORTE EN CURSO — si el usuario está dentro del input de una misión
+  // 4. FORJAR NUEVO PILAR — si el usuario está en add_habit y tiene datos sin guardar
+  if (currentView === 'add_habit') {
+    if (typeof _isAddHabitDirty !== 'undefined' && _isAddHabitDirty) {
+      if (window.Telegram?.WebApp?.showConfirm) {
+        window.Telegram.WebApp.showConfirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.', function(confirmed) {
+          if (confirmed) {
+            _isAddHabitDirty = false;
+            navigateTo('oath');
+          }
+        });
+      } else {
+        if (confirm('¿Seguro que deseas salir sin guardar? Todo el progreso se perderá.')) {
+          _isAddHabitDirty = false;
+          navigateTo('oath');
+        }
+      }
+    } else {
+      // Sin cambios: salir limpiamente al Pacto
+      navigateTo('oath');
+    }
+    return;
+  }
+
+  // 5. ⚠️ REPORTE EN CURSO — si el usuario está dentro del input de una misión
   //    el botón atrás NO debe salir silenciosamente: lanzar fricción de cancelación.
   const reportInput = document.getElementById('view-report-input');
   if (reportInput) {
