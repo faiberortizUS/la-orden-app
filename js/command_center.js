@@ -83,6 +83,28 @@ function renderCommandCenter(data, isFirstTime) {
   const icd = user.icd || 0;
   const pcFmt = Number(user.pcTotal||0).toLocaleString('es-CO');
 
+  let codexHtml = '';
+  if (typeof ADD_HABIT_CATALOG !== 'undefined') {
+    Object.keys(ADD_HABIT_CATALOG).forEach(cat => {
+      if (cat === 'PERSONALIZADO') return;
+      let catName = cat.replace('_', ' ');
+      codexHtml += `<div style="font-size:10px; color:var(--text-3); font-weight:800; letter-spacing:0.1em; margin-top:12px; margin-bottom:4px; text-transform:uppercase;">${catName}</div>`;
+      
+      ADD_HABIT_CATALOG[cat].forEach(c => {
+         const sName = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+         const sInfo = (c.info || 'Táctica táctico sin definición asignada.').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+         codexHtml += `
+             <div class="tappable" onclick="showInteractiveModal('${sName}', '${sInfo}', '🧠')"
+               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:10px 12px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px; margin-bottom:6px;">
+               <span>${c.nombre}</span> <span style="color:var(--gold);font-weight:900;">?</span>
+             </div>
+         `;
+      });
+    });
+  } else {
+    codexHtml = '<div style="font-size:12px; color:var(--text-3);">Catálogo en sincronización... Inicia una misión para cargar matrices.</div>';
+  }
+
   return `
     <div class="view" id="view-command-center">
 
@@ -182,6 +204,22 @@ function renderCommandCenter(data, isFirstTime) {
             </div>
           </div>
         `).join('')}
+      </div>
+
+      <!-- CÓDICE DE TÁCTICAS MAESTRO -->
+      <div class="stagger-up stagger-3" style="padding:0 20px 40px;">
+        <div style="background:var(--bg-elevated); border:1px solid var(--border-gold); border-radius:var(--r-lg); padding:16px; margin-bottom:10px; text-align:left;">
+           <div style="font-family:var(--font-head);font-weight:900;font-size:16px;color:var(--gold);margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+             📖 CÓDICE DE TÁCTICAS
+           </div>
+           <div style="font-size:13px; color:var(--text-3); margin-bottom:16px; line-height:1.5;">
+             Glosario estratégico definitivo de La Orden. Toca cada término del arsenal para interiorizar su ciencia, mentalidad y arquitectura biomecánica.
+           </div>
+           
+           <div style="max-height: 480px; overflow-y: auto; display:flex; flex-direction:column; padding-right:8px; border-top:1px solid rgba(212,168,67,0.2); padding-top:10px;">
+             ${codexHtml}
+           </div>
+        </div>
       </div>
 
       <!-- CTA primera vez -->
