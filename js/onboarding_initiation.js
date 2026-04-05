@@ -60,7 +60,7 @@ async function renderObInitiationAsync(container) {
       background:radial-gradient(circle at top right, #17110e, #0A0A0F);
       padding-bottom:120px; position:relative;">
       
-      ${obProgressBar(5, 6)}
+      ${obProgressBar(4, 5)}
       
       <div style="flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;padding:24px;z-index:2;">
          
