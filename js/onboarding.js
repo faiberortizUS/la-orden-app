@@ -6,11 +6,10 @@
 
 const ONBOARDING_STEPS = [
   'welcome',       // Paso 1: Cinemática de bienvenida
-  'areas',         // Paso 2: Selección de campos de batalla
-  'commitments',   // Paso 3: Compromisos + meta + frecuencia
-  'oath',          // Paso 4: Juramento — Pacto de Acero
-  'initiation',    // Paso 5: Las Reglas del Juego (Tutorial/Gamificación)
-  'payment',       // Paso 6: Activación Stripe
+  'commitments',   // Paso 2: Selección de campos de batalla (Unificado)
+  'oath',          // Paso 3: Juramento — Pacto de Acero
+  'initiation',    // Paso 4: Las Reglas del Juego (Tutorial/Gamificación)
+  'payment',       // Paso 5: Activación Stripe
 ];
 
 const STORAGE_KEY = 'laorden_onboarding';
@@ -154,7 +153,7 @@ function obProgressBar(currentStep, totalSteps) {
 
 /* ─── RESUMEN HACIA EL PAGO ─────────────────────────────── */
 window.resumePaymentOnboarding = function() {
-  OB.step = 5; // Paso de los pagos (index 5)
+  OB.step = 4; // Paso de los pagos (index 4)
   obSave();
   
   const appEl = document.getElementById('app');
