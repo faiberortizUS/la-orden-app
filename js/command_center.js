@@ -116,7 +116,7 @@ function renderCommandCenter(data, isFirstTime) {
               </div>
             </div>
           `;
-          const sTpl = tpl.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          const sTpl = tpl.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\r/g, '').replace(/\n/g, '');
           codexHtml += `
             <div class="tappable" onclick="showInteractiveModal('${c.nombre.replace(/'/g, "\\'")}', '${sTpl}', '🔍')"
               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:14px 16px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px; margin-bottom:8px; cursor:pointer;">
