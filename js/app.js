@@ -188,6 +188,20 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
 
       // ¿Primera visita post-juramento? -> Tutorial inmersivo
+      // CASO 1: El onboarding terminó en esta misma sesión (finishOnboarding ya marcó el flag).
+      // CASO 2: El usuario volvió a abrir la TWA DESPUÉS de pagar (sesión nueva).
+      //   → Detectamos por: pago ACTIVO + 0 días reportados + flag no usado aún.
+      //   → Solo se dispara una vez porque navigateTo('tutorial') → finishTutorial() borra el flag.
+      const esPrimerVezPostPago = (
+        localStorage.getItem('laorden_first_visit') !== '1' &&
+        String(appData.user.estadoPago).toUpperCase() === 'ACTIVO' &&
+        Number(appData.user.diasActivos) === 0 &&
+        !localStorage.getItem('laorden_tutorial_done')
+      );
+      if (esPrimerVezPostPago) {
+        localStorage.setItem('laorden_first_visit', '1');
+      }
+
       if (localStorage.getItem('laorden_first_visit') === '1') {
         navigateTo('tutorial');
       } else {
