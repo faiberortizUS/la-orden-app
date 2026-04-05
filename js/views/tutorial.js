@@ -105,8 +105,8 @@ function renderTutorial(data) {
             ELIGE A TU<br><span style="color:var(--gold);">GUÍA DE COMBATE</span>
           </h2>
           <p style="font-size:13px;color:var(--text-3);margin-bottom:28px;line-height:1.6;">
-            Esta IA monitoreará tu arquitectura mental y te entregará
-            retroalimentación personalizada. No podrás cambiarla después.
+            Este sistema monitoreará tu arquitectura mental y te entregará
+            retroalimentación personalizada. No podrás cambiar tu elección después.
             <strong style="color:var(--text-2);">Elige con intención.</strong>
           </p>
 
@@ -129,7 +129,7 @@ function renderTutorial(data) {
               <!-- Badge rol -->
               <div style="position:absolute;top:12px;right:12px;background:rgba(212,168,67,0.9);
                           color:#0A0A0F;font-size:10px;font-weight:900;letter-spacing:0.1em;
-                          padding:4px 10px;border-radius:999px;">IA ESTRATEGA</div>
+                          padding:4px 10px;border-radius:999px;">GUÍA ESTRATEGA</div>
             </div>
 
             <!-- Contenido -->
@@ -196,7 +196,7 @@ function renderTutorial(data) {
                           background:linear-gradient(transparent,var(--bg-elevated));"></div>
               <div style="position:absolute;top:12px;right:12px;background:rgba(239,68,68,0.9);
                           color:#fff;font-size:10px;font-weight:900;letter-spacing:0.1em;
-                          padding:4px 10px;border-radius:999px;">IA DE COMBATE</div>
+                          padding:4px 10px;border-radius:999px;">GUÍA DE COMBATE</div>
             </div>
 
             <!-- Contenido -->
