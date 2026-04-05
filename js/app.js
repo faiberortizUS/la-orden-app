@@ -77,6 +77,93 @@ function showInteractiveModal(title, text, badge) {
   }
 }
 
+function showGuideDailyMessage() {
+  const existing = document.getElementById('interactiveModal');
+  if (existing) existing.remove();
+
+  const guideName = localStorage.getItem('laorden_selected_guide') || 'Atena';
+  const isDarius = guideName === 'Darius';
+  
+  // Imgs globales de tut_images.js
+  const imgUrl = isDarius ? (typeof TUT_IMG_DARIUS !== 'undefined' ? TUT_IMG_DARIUS : '') : (typeof TUT_IMG_ATENA !== 'undefined' ? TUT_IMG_ATENA : '');
+  const color = isDarius ? 'var(--fire)' : 'var(--gold)';
+  
+  // Mensaje Pseudo-Aleatorio (Gira por día de la semana)
+  const today = new Date().getDay();
+  const atenMsgs = [
+     "El mundo castiga a los mediocres y recompensa a los consistentes. Hoy no vas a negociar con tus excusas.",
+     "He auditado tus números. Tu único enemigo de hoy es la fricción térmica de tu propia pereza. Sella tu parte.",
+     "La consistencia repetida diariamente produce neuroplasticidad imparable. Concéntrate en la repetición hoy.",
+     "La métrica de ayer ya no importa. El ICD de hoy es lo único vivo. Ejecuta tus misiones sin cuestionarlas.",
+     "No me interesa tu motivación. Ejecuta el sistema. Tus emociones son irrelevantes frente al peso numérico del tablero.",
+     "Tu Célula te observa. Si caes hoy arrastrarás obligatoriamente la métrica de tus hermanos. Ejerce control.",
+     "Tu identidad en el 1% no se forja con promesas futuras, se construye hoy aplastando tus debilidades actuales."
+  ];
+  const dariMsgs = [
+     "Déjate de delicadezas. No vine a darte palmadas en la espada, vine a forzar tu cumplimiento y a cobrarte la factura.",
+     "¿Día difícil? Al sistema le da igual. Si tienes energía para respirar y quejarte, tienes la energía para reportar.",
+     "Si vas a fallar hoy, ten el honor de decirle a la Célula que eres el cobarde que retrocede, sino, avanza y cobra.",
+     "Hoy la resistencia va a golpearte durísimo. Úsala como gasolina táctica. Convierte tu incomodidad en rentabilidad.",
+     "Un maldito día a la vez. Olvida la métrica de 30 días, aprieta la mandíbula y concéntrate solo en HOY. Cumple.",
+     "El dolor agudo de la disciplina se desvanece rápido. El peso inerte del arrepentimiento no. Elige tu veneno.",
+     "El choque térmico ha comenzado. El sistema ha sido audaz para acorralarte donde querías. No retrocedas ni un centímetro."
+  ];
+  const msg = isDarius ? dariMsgs[today] : atenMsgs[today];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'interactiveModal';
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: rgba(0,0,0,0.85);
+    animation: modalBgIn 0.3s ease forwards;
+  `;
+
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: #12121A; border-top: 2px solid ${color};
+    border-radius: 24px 24px 0 0; padding: 24px 24px 40px;
+    box-shadow: 0 -10px 40px ${isDarius ? 'rgba(239,68,68,0.15)' : 'rgba(212,168,67,0.15)'};
+    transform: translateY(100%); animation: modalSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  `;
+
+  content.innerHTML = `
+    <div style="width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 24px;"></div>
+    
+    <div style="display:flex; align-items:flex-end; gap:16px; margin-bottom:24px;">
+      <div style="width:72px; height:72px; border-radius:50%; border:2px solid ${color}; overflow:hidden; background:#0d0805; flex-shrink:0;">
+        <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover; filter:saturate(1.2) contrast(1.1);" onerror="this.outerHTML='<div style=\\'font-size:36px;display:flex;align-items:center;justify-content:center;height:100%;\\'>${isDarius?'🐺':'👁️'}</div>'">
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:4px;">${isDarius ? 'Protocolo Fuego (Guía)' : 'Auditoría Táctica (Guía)'}</div>
+        <div style="font-family:var(--font-head); font-size:24px; font-weight:900; color:${color}; line-height:1; letter-spacing:0.05em;">${guideName.toUpperCase()}</div>
+      </div>
+    </div>
+
+    <div style="background:${isDarius ? 'rgba(239,68,68,0.08)' : 'rgba(212,168,67,0.08)'}; border:1px solid ${isDarius ? 'rgba(239,68,68,0.3)' : 'rgba(212,168,67,0.3)'}; border-radius:12px 12px 12px 0; padding:20px; position:relative; margin-bottom:32px;">
+      <div style="position:absolute; top:-8px; left:20px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-bottom:8px solid ${isDarius ? 'rgba(239,68,68,0.3)' : 'rgba(212,168,67,0.3)'};"></div>
+      <p style="font-size:15px; color:var(--text-1); line-height:1.6; margin:0; font-style:italic;">"${msg}"</p>
+    </div>
+
+    <button onclick="document.getElementById('interactiveModal').remove()" 
+      style="width:100%; padding:16px; border-radius:14px; background:${color}; border:none; color:${isDarius ? '#fff' : '#0A0A0F'}; font-family:var(--font-head); font-weight:900; font-size:16px; letter-spacing:0.06em; cursor:pointer; -webkit-tap-highlight-color:transparent;">
+      MENSAJE RECIBIDO
+    </button>
+  `;
+
+
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+  }
+}
+
 // --- INICIALIZACION --------------------------------------
 window.addEventListener('DOMContentLoaded', async () => {
   const tg = window.Telegram?.WebApp;
