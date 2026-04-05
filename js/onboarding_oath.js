@@ -29,7 +29,7 @@ function renderObOath() {
       background:radial-gradient(ellipse at center, #1a0a00 0%, #0A0A0F 70%);
       padding-bottom:120px;">
 
-      ${obProgressBar(3, 5)}
+      ${obProgressBar(2, 4)}
 
       <div style="flex:1;display:flex;flex-direction:column;align-items:center;
         padding:24px 24px 0;text-align:center;">
