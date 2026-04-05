@@ -16,12 +16,12 @@ let currentStatsTab = 'EXEC'; // 'EXEC' | 'COMPARE'
 let currentStatsFilter = 'GLOBAL';
 
 // ── KPI Premium helpers ──────────────────────────────────────────────
-function _kpiCob(sa, g) { const cs = sa.filter(d => g(d).total > 0).map(d => g(d).count / g(d).total * 100); return cs.length ? Math.round(cs.reduce((a, b) => a + b, 0) / cs.length) : 0; }
-function _kpiCumpl(sa, g) { const ps = sa.map(d => g(d).pct).filter(p => p > 0); return ps.length ? Math.round(ps.reduce((a, b) => a + Math.min(b, 100), 0) / ps.length) : 0; }
-function _kpiSobre(sa, g) { const es = sa.map(d => g(d).pct).filter(p => p > 100).map(p => p - 100); return es.length ? Math.round(es.reduce((a, b) => a + b, 0) / es.length) : 0; }
-function _kpiTend(sa, g) { const ps = sa.map(d => g(d).pct), a1 = ps.slice(0, 4).filter(p => p > 0), a2 = ps.slice(4).filter(p => p > 0); if (!a1.length || !a2.length) return 0; return Math.round(a2.reduce((x, b) => x + b, 0) / a2.length - a1.reduce((x, b) => x + b, 0) / a1.length); }
-function _kpiReg(ha, g) { return Math.round(ha.filter(d => g(d).nivel > 0).length / 28 * 100); }
-function _kpiVolat(sa, g) { const ps = sa.map(d => g(d).pct).filter(p => p > 0); if (ps.length < 2) return 0; const avg = ps.reduce((a, b) => a + b, 0) / ps.length; return Math.round(Math.sqrt(ps.reduce((a, p) => a + Math.pow(p - avg, 2), 0) / ps.length)); }
+function _kpiCob(sa, g) { const cs = sa.filter(d => g(d).total > 0).map(d => g(d).count / g(d).total * 100); return cs.length ? Math.round(cs.reduce((a, b) => a + b, 0) / cs.length) : null; }
+function _kpiCumpl(sa, g) { const ps = sa.map(d => g(d).pct).filter(p => p > 0); return ps.length ? Math.round(ps.reduce((a, b) => a + Math.min(b, 100), 0) / ps.length) : null; }
+function _kpiSobre(sa, g) { const es = sa.map(d => g(d).pct).filter(p => p > 100).map(p => p - 100); return es.length ? Math.round(es.reduce((a, b) => a + b, 0) / es.length) : null; }
+function _kpiTend(sa, g) { const ps = sa.map(d => g(d).pct), a1 = ps.slice(0, 4).filter(p => p > 0), a2 = ps.slice(4).filter(p => p > 0); if (!a1.length || !a2.length) return null; return Math.round(a2.reduce((x, b) => x + b, 0) / a2.length - a1.reduce((x, b) => x + b, 0) / a1.length); }
+function _kpiReg(ha, g) { const actives = ha.filter(d => g(d).nivel > 0).length; return actives === 0 ? null : Math.round(actives / 28 * 100); }
+function _kpiVolat(sa, g) { const ps = sa.map(d => g(d).pct).filter(p => p > 0); if (ps.length < 2) return null; const avg = ps.reduce((a, b) => a + b, 0) / ps.length; return Math.round(Math.sqrt(ps.reduce((a, p) => a + Math.pow(p - avg, 2), 0) / ps.length)); }
 function _kpiRecup(ha, g) { let n = 0; for (let i = ha.length - 1; i >= 0; i--) { if (g(ha[i]).nivel === 0) break; n++; } return n; }
 // ─────────────────────────────────────────────────────────────────────
 
@@ -145,12 +145,13 @@ function _renderStatsDashboard(data) {
   });
 
   // Si es global calculamos promedios 7D
-  let globalCumpl7d = 0; let globalCobert7d = 0;
+  let globalCumpl7d = null; let globalCobert7d = null;
   if(isGlobal) {
     const semPts = semanaArr.map(s => getSemData(s).pct);
-    globalCumpl7d = Math.round(semPts.reduce((a, b) => a + b, 0) / (semPts.length||1));
-    const cobPts = semanaArr.map(s => getSemData(s).cobertura || 0);
-    globalCobert7d = Math.round(cobPts.reduce((a, b) => a + b, 0) / (cobPts.length||1));
+    const semCob = semanaArr.map(s => getSemData(s).cobertura||0).filter(c => c > 0);
+    const validPts = semPts.filter(p => p > 0);
+    globalCumpl7d = validPts.length ? Math.round(validPts.reduce((a, b) => a + Math.min(b, 100), 0) / validPts.length) : null;
+    globalCobert7d = semCob.length ? Math.round(semCob.reduce((a, b) => a + b, 0) / semCob.length) : null;
   }
 
   // ── 10 KPIs Premium ─────────────────────────────────────────
@@ -161,9 +162,9 @@ function _renderStatsDashboard(data) {
   const kpiReg = _kpiReg(heatArr, getHeatData);
   const kpiVol = _kpiVolat(semanaArr, getSemData);
   const kpiRec = _kpiRecup(heatArr, getHeatData);
-  const volLbl = kpiVol <= 15 ? 'Estable' : kpiVol <= 35 ? 'Variable' : 'Caótico';
-  const tIcon = kpiTend > 5 ? '↑' : kpiTend < -5 ? '↓' : '→';
-  const tColor = kpiTend > 5 ? 'var(--success)' : kpiTend < -5 ? '#EF4444' : 'var(--text-2)';
+  const volLbl = kpiVol === null ? 'Fase Cero' : kpiVol <= 15 ? 'Estable' : kpiVol <= 35 ? 'Variable' : 'Caótico';
+  const tIcon = kpiTend === null ? '—' : kpiTend > 5 ? '↑' : kpiTend < -5 ? '↓' : '→';
+  const tColor = kpiTend === null ? 'var(--text-3)' : kpiTend > 5 ? 'var(--success)' : kpiTend < -5 ? '#EF4444' : 'var(--text-2)';
   const areasD = data.areasResumen || [];
   // ─────────────────────────────────────────────────────────────
 
@@ -213,12 +214,12 @@ function _renderStatsDashboard(data) {
       <div class="kpi-exec-bar stagger-up stagger-1" style="margin-bottom:10px;">
         <div class="kpi-exec-chip kpi-exec-chip--purple tappable" onclick="showInteractiveModal('Estabilidad de Esfuerzo','Mide matemáticamente qué tanto varía tu rendimiento día tras día.<br><br>• <b>Estable (🔥 0–15%):</b> Eres una roca. Mantienes el mismo nivel siempre.<br>• <b>Variable (⚖️ 16–35%):</b> Tu energía sube y baja según el día.<br>• <b>Caótico (⚠️ >35%):</b> Eres impredecible. Un día das el 100% y al siguiente desapareces.<br><br>💡 El 1% busca Estabilidad.','📊')">
           <div class="kpi-exec-label">Estabilidad</div>
-          <div class="kpi-exec-value" style="font-size:14px;color:var(--electric);">${volLbl}</div>
-          <div class="kpi-exec-sub">σ = ${kpiVol}%</div>
+          <div class="kpi-exec-value" style="font-size:14px;color:${kpiVol === null ? 'var(--text-3)' : 'var(--electric)'};">${volLbl}</div>
+          <div class="kpi-exec-sub">${kpiVol === null ? 'Sin actividad detectada' : 'σ = ' + kpiVol + '%'}</div>
         </div>
         <div class="kpi-exec-chip kpi-exec-chip--gold tappable" onclick="showInteractiveModal('Regularidad 28d','% de los últimos 28 días con al menos 1 misión reportada. La ciencia del hábito exige contexto estable y repetición consistente.','📅')">
           <div class="kpi-exec-label">Regularidad</div>
-          <div class="kpi-exec-value" style="color:${kpiReg >= 80 ? 'var(--success)' : kpiReg >= 50 ? 'var(--gold)' : '#EF4444'};">${kpiReg}%</div>
+          <div class="kpi-exec-value" style="font-size:18px;color:${kpiReg === null ? 'var(--text-3)' : (kpiReg >= 80 ? 'var(--success)' : kpiReg >= 50 ? 'var(--gold)' : '#EF4444')};">${kpiReg === null ? '<span style="font-size:13px;font-weight:600;">Sin Rastro</span>' : kpiReg + '%'}</div>
           <div class="kpi-exec-sub">${diasConReporte28}/28d</div>
         </div>
         <div class="kpi-exec-chip tappable" onclick="showInteractiveModal('Recuperación','Días activos consecutivos desde tu última caída. Es tu momentum real, no el acumulado histórico.','⚡')">
@@ -280,11 +281,11 @@ function _renderStatsDashboard(data) {
           ${isGlobal ? `
             <div style="flex:1; background:rgba(0,0,0,0.4); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.03);">
               <div style="font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Cumplimiento Prom. (7D)</div>
-              <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:var(--gold); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${globalCumpl7d}<span style="font-size:12px;">%</span> <span style="font-size:10px; font-weight:700; color:var(--text-3);">sobre meta</span></div>
+              <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:${globalCumpl7d === null ? 'var(--text-3)' : 'var(--gold)'}; line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${globalCumpl7d === null ? '<span style="font-size:13px;font-family:var(--font-body);font-weight:600;">Fase Cero</span>' : globalCumpl7d + '<span style="font-size:12px;">%</span>'} <span style="font-size:10px; font-weight:700; color:var(--text-3);">sobre meta</span></div>
             </div>
             <div style="flex:1; background:rgba(0,0,0,0.4); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.03);">
               <div style="font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); font-weight:700;">Cobertura Prom. (7D)</div>
-              <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:var(--gold); line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${globalCobert7d}<span style="font-size:12px;">%</span> <span style="font-size:10px; font-weight:700; color:var(--text-3);">misiones activas</span></div>
+              <div style="font-family:var(--font-head); font-variant-numeric:tabular-nums; font-size:20px; font-weight:900; color:${globalCobert7d === null ? 'var(--text-3)' : 'var(--gold)'}; line-height:1.2; letter-spacing:-0.02em; margin-top:2px;">${globalCobert7d === null ? '<span style="font-size:13px;font-family:var(--font-body);font-weight:600;">Sin Rastro</span>' : globalCobert7d + '<span style="font-size:12px;">%</span>'} <span style="font-size:10px; font-weight:700; color:var(--text-3);">misiones</span></div>
             </div>
           ` : `
             <div style="flex:1; background:rgba(0,0,0,0.4); border-radius:var(--r-md); padding:10px; border:1px solid rgba(255,255,255,0.03);">
@@ -336,21 +337,21 @@ function _renderStatsDashboard(data) {
             <div style="font-size:11px; color:var(--text-3); margin-top:3px;">3 dimensiones · últimos 7 días</div>
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
-            <span style="font-size:13px;font-weight:700;color:${tColor};">${tIcon} ${kpiTend > 0 ? '+' + kpiTend : kpiTend}%</span>
+            <span style="font-size:13px;font-weight:700;color:${tColor};">${tIcon} ${kpiTend === null ? '' : (kpiTend > 0 ? '+' + kpiTend : kpiTend) + '%'}</span>
             <span style="font-size:10px;color:var(--text-3);">vs sem.</span>
           </div>
         </div>
         <div class="sem-metrics-row">
           <div class="sem-metric-block" style="border-color:rgba(123,97,255,0.2);">
-            <div class="sem-metric-val" style="font-size:18px;color:var(--electric);">${kpiCob}%</div>
+            <div class="sem-metric-val" style="font-size:18px;color:var(--electric);">${kpiCob === null ? '<span style="font-size:12px;color:var(--text-3)">Sin Rastro</span>' : kpiCob + '%'}</div>
             <div class="sem-metric-lbl">Cobertura</div>
           </div>
-          <div class="sem-metric-block" style="border-color:${kpiCumpl >= 80 ? 'rgba(34,197,94,0.3)' : kpiCumpl >= 50 ? 'rgba(212,168,67,0.3)' : 'rgba(239,68,68,0.3)'}; padding:12px 8px;">
-            <div class="sem-metric-val" style="font-size:26px;color:${kpiCumpl >= 80 ? 'var(--success)' : kpiCumpl >= 50 ? 'var(--gold)' : '#EF4444'};">${kpiCumpl}%</div>
+          <div class="sem-metric-block" style="border-color:${kpiCumpl === null ? 'transparent' : kpiCumpl >= 80 ? 'rgba(34,197,94,0.3)' : kpiCumpl >= 50 ? 'rgba(212,168,67,0.3)' : 'rgba(239,68,68,0.3)'}; padding:12px 8px;">
+            <div class="sem-metric-val" style="font-size:${kpiCumpl === null ? '14px' : '26px'};color:${kpiCumpl === null ? 'var(--text-3)' : kpiCumpl >= 80 ? 'var(--success)' : kpiCumpl >= 50 ? 'var(--gold)' : '#EF4444'};">${kpiCumpl === null ? 'Fase Cero' : kpiCumpl + '%'}</div>
             <div class="sem-metric-lbl">Cumplimiento</div>
           </div>
           <div class="sem-metric-block" style="border-color:${kpiSob > 0 ? 'rgba(255,107,53,0.3)' : 'rgba(255,255,255,0.04)'}">
-            <div class="sem-metric-val" style="font-size:18px;color:${kpiSob > 0 ? 'var(--fire)' : 'var(--text-3)'}">${kpiSob > 0 ? '+' + kpiSob + '%' : '—'}</div>
+            <div class="sem-metric-val" style="font-size:18px;color:${kpiSob > 0 ? 'var(--fire)' : 'var(--text-3)'}">${kpiSob === null ? '<span style="font-size:12px;">Sin Rastro</span>' : kpiSob > 0 ? '+' + kpiSob + '%' : '—'}</div>
             <div class="sem-metric-lbl">Sobrecumpl.</div>
           </div>
         </div>
