@@ -205,12 +205,12 @@ async function finishOnboarding(isSkip = false) {
   } else {
     updateHeader(appData);
 
-    // Mostrar la app y el Centro de Comandos (primera vez)
+    // Mostrar la app y el Tutorial (primera vez)
     const appEl = document.getElementById('app');
     if (appEl) appEl.classList.remove('hidden');
 
-    // Marcar que ya vio el onboarding -> ir al centro de comandos por primera vez
+    // Marcar que ya vio el onboarding -> ir al tutorial por primera vez
     localStorage.setItem('laorden_first_visit', '1');
-    navigateTo('command_center');
+    navigateTo('tutorial');
   }
 }
