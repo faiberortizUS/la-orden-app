@@ -101,11 +101,9 @@ function renderCommandCenter(data, isFirstTime) {
 
          ADD_HABIT_CATALOG[cat].forEach(c => {
            const infoCompleto = c.info || '';
+           const arquitectura = c.desc || infoCompleto;
 
-           // Arquitectura: identidad del hábito en contexto de su área
-           const arquitectura = 'Práctica del área de <strong>' + areaLabel + '</strong>. Al ejecutar <em>' + c.nombre + '</em> de forma constante, integras este hábito como parte de tu identidad de alto rendimiento, no como una tarea, sino como quien eres.';
-
-           // Beneficio Real: primera oración de c.info (extrae la evidencia más contundente)
+           // Beneficio Real: primera oración de c.info (la estadística más contundente)
            const primerPuntoIdx = infoCompleto.search(/\.\s+[A-Z0-9]/);
            const beneficio = primerPuntoIdx > 0
              ? infoCompleto.substring(0, primerPuntoIdx + 1)
