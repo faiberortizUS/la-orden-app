@@ -119,6 +119,19 @@ function renderReport(data, params) {
           </div>
         `).join('')}
       </div>
+
+      <!-- LETRA PEQUEÑA / DOCTRINA -->
+      <div style="margin-top: 32px; padding: 16px; background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.06); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+          ⚖️ El Peso de tu Palabra
+        </div>
+        <div style="font-size: 11px; color: var(--text-3); line-height: 1.6; padding:0 10px;">
+          En La Orden, hemos destruido intencionalmente la opción de 'Eliminar Misiones' para blindarte de tus propias excusas y debilidades.
+          <br><br>
+          <span style="opacity: 0.7;">Si cometiste un error matemático real durante la calibración, deberás tramitar la eliminación manualmente contactando a Soporte vía Telegram y asumiendo la responsabilidad.</span>
+        </div>
+      </div>
+
     </div>
   `;
 }
@@ -351,10 +364,13 @@ async function submitReport() {
        btn.style.color      = '#EF4444';
        // Restaurar botón original tras 3 segundos para no bloquear al usuario
        setTimeout(() => {
-         btn.innerHTML        = '✍️ SELLAR MI VICTORIA';
+         btn.innerHTML        = '<span style="filter:drop-shadow(0 0 5px rgba(0,0,0,0.8));">🩸 MANTÉN PRESIONADO PARA SELLAR</span>';
          btn.style.background = '';
          btn.style.border     = '';
          btn.style.color      = '';
+         btn.style.textShadow = '';
+         btn.onmousedown      = startHoldConfirm;
+         btn.ontouchstart     = startHoldConfirm;
        }, 3000);
     }
     return;
