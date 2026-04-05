@@ -27,13 +27,13 @@ function _kpiRecup(ha, g) { let n = 0; for (let i = ha.length - 1; i >= 0; i--) 
 
 // Wrapper global (usado por compare.js) para forzar repintado sin reload
 window.renderStatsWrapper = function() {
-  if (!window.appData) return '';
-  return renderStats(window.appData);
+  if (!window._appData) return '';
+  return renderStats(window._appData);
 };
 
 function changeStatsTab(tab) {
   currentStatsTab = tab;
-  if (window.appData) {
+  if (window._appData) {
     document.getElementById('viewContainer').innerHTML = renderStatsWrapper();
     if (tab === 'EXEC' && typeof initStatsAnimations === 'function') {
       setTimeout(initStatsAnimations, 50);
@@ -878,22 +878,31 @@ function showDayDrilldown(idx, data, filtro) {
   // Actividades del día (compromisos + estado)
   const compromisos = data.compromisos || [];
   const actividadesHtml = isG && compromisos.length > 0 ? compromisos.map(c => {
-    const pctC = c.meta > 0 ? Math.min(200, Math.round((c.valorHoy / c.meta) * 100)) : 0;
-    const cls = c.hecho ? (pctC >= 100 ? 'var(--success)' : 'var(--gold)') : 'var(--text-3)';
+    // Si no es hoy, buscamos en el historial específico de la misión
+    const histMision = (data.historial && data.historial[c.id]) ? data.historial[c.id] : [];
+    const cellMision = gH(histMision[actualIdx] || 0);
+
+    const valorReportado = esHoy ? (c.valorHoy || 0) : (cellMision.valor || 0);
+    const metaDia = esHoy ? (c.meta || 0) : (cellMision.meta || c.meta || 0);
+    const pctC = metaDia > 0 ? Math.min(200, Math.round((valorReportado / metaDia) * 100)) : 0;
+    const isDone = pctC >= 100 || (!esHoy && cellMision.pct > 0);
+    
+    const cls = isDone ? 'var(--success)' : (pctC > 0 ? 'var(--gold)' : 'var(--text-3)');
+    
     return `
       <div class="drill-activity-item">
         <span style="font-size:20px;">${c.emoji}</span>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text-1);">${c.nombre}</div>
           <div style="font-size:11px;color:var(--text-3);">
-            ${c.hecho ? `${Number(c.valorHoy || 0).toLocaleString('es-CO')} ${c.unidad}` : 'Sin reporte'}
+            ${pctC > 0 ? `${Number(valorReportado).toLocaleString('es-CO')} ${c.unidad}` : 'Sin reporte'}
           </div>
         </div>
         <div class="drill-activity-pct" style="color:${cls};">
-          ${c.hecho ? pctC + '%' : '—'}
+          ${pctC > 0 ? pctC + '%' : '—'}
         </div>
       </div>`;
-  }).join('') : '<p style="color:var(--text-3);font-size:13px;">Datos del día no disponibles en vista histórica.</p>';
+  }).join('') : '<p style="color:var(--text-3);font-size:13px;">Filtro activo. Selecciona "Global" para ver el desglose.</p>';
 
   const nivelLabel = ['Vacío', 'Soporte Vital', 'Parcial', 'Día Ganado ⭐', 'Ejecución Élite ⚡'];
   const nivelColor = ['var(--text-3)', 'rgba(123,97,255,0.8)', 'rgba(123,97,255,1)', 'var(--success)', 'var(--gold)'];
@@ -938,8 +947,8 @@ function showDayDrilldown(idx, data, filtro) {
         </div>`: ''}
       </div>`: ''}
 
-      ${esHoy && isG ? `
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-3);margin-bottom:10px;">Estado de misiones hoy</div>
+      ${isG ? `
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-3);margin-bottom:10px;">Desglose Operativo Diario</div>
         ${actividadesHtml}
       `: ''}
     </div>
