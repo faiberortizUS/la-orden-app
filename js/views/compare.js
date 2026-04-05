@@ -280,30 +280,30 @@ function renderCompare(data) {
 // ── Controladores de Eventos Globales ──
 window.changeCompareSubTab = function(tab) {
   currentCompareSubTab = tab;
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
 
 window.changeComparePeriodRange = function(val) {
   comparePeriodRange = val;
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
 
 window.changeCompareDayA = function(val) {
   compareDayA = parseInt(val);
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
 
 window.changeCompareDayB = function(val) {
   compareDayB = parseInt(val);
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
 
 window.changeCompareMissionA = function(val) {
   compareMissionA = val;
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
 
 window.changeCompareMissionB = function(val) {
   compareMissionB = val;
-  if(window.appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
+  if(window._appData) document.getElementById('viewContainer').innerHTML = window.renderStatsWrapper();
 };
