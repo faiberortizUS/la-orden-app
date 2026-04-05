@@ -76,10 +76,10 @@ function _renderStatsDashboard(data) {
   const getSemData = (item) => typeof item === 'object' ? item : { pct: item || 0, count: 0, total: 0, valor: 0 };
 
   const histList = historial ? (historial[currentStatsFilter] || historial.GLOBAL || []) : [];
-  const heatArr = histList.length === 28 ? histList : Array(28).fill(0);
+  const heatArr = histList.length >= 28 ? histList.slice(-28) : Array(28).fill(0);
 
   const semList = semana ? (semana[currentStatsFilter] || semana.GLOBAL || []) : [];
-  const semanaArr = semList.length === 7 ? semList : Array(7).fill(0);
+  const semanaArr = semList.length >= 7 ? semList.slice(-7) : Array(7).fill(0);
 
   // Días dinámicos (termina hoy)
   const diasLabels = [];
@@ -368,7 +368,9 @@ function _renderStatsDashboard(data) {
           </div>
           ${semanaArr.map((item, i) => {
     const d = getSemData(item);
-    const pct = d.pct;
+    let pct = d.pct;
+    // Límite visual estricto para evitar 400% y distorsión de la UI
+    if (pct > 200) pct = 200; 
     const esHoy = i === semanaArr.length - 1;
 
     const h = pct > 0 ? Math.max(14, Math.round((pct / maxSem) * 120)) : 6;
@@ -863,8 +865,8 @@ function showDayDrilldown(idx, data, filtro) {
   };
 
   // idx is 0..27 logically for the heatmap grid (recent 28 days)
-  // in histList (length 56), the recent 28 days are index 28 to 55
-  const actualIdx = idx + 28;
+  // in histList (which could be length 56), the recent 28 days are at the end
+  const actualIdx = idx + (histList.length >= 28 ? histList.length - 28 : 0);
 
   const cell = gH(histList[actualIdx] || 0);
   const fecha = cell.fecha || '';
@@ -915,6 +917,7 @@ function showDayDrilldown(idx, data, filtro) {
     <div class="drill-backdrop" onclick="closeDrilldown()"></div>
     <div class="drill-sheet">
       <div class="drill-handle"></div>
+      <div onclick="closeDrilldown()" style="position:absolute; right:16px; top:16px; font-size:24px; color:var(--text-3); width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(255,255,255,0.05); cursor:pointer; z-index:10;">×</div>
       <div class="drill-date-title">${esHoy ? '🗓️ Hoy' : fechaDisplay}</div>
       <div class="drill-date-sub" style="color:${nivelColor[cell.nivel]};">${nivelLabel[cell.nivel] || 'Sin datos'}</div>
 
@@ -967,8 +970,13 @@ function showDayDrilldown(idx, data, filtro) {
   document.querySelectorAll('.heatmap-day').forEach(el => el.classList.remove('heatmap-day--selected'));
   const sel = document.querySelector(`[data-idx="${idx}"]`);
   if (sel) sel.classList.add('heatmap-day--selected');
-}
 
+  // Mostrar botón de retroceso de Telegram
+  if (window.Telegram?.WebApp?.BackButton) {
+    window.Telegram.WebApp.BackButton.show();
+    window.Telegram.WebApp.BackButton.onClick(closeDrilldown);
+  }
+}
 function closeDrilldown() {
   const el = document.getElementById('drilldown-container');
   if (el) {
@@ -977,4 +985,10 @@ function closeDrilldown() {
     setTimeout(() => el.remove(), 200);
   }
   document.querySelectorAll('.heatmap-day').forEach(el => el.classList.remove('heatmap-day--selected'));
+  
+  // Ocultar botón de retroceso
+  if (window.Telegram?.WebApp?.BackButton) {
+    window.Telegram.WebApp.BackButton.offClick(closeDrilldown);
+    window.Telegram.WebApp.BackButton.hide();
+  }
 }
