@@ -207,17 +207,17 @@ function renderObCommitmentsCombined() {
 
 // ── RENDER DE ACTIVIDAD (Bloque individual) ───────────────
 function renderActivityBlock(c, areaId, isSel, comp) {
-  const safeNombre = c.nombre.replace(/'/g, "\\\\\\'").replace(/"/g, "&quot;");
+  const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
   const rawInfo = c.info || '';
   const rawDesc = c.desc || rawInfo;
   
   // Extraer primera oración para beneficio real
-  const _pIdx = rawInfo.search(/\\.\\s+[A-Z0-9]/);
+  const _pIdx = rawInfo.search(/\.\s+[A-Z0-9]/);
   const beneficio = _pIdx > 0 ? rawInfo.substring(0, _pIdx + 1) : rawInfo;
   
   // Armar tooltip (Códice)
   const tooltipHtml = '<div style="margin-bottom:14px;"><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">👁️ Arquitectura Conceptual</div><div style="font-size:13px; color:var(--text-1); line-height:1.6; margin-bottom:14px;">' + rawDesc + '</div><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">📈 El Beneficio Real</div><div style="font-size:13px; color:var(--text-1); line-height:1.6; margin-bottom:14px;">' + beneficio + '</div><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">🔬 Bio-Ciencia</div><div style="font-size:13px; color:var(--text-2); font-style:italic; line-height:1.6; margin-bottom:14px;">' + rawInfo + '</div></div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">🎯 Calibración Sugerida</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">' + c.metaDef.toLocaleString('es-CO') + ' ' + c.unidad + '</span></div></div>';
-  const safeInfo = tooltipHtml.replace(/'/g, "\\\\\\'").replace(/"/g, "&quot;");
+  const safeInfo = tooltipHtml.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
   return `
     <div id="comp-${c.id}" style="background:var(--bg-base);border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
