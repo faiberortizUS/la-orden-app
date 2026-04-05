@@ -146,8 +146,11 @@ function renderHome(data) {
       <!-- MISIONES DEL DÍA (solo si hay compromisos) -->
       ${!sinCompromisos ? `
         <div>
-          <div class="missions-header">
-            <span class="section-title">Misiones de hoy</span>
+          <div class="missions-header tappable" onclick="showInteractiveModal('El Peso de Tu Palabra', 'En La Orden hemos destruido intencionalmente la opción de \\'Eliminar Misiones\\' para blindarte de tus propias excusas.<br><br>Lo que se promete se cumple. O tu índice (ICD) sufrirá el castigo matemático.<br><br><b>⚠️ Protocolo de Error Genuino:</b><br>Si cometiste un error real al forjar tu pacto (ej. escribiste 200 km en lugar de 20 km) deberás presentar tu corrección manualmente contactando a Soporte en Telegram para enmendar tu expediente.', '⚖️')">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="section-title" style="margin:0;">Misiones de hoy</span>
+              <div style="background:rgba(212,168,67,0.2); border-radius:50%; width:16px; height:16px; display:flex; justify-content:center; align-items:center; color:var(--gold); font-size:10px; font-weight:800; cursor:pointer;">?</div>
+            </div>
             <span class="missions-count">${doneCount}/${activos.length}</span>
           </div>
           <div class="prog-bar-wrap" style="margin-bottom:var(--s4);">
