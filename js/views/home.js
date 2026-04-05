@@ -59,9 +59,8 @@ function renderHome(data) {
         </div>
       ` : ''}
 
-      <!-- ICD HERO CARD -->
-      <div>
-        <div class="card card--glass card--gold tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" onclick="showInteractiveModal('Tu ICD: Lo que pierdes cada día que no reportas', '⚠️ <b>Aversión a la Pérdida:</b> Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>No lo pierdas.</b>', '🎯')">
+      <div onclick="showInteractiveModal('Tu ICD: Protección de Activos', '⚠️ Cada día sin reporte destruye puntos de tu ICD. Un ICD bajo no solo es un número — te <b>retrograda de rango</b> y te expulsa del ranking global.<br><br>📊 <b>Fórmula de La Orden:</b><br>50% Cumplimiento · 30% Regularidad · 20% Resiliencia<br><br>🎯 <b>Zonas de poder:</b><br>• 85+ = Zona Élite (Top 1%)<br>• 70–84 = Zona Sólida<br>• 50–69 = En Progreso<br>• &lt;50 = Zona de Riesgo<br><br>💡 Un ICD de 85 tarda 21 días en construirse y solo 3 días en caer a zona de riesgo si paras. <b>Protege tu inversión diaria.</b>', '🎯')">
+        <div class="card card--glass card--gold tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}">
           <div class="gauge-wrap">
             <svg class="gauge-svg" viewBox="0 0 180 180">
               <defs>
