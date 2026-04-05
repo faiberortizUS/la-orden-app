@@ -245,6 +245,27 @@ function navigateTo(view, params) {
   container.style.opacity = '0.4';
   container.style.transition = 'opacity 0.15s ease-out';
 
+  // ── BLOQUEO del nav durante tutorial ──────────────────
+  const nav = document.getElementById('bottomNav');
+  if (nav) {
+    if (view === 'tutorial') {
+      nav.style.pointerEvents = 'none';
+      nav.style.opacity       = '0.25';
+      nav.style.filter        = 'grayscale(1)';
+    } else {
+      nav.style.pointerEvents = '';
+      nav.style.opacity       = '';
+      nav.style.filter        = '';
+    }
+  }
+
+  // ── Si intenta navegar fuera del tutorial, interceptar ──────
+  if (currentView === 'tutorial' && view !== 'tutorial' && view !== 'command_center') {
+    if (typeof _mostrarFriccionTutorial === 'function') _mostrarFriccionTutorial();
+    container.style.opacity = '1';
+    return;
+  }
+
   setTimeout(() => {
     switch (view) {
       case 'home':      html = renderHome(appData); break;
@@ -262,11 +283,19 @@ function navigateTo(view, params) {
       }
       default:          html = renderHome(appData);
     }
-  
+
     container.innerHTML = html;
     container.scrollTop = 0;
     container.style.opacity = '1';
-  
+
+    // Inyectar imágenes de guías tras renderizar el tutorial
+    if (view === 'tutorial') {
+      const imgA = document.querySelector('#guide-card-atena img');
+      const imgD = document.querySelector('#guide-card-darius img');
+      if (imgA && typeof TUT_IMG_ATENA  !== 'undefined') imgA.src = TUT_IMG_ATENA;
+      if (imgD && typeof TUT_IMG_DARIUS !== 'undefined') imgD.src = TUT_IMG_DARIUS;
+    }
+
     requestAnimationFrame(() => {
       switch (view) {
         case 'home':      if (typeof initHomeAnimations === 'function') initHomeAnimations();  break;
@@ -384,14 +413,25 @@ function _handleBackAction() {
   const modal = document.getElementById('interactiveModal');
   if (modal) { modal.remove(); return; }
 
-  // 2. Si el Locked Dashboard está activo (Usuarios morosos), no lo dejamos salir sin fricción
+  // 2. TUTORIAL ACTIVO — navegar internamente o mostrar fricción
+  if (currentView === 'tutorial') {
+    const step = typeof tutCurrentStep !== 'undefined' ? tutCurrentStep : 0;
+    if (step > 0) {
+      if (typeof prevTutStep === 'function') prevTutStep();
+    } else {
+      if (typeof _mostrarFriccionTutorial === 'function') _mostrarFriccionTutorial();
+    }
+    return;
+  }
+
+  // 3. Si el Locked Dashboard está activo (Usuarios morosos), no lo dejamos salir sin fricción
   const ld = document.getElementById('lockedDashboard');
   if (ld && getComputedStyle(ld).display !== 'none') {
     _mostrarPopupSalida();
     return;
   }
 
-  // 3. Onboarding — verificar tanto display:flex como display:block (no 'none')
+  // 4. Onboarding — verificar tanto display:flex como display:block (no 'none')
   const obContainer = document.getElementById('onboardingContainer');
   if (obContainer) {
     const obDisplay = obContainer.style.display || getComputedStyle(obContainer).display;
