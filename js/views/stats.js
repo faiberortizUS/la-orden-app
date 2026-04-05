@@ -668,6 +668,24 @@ function _renderStatsDashboard(data) {
               </div>
             `;
     }).join('')}
+
+          ${inactivos.map(c => {
+      return `
+              <div class="tappable" style="display:flex; align-items:center; gap:10px; padding:12px 0;
+                border-bottom:1px dashed var(--border); opacity:0.6; background:rgba(255,255,255,0.01);" onclick="selectMission('${c.id}')">
+                <div style="font-size:26px; flex-shrink:0; filter:grayscale(0.5);">${c.emoji}</div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:13px; font-weight:700; color:var(--text-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.nombre}</div>
+                  <div style="font-size:11px; color:var(--gold); margin-top:2px;">
+                    ⚡ Misión Extra (${c.frecuencia === 'FDS' ? 'Fines de semana' : 'Lunes a viernes'})
+                  </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <div style="font-size:14px; color:var(--text-3);">⟩</div>
+                </div>
+              </div>
+            `;
+    }).join('')}
         </div>
       ` : ''}
 
