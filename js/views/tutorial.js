@@ -180,8 +180,9 @@ function finishTutorial() {
   if (window.Telegram?.WebApp?.HapticFeedback) {
     window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
   }
-  // Quitar el flag de primer ingreso
+  // Quitar el flag de primer ingreso y marcar el tutorial como visto permanentemente
   localStorage.removeItem('laorden_first_visit');
+  localStorage.setItem('laorden_tutorial_done', '1');
   
   // Confetti místico para recompensar al cerrar el tutorial
   if (typeof startConfetti === 'function') startConfetti();
