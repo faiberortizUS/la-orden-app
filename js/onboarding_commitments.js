@@ -91,13 +91,10 @@ let _obExpandedArea = null; // Controla qué acordeón está abierto
 
 // Lllamada de entrada desde onboarding.js
 function renderObCommitmentsAsync(container) {
-  // Inicialmente abrimos la primera área que tenga compromisos, o la primera del catálogo si no hay
-  if (!_obExpandedArea) {
-    if (OB.compromisos.length > 0) {
-      _obExpandedArea = OB.compromisos[0].areaId;
-    } else {
-      _obExpandedArea = 'SALUD_FISICA';
-    }
+  // Inicialmente abrimos la primera área que tenga compromisos.
+  // Si no hay ninguno (primera vez), se declaran cerrados (null) para una mejor presentación.
+  if (!_obExpandedArea && OB.compromisos.length > 0) {
+    _obExpandedArea = OB.compromisos[0].areaId;
   }
   container.innerHTML = renderObCommitmentsCombined();
   container.scrollTop = 0;
@@ -106,8 +103,8 @@ function renderObCommitmentsAsync(container) {
 // ── VISTA PRINCIPAL ──────────────────────────────────────
 function renderObCommitmentsCombined() {
   const totalComps = OB.compromisos.length;
-  // Paso 2 de 5 (antes era 3 de 6, pero eliminamos areas como paso independiente)
-  const pbArgs = typeof obProgressBar !== 'undefined' ? obProgressBar(2, 5) : '';
+  // Paso 1 de 4 (La bienvenida ya no cuenta como paso)
+  const pbArgs = typeof obProgressBar !== 'undefined' ? obProgressBar(1, 4) : '';
 
   return `
     <div id="ob-commitments" style="min-height:100vh;padding-bottom:120px;background:var(--bg-primary);">
@@ -115,7 +112,7 @@ function renderObCommitmentsCombined() {
 
       <div style="padding:24px 20px 16px;">
         <div style="font-size:11px;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;font-weight:800;">
-          Paso 2: Plan de Batalla
+          Paso 1: Plan de Batalla
         </div>
         <div style="font-family:var(--font-head);font-size:28px;font-weight:900;color:var(--text-1);margin-bottom:4px;line-height:1.1;">
           TERRENO DE<br>OPERACIONES
