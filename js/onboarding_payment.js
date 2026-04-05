@@ -39,7 +39,7 @@ function renderObPayment() {
           <div style="flex:1;background:var(--bg-elevated);border-radius:99px;height:4px;">
             <div style="height:4px;border-radius:99px;background:linear-gradient(90deg,var(--electric),var(--gold));width:100%;transition:width 0.4s ease;"></div>
           </div>
-          <span style="font-size:11px;color:var(--text-3);min-width:28px;">5/5</span>
+          <span style="font-size:11px;color:var(--text-3);min-width:28px;">4/4</span>
         </div>
       </div>
 
