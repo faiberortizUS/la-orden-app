@@ -92,35 +92,41 @@ function renderCommandCenter(data, isFirstTime) {
       
       ADD_HABIT_CATALOG[cat].forEach(c => {
          const tpl = `
-           <div style="margin-bottom:10px; padding:14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.04); border-radius:var(--r-md);">
-             <div style="font-weight:900; color:var(--gold); font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">🧠 ${c.nombre}</div>
-             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-               <div style="margin-bottom:10px;">
-                 <div style="font-size:9px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">👁️ La Mente</div>
-                 <div style="font-size:12px; line-height:1.4; color:var(--text-1);">¿Qué es?</div>
-               </div>
-               <div style="margin-bottom:10px;">
-                 <div style="font-size:9px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">📈 El Beneficio</div>
-                 <div style="font-size:12px; line-height:1.4; color:var(--text-1);">Progreso real.</div>
-               </div>
-               <div>
-                 <div style="font-size:9px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">🔬 Bio-Ciencia</div>
-                 <div style="font-size:11px; line-height:1.4; color:var(--text-2); font-style:italic;">${c.info.split('.')[0]}.</div>
-               </div>
-               <div>
-                 <div style="font-size:9px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">🎯 Meta Impacto</div>
-                 <div style="font-size:14px; font-weight:900; color:var(--gold); font-family:var(--font-head);">${c.meta} ${c.unidad}</div>
-               </div>
-             </div>
-           </div>
-         `;
-         const sTpl = tpl.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-         codexHtml += `
-             <div class="tappable" onclick="showInteractiveModal('${c.nombre.replace(/'/g, "\\'")}', '${sTpl}', '🔍')"
-               style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:12px 14px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px; margin-bottom:8px;">
-               <span>${c.nombre}</span> <span style="font-size:11px; color:var(--gold); opacity:0.6;">DATO CIENTÍFICO ›</span>
-             </div>
-         `;
+            <div style="margin-bottom:10px; padding:14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.04); border-radius:var(--r-md); text-align:left;">
+              <div style="font-weight:900; color:var(--gold); font-size:16px; margin-bottom:16px; border-bottom:1px solid rgba(212,168,67,0.2); padding-bottom:8px;">🧠 ${c.nombre}</div>
+              
+              <div style="margin-bottom:12px;">
+                <div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:4px;">👁️ Arquitectura Conceptual</div>
+                <div style="font-size:13px; line-height:1.5; color:var(--text-1);">¿Qué es y por qué importa?</div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:4px;">📈 El Beneficio Real</div>
+                <div style="font-size:13px; line-height:1.5; color:var(--text-1);">Progreso medible en tu identidad.</div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:4px;">🔬 Sustento Tecnológico (Bio-Ciencia)</div>
+                <div style="font-size:13px; line-height:1.5; color:var(--text-2); font-style:italic;">${c.info}.</div>
+              </div>
+
+              <div style="background:rgba(212,168,67,0.1); padding:12px; border-radius:8px; border:1px solid rgba(212,168,67,0.2);">
+                <div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:4px;">🎯 Calibración Sugerida</div>
+                <div style="font-size:16px; font-weight:900; color:var(--text-1); font-family:var(--font-head);">${c.meta} ${c.unit || c.unidad}</div>
+              </div>
+            </div>
+          `;
+          const sTpl = tpl.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+          codexHtml += `
+            <div class="tappable" onclick="showInteractiveModal('${c.nombre.replace(/'/g, "\\'")}', '${sTpl}', '🔍')"
+              style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.2); padding:14px 16px; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; color:var(--text-1); font-weight:700; font-size:13px; margin-bottom:8px; cursor:pointer;">
+              <div style="display:flex; flex-direction:column;">
+                <span>${c.nombre}</span>
+                <span style="font-size:10px; color:var(--text-3); font-weight:400; margin-top:2px;">Meta: ${c.meta} ${c.unidad}</span>
+              </div>
+              <span style="font-size:11px; color:var(--gold); font-weight:800;">VER DATA ›</span>
+            </div>
+          `;
       });
     });
   } else {
@@ -229,7 +235,7 @@ function renderCommandCenter(data, isFirstTime) {
       </div>
 
       <!-- CÓDICE DE TÁCTICAS MAESTRO -->
-      <div class="stagger-up stagger-3" style="padding:0 20px 120px;">
+      <div class="stagger-up stagger-3" style="padding:0 20px 32px;">
         <div style="background:var(--bg-elevated); border:1px solid var(--border-gold); border-radius:var(--r-lg); padding:20px; margin-bottom:10px; text-align:left; position:relative; overflow:hidden;">
            <div style="position:absolute; top:-20px; right:-20px; font-size:100px; opacity:0.03; pointer-events:none;">📖</div>
            <div style="font-family:var(--font-head);font-weight:900;font-size:18px;color:var(--gold);margin-bottom:12px; display:flex; align-items:center; gap:8px; letter-spacing:0.05em;">
