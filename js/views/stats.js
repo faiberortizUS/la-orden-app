@@ -12,6 +12,7 @@
  *  7. Misiones de Hoy — al final como contexto operativo
  */
 
+let currentStatsTab = 'EXEC'; // 'EXEC' | 'COMPARE'
 let currentStatsFilter = 'GLOBAL';
 
 // ── KPI Premium helpers ──────────────────────────────────────────────
@@ -24,7 +25,39 @@ function _kpiVolat(sa, g) { const ps = sa.map(d => g(d).pct).filter(p => p > 0);
 function _kpiRecup(ha, g) { let n = 0; for (let i = ha.length - 1; i >= 0; i--) { if (g(ha[i]).nivel === 0) break; n++; } return n; }
 // ─────────────────────────────────────────────────────────────────────
 
+// Wrapper global (usado por compare.js) para forzar repintado sin reload
+window.renderStatsWrapper = function() {
+  if (!window.appData) return '';
+  return renderStats(window.appData);
+};
+
+function changeStatsTab(tab) {
+  currentStatsTab = tab;
+  if (window.appData) {
+    document.getElementById('viewContainer').innerHTML = renderStatsWrapper();
+    if (tab === 'EXEC' && typeof initStatsAnimations === 'function') {
+      setTimeout(initStatsAnimations, 50);
+    }
+  }
+}
+
 function renderStats(data) {
+  // Common Top Segmented Control Tab
+  const tabsHtml = `
+    <div style="display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.6); padding:4px; border-radius:12px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); width:100%; max-width:400px; margin-left:auto; margin-right:auto;">
+      <div class="tappable" onclick="changeStatsTab('EXEC')" style="flex:1; text-align:center; padding:10px 14px; border-radius:8px; font-size:12px; font-family:var(--font-head); font-weight:800; transition:all 0.2s; ${currentStatsTab === 'EXEC' ? 'background:rgba(212,168,67,0.15); color:var(--text-1); box-shadow:0 0 10px rgba(212,168,67,0.2);' : 'color:var(--text-3);'}">Resumen Ejecutivo</div>
+      <div class="tappable" onclick="changeStatsTab('COMPARE')" style="flex:1; text-align:center; padding:10px 14px; border-radius:8px; font-size:12px; font-family:var(--font-head); font-weight:800; transition:all 0.2s; ${currentStatsTab === 'COMPARE' ? 'background:rgba(212,168,67,0.15); color:var(--text-1); box-shadow:0 0 10px rgba(212,168,67,0.2);' : 'color:var(--text-3);'}">Modo Comparativa ⚖️</div>
+    </div>
+  `;
+
+  if (currentStatsTab === 'COMPARE' && typeof renderCompare === 'function') {
+    return `<div style="padding:16px 16px 0;">${tabsHtml}</div>` + renderCompare(data);
+  }
+
+  return `<div style="padding:16px 16px 0;">${tabsHtml}</div>` + _renderStatsDashboard(data);
+}
+
+function _renderStatsDashboard(data) {
   const { user, compromisos, historial, semana } = data;
 
   const icd = Number(user.icd) || 0;
@@ -153,7 +186,7 @@ function renderStats(data) {
 
 
   return `
-    <div class="view" id="view-stats" style="padding-bottom: 32px;">
+    <div class="view" id="view-stats" style="padding-bottom: 32px; padding-top:0;">
 
       <!-- ══ 1. KPI COMMAND BAR — 6 métricas en 2 filas ══ -->
       <div class="kpi-exec-bar stagger-up stagger-1">
@@ -825,7 +858,11 @@ function showDayDrilldown(idx, data, filtro) {
     return { nivel: n, count: n>0?'?':0, total: n>0?'?':0, valor: 0, pct: p, fecha: '', dia: '' };
   };
 
-  const cell = gH(histList[idx] || 0);
+  // idx is 0..27 logically for the heatmap grid (recent 28 days)
+  // in histList (length 56), the recent 28 days are index 28 to 55
+  const actualIdx = idx + 28;
+
+  const cell = gH(histList[actualIdx] || 0);
   const fecha = cell.fecha || '';
   const diaNom = cell.dia || '';
 
@@ -834,9 +871,9 @@ function showDayDrilldown(idx, data, filtro) {
   const fechaDisplay = fecha || (d.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' }));
   const esHoy = idx === 27;
 
-  // Comparación con ayer (idx-1)
-  const cellAyer = idx > 0 ? gH(histList[idx - 1] || 0) : null;
-  const cellSemanAnt = idx >= 7 ? gH(histList[idx - 7] || 0) : null;
+  // Comparación con ayer (actualIdx-1)
+  const cellAyer = actualIdx > 0 ? gH(histList[actualIdx - 1] || 0) : null;
+  const cellSemanAnt = actualIdx >= 7 ? gH(histList[actualIdx - 7] || 0) : null;
 
   // Actividades del día (compromisos + estado)
   const compromisos = data.compromisos || [];
