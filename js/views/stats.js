@@ -14,6 +14,16 @@
 
 let currentStatsFilter = 'GLOBAL';
 
+// ── KPI Premium helpers ──────────────────────────────────────────────
+function _kpiCob(sa,g){const cs=sa.filter(d=>g(d).total>0).map(d=>g(d).count/g(d).total*100);return cs.length?Math.round(cs.reduce((a,b)=>a+b,0)/cs.length):0;}
+function _kpiCumpl(sa,g){const ps=sa.map(d=>g(d).pct).filter(p=>p>0);return ps.length?Math.round(ps.reduce((a,b)=>a+Math.min(b,100),0)/ps.length):0;}
+function _kpiSobre(sa,g){const es=sa.map(d=>g(d).pct).filter(p=>p>100).map(p=>p-100);return es.length?Math.round(es.reduce((a,b)=>a+b,0)/es.length):0;}
+function _kpiTend(sa,g){const ps=sa.map(d=>g(d).pct),a1=ps.slice(0,4).filter(p=>p>0),a2=ps.slice(4).filter(p=>p>0);if(!a1.length||!a2.length)return 0;return Math.round(a2.reduce((x,b)=>x+b,0)/a2.length-a1.reduce((x,b)=>x+b,0)/a1.length);}
+function _kpiReg(ha,g){return Math.round(ha.filter(d=>g(d).nivel>0).length/28*100);}
+function _kpiVolat(sa,g){const ps=sa.map(d=>g(d).pct).filter(p=>p>0);if(ps.length<2)return 0;const avg=ps.reduce((a,b)=>a+b,0)/ps.length;return Math.round(Math.sqrt(ps.reduce((a,p)=>a+Math.pow(p-avg,2),0)/ps.length));}
+function _kpiRecup(ha,g){let n=0;for(let i=ha.length-1;i>=0;i--){if(g(ha[i]).nivel===0)break;n++;}return n;}
+// ─────────────────────────────────────────────────────────────────────
+
 function renderStats(data) {
   const { user, compromisos, historial, semana } = data;
 
@@ -98,11 +108,24 @@ function renderStats(data) {
     const d = getHeatData(item);
     const val = isGlobal ? (d.count || 0) : (d.valor || 0);
     volMes += val;
-    if (idx >= 21) volSemana += val; // Últimos 7 días
+    if (idx >= 21) volSemana += val;
   });
 
+  // ── 10 KPIs Premium ─────────────────────────────────────────
+  const kpiCob   = _kpiCob(semanaArr, getSemData);
+  const kpiCumpl = _kpiCumpl(semanaArr, getSemData);
+  const kpiSob   = _kpiSobre(semanaArr, getSemData);
+  const kpiTend  = _kpiTend(semanaArr, getSemData);
+  const kpiReg   = _kpiReg(heatArr, getHeatData);
+  const kpiVol   = _kpiVolat(semanaArr, getSemData);
+  const kpiRec   = _kpiRecup(heatArr, getHeatData);
+  const volLbl   = kpiVol<=15?'Estable':kpiVol<=35?'Variable':'Caótico';
+  const tIcon    = kpiTend>5?'↑':kpiTend<-5?'↓':'→';
+  const tColor   = kpiTend>5?'var(--success)':kpiTend<-5?'#EF4444':'var(--text-2)';
+  const areasD   = data.areasResumen||[];
+  // ─────────────────────────────────────────────────────────────
 
-  // ── Filtro selector (Estilo minimalista para incrustar)
+  // ── Filtro selector
   const filterHtml = `
     <select id="statsFilterSelect" onchange="changeStatsFilter(this.value)"
       style="width:100%; padding:8px 10px; background:var(--bg-overlay);
@@ -123,52 +146,46 @@ function renderStats(data) {
   return `
     <div class="view" id="view-stats" style="padding-bottom: 32px;">
 
-      <!-- ════════════════════════════════════════════════════ -->
-      <!-- 1. KPI COMMAND BAR                                   -->
-      <!-- ════════════════════════════════════════════════════ -->
-      <div class="stagger-up stagger-1" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+      <!-- ══ 1. KPI COMMAND BAR — 6 métricas en 2 filas ══ -->
+      <div class="kpi-exec-bar stagger-up stagger-1">
 
-        <!-- ICD -->
-        <div class="tappable ${icd >= 85 ? 'breathe-gold' : icd < 50 ? 'breathe-danger' : ''}" 
-          onclick="showInteractiveModal('Indice de Consistencia Disciplinada','El ICD mide tu confiabilidad matematica en los ultimos 28 dias. 100 es perfeccion absoluta. Cada dia sin reportar lo reduce exponencialmente.','🎯')"
-          style="background:${icdZona.bg}; border:1px solid ${icdZona.color}40;
-            border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
-          <div style="font-size:10px; letter-spacing:0.15em; color:${icdZona.color}; text-transform:uppercase; font-weight:700; margin-bottom:6px;">ICD</div>
-          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--text-1); line-height:1; letter-spacing:-0.02em;">${icd}</div>
-          <div style="font-size:11px; color:${icdZona.color}; margin-top:4px; font-weight:600;">${icdZona.label}</div>
-          <div style="position:absolute; top:10px; right:12px; font-size:18px; opacity:0.6;">${tendencia === '↑' ? '📈' : tendencia === '↓' ? '📉' : '➡️'}</div>
-          <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Tendencia: <strong style="color:${tendencia==='↑'?'var(--success)':tendencia==='↓'?'#EF4444':'var(--text-2)'}">${tendencia}</strong></div>
+        <!-- Fila 1: ICD · Racha · Cobertura Hoy -->
+        <div class="kpi-exec-chip kpi-exec-chip--gold tappable" onclick="showInteractiveModal('ICD','Índice de Consistencia en 28 días. 100 = perfección absoluta. Cada día sin reportar lo reduce.','🎯')">
+          <div class="kpi-exec-label">ICD</div>
+          <div class="kpi-exec-value" style="color:${icdZona.color};">${icd}</div>
+          <div class="kpi-exec-sub">${tendencia} ${icdZona.label.split(' ')[0]}</div>
         </div>
-
-        <!-- RACHA -->
-        <div class="tappable" onclick="showInteractiveModal('Linea Activa','Dias consecutivos cumpliendo al menos 1 compromiso. La racha es el arma mas poderosa de la disciplina. No la rompas.','🔥')"
-          style="background:rgba(255,107,53,0.06); border:1px solid rgba(255,107,53,0.25);
-            border-radius:var(--r-lg); padding:16px 14px; position:relative; overflow:hidden;">
-          <div style="font-size:10px; letter-spacing:0.15em; color:var(--fire); text-transform:uppercase; font-weight:700; margin-bottom:6px;">RACHA</div>
-          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--text-1); line-height:1; letter-spacing:-0.02em;">${lineaActiva}<span style="font-size:16px;margin-left:4px;">🔥</span></div>
-          <div style="font-size:11px; color:var(--fire); margin-top:4px; font-weight:600;">dias consecutivos</div>
-          <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Proximo hito: <strong style="color:var(--text-1)">${nextHito}d</strong></div>
+        <div class="kpi-exec-chip kpi-exec-chip--fire tappable" onclick="showInteractiveModal('Línea Activa','Días consecutivos sin romper el pacto. La racha es el arma más poderosa.','🔥')">
+          <div class="kpi-exec-label">Racha</div>
+          <div class="kpi-exec-value" style="color:var(--fire);">${lineaActiva}<span style="font-size:13px;">🔥</span></div>
+          <div class="kpi-exec-sub">hito: ${nextHito}d</div>
         </div>
-
-        <!-- PC TOTALES -->
-        <div class="tappable" onclick="showInteractiveModal('Puntos de Poder (PC)','Moneda del sistema. Se acumulan por cada victoria registrada. +20 PC bonus si superas el 150% de tu meta.','⚡')"
-          style="background:rgba(212,168,67,0.06); border:1px solid rgba(212,168,67,0.25);
-            border-radius:var(--r-lg); padding:16px 14px;">
-          <div style="font-size:10px; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; font-weight:700; margin-bottom:6px;">PC TOTALES</div>
-          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--gold); line-height:1; letter-spacing:-0.02em;">${pcTotal.toLocaleString('es-CO')}</div>
-          <div style="font-size:10px; color:var(--text-3); margin-top:8px;">puntos de poder</div>
+        <div class="kpi-exec-chip ${pctDia>=80?'kpi-exec-chip--green':pctDia>=50?'kpi-exec-chip--gold':'kpi-exec-chip--red'} tappable" onclick="showInteractiveModal('Cobertura de Hoy','% de misiones activas ya reportadas hoy. No confundir con cumplimiento: puedes reportar pocas y superar la meta en las que sí reportaste.','📋')">
+          <div class="kpi-exec-label">Hoy</div>
+          <div class="kpi-exec-value" style="color:${pctDia>=80?'var(--success)':pctDia>=50?'var(--gold)':'#EF4444'};">${pctDia}%</div>
+          <div class="kpi-exec-sub">${hechos.length}/${activos.length} mis.</div>
         </div>
-
-        <!-- DIAS ACTIVOS -->
-        <div class="tappable" onclick="showInteractiveModal('Dias Activos','Total historico de dias en los que has honrado el pacto. No se reinicia con la racha. Es tu huella permanente.','📅')"
-          style="background:rgba(123,97,255,0.06); border:1px solid rgba(123,97,255,0.25);
-            border-radius:var(--r-lg); padding:16px 14px;">
-          <div style="font-size:10px; letter-spacing:0.15em; color:var(--electric); text-transform:uppercase; font-weight:700; margin-bottom:6px;">DIAS ACTIVOS</div>
-          <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:var(--electric); line-height:1; letter-spacing:-0.02em;">${diasActivos}</div>
-          <div style="font-size:10px; color:var(--text-3); margin-top:8px;">dias en total</div>
-        </div>
-
       </div>
+
+      <!-- Fila 2: Volatilidad · Regularidad · Recuperación -->
+      <div class="kpi-exec-bar stagger-up stagger-1" style="margin-bottom:10px;">
+        <div class="kpi-exec-chip kpi-exec-chip--purple tappable" onclick="showInteractiveModal('Volatilidad Semanal','Desviación estándar de tu rendimiento diario. Bajo = guerrero consistente. Alto = conducta impredecible.','📉')">
+          <div class="kpi-exec-label">Volatilidad</div>
+          <div class="kpi-exec-value" style="font-size:14px;color:var(--electric);">${volLbl}</div>
+          <div class="kpi-exec-sub">σ=${kpiVol}%</div>
+        </div>
+        <div class="kpi-exec-chip kpi-exec-chip--gold tappable" onclick="showInteractiveModal('Regularidad 28d','% de los últimos 28 días con al menos 1 misión reportada. La ciencia del hábito exige contexto estable y repetición consistente.','📅')">
+          <div class="kpi-exec-label">Regularidad</div>
+          <div class="kpi-exec-value" style="color:${kpiReg>=80?'var(--success)':kpiReg>=50?'var(--gold)':'#EF4444'};">${kpiReg}%</div>
+          <div class="kpi-exec-sub">${diasConReporte28}/28d</div>
+        </div>
+        <div class="kpi-exec-chip tappable" onclick="showInteractiveModal('Recuperación','Días activos consecutivos desde tu última caída. Es tu momentum real, no el acumulado histórico.','⚡')">
+          <div class="kpi-exec-label">Recuperac.</div>
+          <div class="kpi-exec-value" style="color:${kpiRec>=7?'var(--success)':kpiRec>=3?'var(--gold)':'var(--text-2)'};">${kpiRec}d</div>
+          <div class="kpi-exec-sub">sin caída</div>
+        </div>
+      </div>
+
 
       <!-- ════════════════════════════════════════════════════ -->
       <!-- THE ORACLE: AUDITORIA OPERACIONAL SINCRONICA         -->
@@ -244,7 +261,8 @@ function renderStats(data) {
         <div class="heatmap">
           ${heatArr.map((item, i) => {
             const d = getHeatData(item);
-            return `<div class="heatmap-day tappable" data-level="${d.nivel}" onclick="showHeatmapTooltip(this, ${d.nivel}, ${d.valor || 0}, ${d.count || 0}, ${d.total || 0}, ${isGlobal})"></div>`;
+            const fechaStr = d.fecha || '';
+            return `<div class="heatmap-day tappable" data-level="${d.nivel}" data-idx="${i}" onclick="showDayDrilldown(${i}, window._appData, '${currentStatsFilter}')"></div>`;
           }).join('')}
         </div>
         <div style="display:flex; gap:6px; margin-top:10px; align-items:center; justify-content:flex-end;">
@@ -259,14 +277,28 @@ function renderStats(data) {
       <!-- 3. GRAFICA SEMANAL PREMIUM                           -->
       <!-- ════════════════════════════════════════════════════ -->
       <div class="card stagger-up stagger-3" style="margin-bottom:10px; padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;" class="tappable" onclick="showInteractiveModal('Rendimiento Semanal', 'Tu promedio de ejecución implacable en los últimos 7 días.<br><br>¿Tu gráfica tiene altibajos extremos? Eres inestable. Mantenerse consistentemente por encima de la línea del 75% separa a los aficionados de los guerreros élite.', '📊')">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;" class="tappable" onclick="showInteractiveModal('Rendimiento Semanal — 3 Dimensiones','<b>Cobertura</b> = misiones reportadas / activas.<br><b>Cumplimiento</b> = promedio ponderado de qué tanto alcanzaste la meta.<br><b>Sobrecumplimiento</b> = exceso promedio sobre el 100%.<br><br>Un panel honesto no mezcla estas métricas. Cada una habla de algo distinto.','📊')">
           <div>
             <div class="section-title" style="margin:0;">Rendimiento Semanal</div>
-            <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Ejecucion de los ultimos 7 dias</div>
+            <div style="font-size:11px; color:var(--text-3); margin-top:3px;">3 dimensiones · últimos 7 días</div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-family:var(--font-head); font-size:32px; font-weight:900; color:${promedioSem>=85?'var(--success)':promedioSem>=50?'var(--gold)':'var(--text-2)'}; line-height:1; letter-spacing:-0.02em;">${promedioSem}%</div>
-            <div style="font-size:10px; color:var(--text-3); margin-top:2px;">Promedio</div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:13px;font-weight:700;color:${tColor};">${tIcon} ${kpiTend>0?'+'+kpiTend:kpiTend}%</span>
+            <span style="font-size:10px;color:var(--text-3);">vs sem.</span>
+          </div>
+        </div>
+        <div class="sem-metrics-row">
+          <div class="sem-metric-block" style="border-color:rgba(123,97,255,0.2);">
+            <div class="sem-metric-val" style="font-size:18px;color:var(--electric);">${kpiCob}%</div>
+            <div class="sem-metric-lbl">Cobertura</div>
+          </div>
+          <div class="sem-metric-block" style="border-color:${kpiCumpl>=80?'rgba(34,197,94,0.3)':kpiCumpl>=50?'rgba(212,168,67,0.3)':'rgba(239,68,68,0.3)'}; padding:12px 8px;">
+            <div class="sem-metric-val" style="font-size:26px;color:${kpiCumpl>=80?'var(--success)':kpiCumpl>=50?'var(--gold)':'#EF4444'};">${kpiCumpl}%</div>
+            <div class="sem-metric-lbl">Cumplimiento</div>
+          </div>
+          <div class="sem-metric-block" style="border-color:${kpiSob>0?'rgba(255,107,53,0.3)':'rgba(255,255,255,0.04)'}">
+            <div class="sem-metric-val" style="font-size:18px;color:${kpiSob>0?'var(--fire)':'var(--text-3)'}">${kpiSob>0?'+'+kpiSob+'%':'—'}</div>
+            <div class="sem-metric-lbl">Sobrecumpl.</div>
           </div>
         </div>
         <div style="display:flex; align-items:flex-end; gap:8px; height:150px; padding:0 2px; position:relative;">
@@ -319,6 +351,54 @@ function renderStats(data) {
           }).join('')}
         </div>
       </div>
+
+      <!-- ══ AUDITORÍA DIARIA — Tabla rolling 7 días ══ -->
+      <div class="card stagger-up stagger-3" style="margin-bottom:10px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;" class="tappable" onclick="showInteractiveModal('Auditoría Diaria','Registro exacto de tu actividad día por día. Sin promedios que engañen: ves los números reales de cada jornada.','📋')">
+          <div class="section-title" style="margin:0;">Auditoría Diaria</div>
+          <span style="font-size:11px;color:var(--text-3);">↔ desliza</span>
+        </div>
+        <div class="day-matrix-wrap">
+          <table class="day-matrix">
+            <thead><tr>
+              <th style="text-align:left;">Misión</th>
+              ${semanaArr.map((item,i)=>{ const d=getSemData(item); const esH=i===6; return `<th class="${esH?'today-col':''}">${d.dia||diasLabels[i]}</th>`; }).join('')}
+            </tr></thead>
+            <tbody>
+              ${isGlobal ? `
+                <tr>
+                  <td class="row-label">Misiones</td>
+                  ${semanaArr.map((item,i)=>{ const d=getSemData(item),esH=i===6,cnt=d.count||0,tot=d.total||0; const cls=cnt>0&&cnt>=tot?'good':cnt>0?'mid':'zero'; return `<td class="cell-val cell-val--${cls}" style="${esH?'color:var(--gold);':''}">${tot>0?cnt+'/'+tot:'—'}</td>`; }).join('')}
+                </tr>
+                <tr>
+                  <td class="row-label">Cumplim.</td>
+                  ${semanaArr.map((item,i)=>{ const p=getSemData(item).pct,esH=i===6; const cls=p>=85?'good':p>=50?'mid':p>0?'low':'zero'; return `<td class="cell-val cell-val--${cls}" style="${esH?'color:var(--gold);':''}">${p>0?p+'%':'—'}</td>`; }).join('')}
+                </tr>` : (()=>{ const comp=compromisosList.find(c=>c.id===currentStatsFilter); return `
+                <tr>
+                  <td class="row-label">${comp?comp.emoji+' '+comp.nombre.substring(0,10):'Misión'}</td>
+                  ${semanaArr.map((item,i)=>{ const d=getSemData(item),esH=i===6,val=d.valor||0,pct=d.pct||0; const cls=pct>=100?'good':pct>=50?'mid':pct>0?'low':'zero'; return `<td class="cell-val cell-val--${cls}" style="${esH?'color:var(--gold);':''}">${val>0?Number(val.toFixed(1)).toLocaleString('es-CO'):'—'}</td>`; }).join('')}
+                </tr>
+                <tr>
+                  <td class="row-label">Cumplim.</td>
+                  ${semanaArr.map((item,i)=>{ const p=getSemData(item).pct,esH=i===6; const cls=p>=100?'good':p>=50?'mid':p>0?'low':'zero'; return `<td class="cell-val cell-val--${cls}" style="${esH?'color:var(--gold);':''}">${p>0?p+'%':'—'}</td>`; }).join('')}
+                </tr>`; })()}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ DISTRIBUCIÓN POR ÁREA ══ -->
+      ${areasD.length>0?`
+      <div class="card stagger-up stagger-3" style="margin-bottom:10px;">
+        <div class="section-title tappable" style="margin-bottom:14px;" onclick="showInteractiveModal('Balance por Área','Distribución de tu energía entre las distintas áreas de vida. Un guerrero élite no descuida ningún frente.','🗺️')">🗺️ Balance por Área</div>
+        ${areasD.map((a,idx)=>{ const cls=a.pct>=80?'green':a.pct>=50?'gold':'red'; return `
+          <div class="area-dist-item">
+            <span class="area-dist-icon">${a.icono}</span>
+            <span class="area-dist-name">${a.nombre}</span>
+            <div class="area-dist-bar-track"><div class="area-dist-bar-fill area-dist-bar-fill--${cls}" id="abar-${idx}" style="width:0%;" data-w="${a.pct}%"></div></div>
+            <span class="area-dist-pct area-dist-pct--${cls}">${a.pct}%</span>
+          </div>`;}).join('')}
+      </div>`:''}
 
       <!-- ════════════════════════════════════════════════════ -->
       <!-- 4. INTELIGENCIA DE RACHA + ICD                       -->
@@ -543,6 +623,13 @@ function initStatsAnimations() {
     });
   }, 50);
 
+  // Animar barras de área
+  setTimeout(() => {
+    document.querySelectorAll('[id^="abar-"]').forEach(el => {
+      el.style.width = el.dataset.w || '0%';
+    });
+  }, 150);
+
   // Animar gauge ICD
   setTimeout(() => {
     const arc = document.getElementById('statsIcdArc');
@@ -690,22 +777,125 @@ function showChartTooltip(element, pct, label) {
 }
 
 function showHeatmapTooltip(element, level, valor, count, total, isGlobal) {
-  let extraInfo = '';
-  if (isGlobal && total > 0) {
-    extraInfo = `<br><span style="font-size:11px;color:var(--text-3); font-weight:600;">${count} de ${total} misiones</span>`;
-  } else if (!isGlobal && valor > 0) {
-    // Aquí podrías agregar la unidad si quieres pasarla, pero valor ya aporta la cifra real.
-    extraInfo = `<br><span style="font-size:11px;color:rgba(212,168,67,1); font-weight:700;">Volumen: +${Number(valor).toLocaleString('es-CO')}</span>`;
-  }
-
-  const messages = [
-    '<span style="color:var(--text-2);">0 Actividad</span>' + extraInfo,
-    'Soporte Vital (1)' + extraInfo,
-    'Cumplimiento Parcial (2)' + extraInfo,
-    '<span style="color:var(--gold);">Día Ganado (3)</span>' + extraInfo,
-    '<span style="color:var(--electric);font-weight:800;">Ejecución Élite (4) ⚡</span>' + extraInfo
-  ];
-  _createTooltip(element, messages[level]);
+  // Mantenido por compatibilidad (ya no es el handler principal del heatmap)
+  let extra='';
+  if(isGlobal&&total>0) extra=`<br><span style="font-size:11px;color:var(--text-3);">${count}/${total} misiones</span>`;
+  else if(!isGlobal&&valor>0) extra=`<br><span style="font-size:11px;color:var(--gold);">Vol: +${Number(valor).toLocaleString('es-CO')}</span>`;
+  const msgs=['<span style="color:var(--text-3);">Día vacío</span>','Soporte Vital','Cumplimiento Parcial','<span style="color:var(--gold);">Día Ganado ⭐</span>','<span style="color:var(--electric);font-weight:800;">Ejecución Élite ⚡</span>'];
+  _createTooltip(element, (msgs[level]||msgs[0])+extra);
 }
 
+// ══ DRILL-DOWN POR FECHA ═══════════════════════════════════════════════
+function showDayDrilldown(idx, data, filtro) {
+  if (!data) return;
+  if (window.Telegram?.WebApp?.HapticFeedback)
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
 
+  const isG = (filtro||'GLOBAL')==='GLOBAL';
+  const historial = data.historial||{};
+  const histList = historial[filtro]||historial.GLOBAL||[];
+  const gH = d => typeof d==='object'?d:{nivel:d||0,count:0,total:0,valor:0,pct:0,fecha:'',dia:''};
+
+  const cell = gH(histList[idx]||0);
+  const fecha = cell.fecha || '';
+  const diaNom = cell.dia || '';
+
+  // Calcular fecha si no viene del backend
+  const d = new Date(); d.setDate(d.getDate()-(27-idx));
+  const fechaDisplay = fecha||(d.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'short'}));
+  const esHoy = idx===27;
+
+  // Comparación con ayer (idx-1)
+  const cellAyer = idx>0?gH(histList[idx-1]||0):null;
+  const cellSemanAnt = idx>=7?gH(histList[idx-7]||0):null;
+
+  // Actividades del día (compromisos + estado)
+  const compromisos = data.compromisos||[];
+  const actividadesHtml = isG && compromisos.length>0 ? compromisos.map(c=>{
+    const pctC = c.meta>0?Math.min(200,Math.round((c.valorHoy/c.meta)*100)):0;
+    const cls = c.hecho?(pctC>=100?'var(--success)':'var(--gold)'):'var(--text-3)';
+    return `
+      <div class="drill-activity-item">
+        <span style="font-size:20px;">${c.emoji}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-1);">${c.nombre}</div>
+          <div style="font-size:11px;color:var(--text-3);">
+            ${c.hecho?`${Number(c.valorHoy||0).toLocaleString('es-CO')} ${c.unidad}`:'Sin reporte'}
+          </div>
+        </div>
+        <div class="drill-activity-pct" style="color:${cls};">
+          ${c.hecho?pctC+'%':'—'}
+        </div>
+      </div>`;
+  }).join('') : '<p style="color:var(--text-3);font-size:13px;">Datos del día no disponibles en vista histórica.</p>';
+
+  const nivelLabel=['Vacío','Soporte Vital','Parcial','Día Ganado ⭐','Ejecución Élite ⚡'];
+  const nivelColor=['var(--text-3)','rgba(123,97,255,0.8)','rgba(123,97,255,1)','var(--success)','var(--gold)'];
+
+  const html = `
+    <div class="drill-backdrop" onclick="closeDrilldown()"></div>
+    <div class="drill-sheet">
+      <div class="drill-handle"></div>
+      <div class="drill-date-title">${esHoy?'🗓️ Hoy':fechaDisplay}</div>
+      <div class="drill-date-sub" style="color:${nivelColor[cell.nivel]};">${nivelLabel[cell.nivel]||'Sin datos'}</div>
+
+      <div class="drill-kpi-row">
+        <div class="drill-kpi-box">
+          <div class="drill-kpi-val" style="color:${nivelColor[cell.nivel]};">${cell.pct||0}%</div>
+          <div class="drill-kpi-lbl">Cumplim.</div>
+        </div>
+        <div class="drill-kpi-box">
+          <div class="drill-kpi-val">${cell.count||0}/${cell.total||0}</div>
+          <div class="drill-kpi-lbl">Misiones</div>
+        </div>
+        <div class="drill-kpi-box">
+          <div class="drill-kpi-val" style="font-size:18px;">${(['0','I','II','III','IV'][cell.nivel])||'0'}</div>
+          <div class="drill-kpi-lbl">Nivel</div>
+        </div>
+      </div>
+
+      ${(cellAyer||cellSemanAnt)?`
+      <div class="drill-compare-row">
+        ${cellAyer?`
+        <div class="drill-compare-chip">
+          <div class="label">← Ayer</div>
+          <div class="val" style="color:${(cell.pct||0)>=(cellAyer.pct||0)?'var(--success)':'#EF4444'};">
+            ${cellAyer.pct||0}% ${(cell.pct||0)>=(cellAyer.pct||0)?'↑':'↓'}
+          </div>
+        </div>`:''}
+        ${cellSemanAnt?`
+        <div class="drill-compare-chip">
+          <div class="label">Sem. ant.</div>
+          <div class="val" style="color:${(cell.pct||0)>=(cellSemanAnt.pct||0)?'var(--success)':'#EF4444'};">
+            ${cellSemanAnt.pct||0}% ${(cell.pct||0)>=(cellSemanAnt.pct||0)?'↑':'↓'}
+          </div>
+        </div>`:''}
+      </div>`:''}
+
+      ${esHoy&&isG?`
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-3);margin-bottom:10px;">Estado de misiones hoy</div>
+        ${actividadesHtml}
+      `:''}
+    </div>
+  `;
+
+  const container = document.createElement('div');
+  container.id = 'drilldown-container';
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  // Marcar celda seleccionada
+  document.querySelectorAll('.heatmap-day').forEach(el=>el.classList.remove('heatmap-day--selected'));
+  const sel=document.querySelector(`[data-idx="${idx}"]`);
+  if(sel) sel.classList.add('heatmap-day--selected');
+}
+
+function closeDrilldown() {
+  const el = document.getElementById('drilldown-container');
+  if (el) {
+    el.style.opacity='0';
+    el.style.transition='opacity 0.2s';
+    setTimeout(()=>el.remove(),200);
+  }
+  document.querySelectorAll('.heatmap-day').forEach(el=>el.classList.remove('heatmap-day--selected'));
+}
