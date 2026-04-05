@@ -772,7 +772,11 @@ function updateAuditCountdown() {
   }
 
   const pad = (n) => n.toString().padStart(2, '0');
-  el.textContent = `-${pad(time.d)}d : ${pad(time.h)}h : ${pad(time.m)}m : ${pad(time.s)}s`;
+  el.innerHTML = `<span style="opacity:0.7;margin-right:4px;">-</span>` +
+                 `${pad(time.d)}<span style="font-size:16px;opacity:0.5;margin:0 8px 0 2px;">D</span>` +
+                 `${pad(time.h)}<span style="font-size:16px;opacity:0.5;margin:0 8px 0 2px;">H</span>` +
+                 `${pad(time.m)}<span style="font-size:16px;opacity:0.5;margin:0 8px 0 2px;">M</span>` +
+                 `${pad(time.s)}<span style="font-size:16px;opacity:0.5;margin-left:2px;">S</span>`;
 }
 
 function showAuditModal() {
