@@ -1,10 +1,8 @@
 /**
  * 🏛️ LA ORDEN — onboarding_commitments.js
- * Selección de compromisos por área, con meta y frecuencia
- * Catálogo cargado desde GAS backend
+ * UNIFICADO: Selección de Campos de Batalla (Áreas) y Compromisos en la misma vista.
  */
 
-// Catálogo local embebido como fallback (GAS sirve el definitivo)
 const CATALOG_LOCAL = {
   SALUD_FISICA:   [
     { id: 'SF_CARDIO',  nombre: 'Ejercicio cardiovascular', unidad: 'min',    pcBase: 30, metaDef: 30,    info: 'Reduce cortisol y aumenta BDNF. 30 min/día = -26% riesgo cardiovascular (AHA, 2021).' },
@@ -68,130 +66,118 @@ const CATALOG_LOCAL = {
   ],
 };
 
+const AREAS_CATALOG = [
+  { id: 'SALUD_FISICA',   emoji: '🏃', nombre: 'Salud Física',      desc: 'Cuerpo como arma' },
+  { id: 'SALUD_MENTAL',   emoji: '🧠', nombre: 'Mente Clara',        desc: 'Control total' },
+  { id: 'ANTI_ADICCION',  emoji: '🚫', nombre: 'Sobriedad',          desc: 'Domar el impulso' },
+  { id: 'FINANZAS',       emoji: '💰', nombre: 'Finanzas',           desc: 'Libertad real' },
+  { id: 'CARRERA',        emoji: '🚀', nombre: 'Carrera',            desc: 'Impacto y dominio' },
+  { id: 'PRODUCTIVIDAD',  emoji: '⚡', nombre: 'Productividad',      desc: 'Máximo rendimiento' },
+  { id: 'RELACIONES',     emoji: '🤝', nombre: 'Relaciones',         desc: 'El círculo correcto' },
+  { id: 'CRECIMIENTO',    emoji: '📚', nombre: 'Crecimiento',        desc: 'Ventaja cognitiva' },
+  { id: 'ENTORNO',        emoji: '🏠', nombre: 'Entorno',            desc: 'Control del caos' },
+  { id: 'ESPIRITUALIDAD', emoji: '🙏', nombre: 'Espiritualidad',     desc: 'Propósito profundo' },
+  { id: 'PERSONALIZADO',  emoji: '🎯', nombre: 'Personalizado',      desc: 'Tu campo único' },
+];
+
 const FREQ_OPTIONS = [
   { id: 'DIARIO', label: 'Todos los días', emoji: '📅' },
   { id: 'L_V',    label: 'Lunes a viernes', emoji: '💼' },
   { id: 'FDS',    label: 'Fines de semana', emoji: '🌅' },
 ];
 
-// Catálogo cargado desde GAS (se sobrescribe si el backend responde)
 let _catalogCache = {};
+let _obExpandedArea = null; // Controla qué acordeón está abierto
 
-async function renderObCommitmentsAsync(container) {
-  container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;">
-    <div style="text-align:center;color:var(--text-3);">
-      <div style="font-size:40px;margin-bottom:12px;">⚔️</div>
-      <div>Cargando tu arsenal...</div>
-    </div>
-  </div>`;
-
-  const areaId = OB.areas[OB.areaIndex];
-  const area   = AREAS_CATALOG.find(a => a.id === areaId);
-
-  // Intentar cargar del backend, fallback al catálogo local de manera ultrarrápida
-  if (!_catalogCache[areaId]) {
-    try {
-      const fetchPromise = fetchCatalog(areaId);
-      const timeoutPromise = new Promise(r => setTimeout(() => r(null), 250));
-      const data = await Promise.race([fetchPromise, timeoutPromise]);
-      _catalogCache[areaId] = (data && data.length > 0) ? data : CATALOG_LOCAL[areaId] || [];
-    } catch(e) {
-      _catalogCache[areaId] = CATALOG_LOCAL[areaId] || [];
+// Lllamada de entrada desde onboarding.js
+function renderObCommitmentsAsync(container) {
+  // Inicialmente abrimos la primera área que tenga compromisos, o la primera del catálogo si no hay
+  if (!_obExpandedArea) {
+    if (OB.compromisos.length > 0) {
+      _obExpandedArea = OB.compromisos[0].areaId;
+    } else {
+      _obExpandedArea = 'SALUD_FISICA';
     }
   }
-
-  container.innerHTML = renderObCommitments(area, _catalogCache[areaId]);
+  container.innerHTML = renderObCommitmentsCombined();
   container.scrollTop = 0;
 }
 
-function renderObCommitments(area, catalog) {
-  const areaIdx  = OB.areaIndex;
-  const totalAreas = OB.areas.length;
-  const already  = OB.compromisos.filter(c => c.areaId === area.id);
-  const selected = already.map(c => c.compromisoId);
+// ── VISTA PRINCIPAL ──────────────────────────────────────
+function renderObCommitmentsCombined() {
+  const totalComps = OB.compromisos.length;
+  // Paso 2 de 5 (antes era 3 de 6, pero eliminamos areas como paso independiente)
+  const pbArgs = typeof obProgressBar !== 'undefined' ? obProgressBar(2, 5) : '';
 
   return `
-    <div id="ob-commitments" style="min-height:100vh;padding-bottom:120px;">
-      ${obProgressBar(3, 6)}
+    <div id="ob-commitments" style="min-height:100vh;padding-bottom:120px;background:var(--bg-primary);">
+      ${pbArgs}
 
       <div style="padding:24px 20px 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <div style="font-size:11px;letter-spacing:0.25em;color:var(--electric);text-transform:uppercase;">
-            Área ${areaIdx + 1} de ${totalAreas}
-          </div>
-          <div style="display:flex;gap:4px;">
-            ${OB.areas.map((a, i) => `<div style="width:8px;height:8px;border-radius:50%;
-              background:${i <= areaIdx ? 'var(--gold)' : 'var(--border)'};"></div>`).join('')}
-          </div>
+        <div style="font-size:11px;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;font-weight:800;">
+          Paso 2: Plan de Batalla
         </div>
-        <div style="font-size:28px;margin-bottom:4px;">${area.emoji}</div>
-        <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--text-1);margin-bottom:4px;">
-          ${area.nombre}
+        <div style="font-family:var(--font-head);font-size:28px;font-weight:900;color:var(--text-1);margin-bottom:4px;line-height:1.1;">
+          TERRENO DE<br>OPERACIONES
         </div>
-        <div style="font-size:13px;color:var(--text-3);">
-          Selecciona qué compromisos vas a sellar en este campo de batalla.
+        <div style="font-size:14px;color:var(--text-3);line-height:1.5;margin-top:12px;">
+          Selecciona un campo de batalla para ver sus misiones. No intentes abarcar todo.
+          <strong style="color:var(--text-2);">Elige lo que verdaderamente estás dispuesto a hacer.</strong>
         </div>
       </div>
 
-      <!-- Lista de compromisos -->
-      <div style="padding:0 20px;" id="commitmentsList">
-        ${catalog.map(c => {
-          const isSel = selected.includes(c.id);
-          const comp  = already.find(x => x.compromisoId === c.id);
-          const safeNombre = c.nombre.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-          const rawInfo = c.info || 'Actividad táctica diseñada para erradicar la mediocridad. Su ejecución diaria engrana tu mente al estándar del 1%.';
-          const tooltipHtml = `<div style="margin-bottom:14px; font-size:13px; color:var(--text-1); line-height:1.6;">${rawInfo}</div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">Calibración Táctica</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">${c.metaDef.toLocaleString('es-CO')} ${c.unidad}</span></div></div>`;
-          const safeInfo = tooltipHtml.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+      <!-- ACORDEÓN DE ÁREAS -->
+      <div id="areasAccordion" style="padding:0 20px;">
+        ${AREAS_CATALOG.map(area => {
+          const areaCompromisos = OB.compromisos.filter(c => c.areaId === area.id);
+          const isExpanded = _obExpandedArea === area.id;
+          const actCount   = areaCompromisos.length;
+          
           return `
-            <div id="comp-${c.id}" style="background:var(--bg-elevated);border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
-              border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden;
-              ${isSel ? 'box-shadow:0 0 16px rgba(212,168,67,0.15);' : ''}
-              transition:all 0.2s ease;">
-
-              <!-- Header del compromiso -->
-              <div onclick="toggleCommitment('${c.id}','${area.id}','${safeNombre}','${c.unidad}',${c.pcBase},${c.metaDef})"
-                style="display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;">
-                <div style="width:24px;height:24px;border-radius:50%;border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
-                  background:${isSel ? 'var(--gold)' : 'transparent'};display:flex;align-items:center;justify-content:center;
-                  font-size:12px;color:#000;font-weight:900;flex-shrink:0;">${isSel ? '✓' : ''}</div>
-                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;">
+            <div class="ob-area-section tappable-no-scale" 
+              style="background:var(--bg-elevated);border:1px solid ${isExpanded ? 'var(--gold)' : 'var(--border)'};
+                     border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden;
+                     ${isExpanded ? 'box-shadow:0 0 16px rgba(212,168,67,0.1);' : ''}
+                     transition:all 0.3s;">
+              
+              <!-- HEADER DE ÁREA -->
+              <div onclick="toggleObAreaExpand('${area.id}')"
+                style="padding:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+                       background:${isExpanded ? 'rgba(212,168,67,0.05)' : 'transparent'};">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${area.emoji}</div>
                   <div>
-                    <div style="font-weight:600;font-size:14px;color:${isSel ? 'var(--gold)' : 'var(--text-1)'};">${c.nombre}</div>
-                    <div style="font-size:11px;color:var(--text-3);">Meta sugerida: ${c.metaDef.toLocaleString('es-CO')} ${c.unidad} · +${c.pcBase} PC</div>
+                    <div style="font-weight:800;color:${isExpanded || actCount > 0 ? 'var(--text-1)' : 'var(--text-2)'};font-size:15px;margin-bottom:2px;">${area.nombre}</div>
+                    <div style="font-size:11px;color:var(--text-3);">${area.desc}</div>
                   </div>
-                  <div onclick="event.stopPropagation(); showInteractiveModal('🧠 ${safeNombre}', '${safeInfo}', '🧠')" style="color:var(--gold);font-size:13px;padding:3px 9px;border-radius:var(--r-full);background:rgba(212,168,67,0.1);margin-left:8px;font-weight:800;border:1px solid rgba(212,168,67,0.3);">?</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  ${actCount > 0 ? `
+                    <!-- CHIP CON FRICCIÓN PARA ELIMINAR -->
+                    <div style="background:var(--gold);color:#0A0A0F;font-size:11px;font-weight:900;
+                                padding:4px 8px;border-radius:12px;display:flex;align-items:center;gap:6px;"
+                         onclick="event.stopPropagation(); requestClearArea('${area.id}', '${area.nombre}', ${actCount})">
+                      ${actCount} act.
+                      <span style="font-weight:400;font-size:16px;line-height:0.8;margin-bottom:1px;">×</span>
+                    </div>
+                  ` : ''}
+                  <div style="color:var(--text-3);font-size:14px;
+                              transform:${isExpanded ? 'rotate(180deg)' : 'none'};
+                              transition:transform 0.3s ease;">▼</div>
                 </div>
               </div>
 
-              <!-- Formulario expandido cuando está seleccionado -->
-              ${isSel ? `
-                <div style="padding:0 16px 16px;border-top:1px solid rgba(212,168,67,0.15);">
-                  <div style="font-size:12px;color:var(--text-3);margin:12px 0 6px;">¿Cuál es tu meta diaria?</div>
-                  <div style="display:flex;gap:8px;align-items:center;">
-                    <input type="number" id="meta-${c.id}" value="${comp ? comp.meta : c.metaDef}"
-                      min="1" inputmode="numeric"
-                      oninput="updateCompromiso('${c.id}','meta',this.value)"
-                      style="flex:1;background:var(--bg-base);border:1px solid var(--border-gold);
-                        border-radius:var(--r-md);color:var(--text-1);font-size:16px;
-                        padding:10px 12px;outline:none;font-family:var(--font-body);" />
-                    <span style="color:var(--text-3);font-size:13px;min-width:44px;">${c.unidad}</span>
+              <!-- CONTENIDO EXPANDIDO (LISTA DE HÁBITOS) -->
+              ${isExpanded ? `
+                <div class="ob-area-body" style="padding:0 16px 16px;border-top:1px solid rgba(212,168,67,0.15);animation:fadeIn 0.3s ease;">
+                  <div style="font-size:10px;color:var(--text-3);margin:16px 0 12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:800;">
+                    Selecciona tus armas:
                   </div>
-
-                  <div style="font-size:12px;color:var(--text-3);margin:12px 0 6px;">¿Con qué frecuencia?</div>
-                  <div style="display:flex;gap:6px;">
-                    ${FREQ_OPTIONS.map(f => `
-                      <div onclick="updateCompromiso('${c.id}','frecuencia','${f.id}')"
-                        id="freq-${c.id}-${f.id}"
-                        style="flex:1;padding:8px 6px;text-align:center;border-radius:var(--r-md);
-                          font-size:11px;cursor:pointer;border:1px solid;
-                          ${(comp ? comp.frecuencia : 'DIARIO') === f.id
-                            ? 'background:rgba(212,168,67,0.15);border-color:var(--gold);color:var(--gold);font-weight:700;'
-                            : 'background:var(--bg-base);border-color:var(--border);color:var(--text-3);'}
-                          transition:all 0.2s;">
-                        ${f.emoji}<br>${f.label}
-                      </div>
-                    `).join('')}
-                  </div>
+                  ${(_catalogCache[area.id] || CATALOG_LOCAL[area.id] || []).map(c => {
+                    const comp = areaCompromisos.find(x => x.compromisoId === c.id);
+                    const isSel = !!comp;
+                    return renderActivityBlock(c, area.id, isSel, comp);
+                  }).join('')}
                 </div>
               ` : ''}
             </div>
@@ -199,85 +185,243 @@ function renderObCommitments(area, catalog) {
         }).join('')}
       </div>
 
-      <!-- Footer -->
+      <!-- FOOTER STICKY -->
       <div style="position:fixed;bottom:0;left:0;right:0;padding:16px 20px;
         background:linear-gradient(to top,var(--bg-base) 70%,transparent);">
-        <button onclick="obCommitmentsProceed()"
+        <button onclick="obCommitmentsProceedCombined()"
           id="commitmentsBtn" class="btn-premium tappable"
           style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;
-            border:none;border-radius:var(--r-xl);cursor:pointer;
-            font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:0.04em;
-            background:linear-gradient(135deg,var(--gold-dim),var(--gold));
-            color:#0A0A0F;box-shadow:0 8px 24px rgba(212,168,67,0.3);
-            transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
-          ${areaIdx < totalAreas - 1
-            ? `⟩ Siguiente área: ${AREAS_CATALOG.find(a => a.id === OB.areas[areaIdx+1])?.nombre || ''}`
-            : '⚔️ TODOS MIS COMPROMISOS ESTÁN SELLADOS'}
+            border:none;border-radius:var(--r-xl);cursor:${totalComps > 0 ? 'pointer' : 'not-allowed'};
+            font-family:var(--font-head);font-size:15px;font-weight:900;letter-spacing:0.04em;
+            transition:all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            ${totalComps > 0 
+              ? 'background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#0A0A0F;box-shadow:0 8px 24px rgba(212,168,67,0.3);transform:translateY(0);' 
+              : 'background:var(--bg-elevated);color:var(--text-3);transform:translateY(4px);opacity:0.8;'}">
+          ${totalComps > 0 ? '⚔️ FORJAR COMPROMISOS ⟩' : 'SELECCIONA AL MENOS UNO'}
         </button>
       </div>
+      
+      <style>
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+      </style>
     </div>
   `;
 }
 
-function toggleCommitment(cId, areaId, nombre, unidad, pcBase, metaDef) {
+// ── RENDER DE ACTIVIDAD (Bloque individual) ───────────────
+function renderActivityBlock(c, areaId, isSel, comp) {
+  const safeNombre = c.nombre.replace(/'/g, "\\\\\\'").replace(/"/g, "&quot;");
+  const rawInfo = c.info || '';
+  const rawDesc = c.desc || rawInfo;
+  
+  // Extraer primera oración para beneficio real
+  const _pIdx = rawInfo.search(/\\.\\s+[A-Z0-9]/);
+  const beneficio = _pIdx > 0 ? rawInfo.substring(0, _pIdx + 1) : rawInfo;
+  
+  // Armar tooltip (Códice)
+  const tooltipHtml = '<div style="margin-bottom:14px;"><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">👁️ Arquitectura Conceptual</div><div style="font-size:13px; color:var(--text-1); line-height:1.6; margin-bottom:14px;">' + rawDesc + '</div><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">📈 El Beneficio Real</div><div style="font-size:13px; color:var(--text-1); line-height:1.6; margin-bottom:14px;">' + beneficio + '</div><div style="font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; font-weight:800; margin-bottom:6px;">🔬 Bio-Ciencia</div><div style="font-size:13px; color:var(--text-2); font-style:italic; line-height:1.6; margin-bottom:14px;">' + rawInfo + '</div></div><div style="background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.3); border-radius:var(--r-md); padding:12px;"><div style="font-size:10px; text-transform:uppercase; color:var(--gold); font-weight:800; letter-spacing:0.1em; margin-bottom:6px;">🎯 Calibración Sugerida</div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:var(--text-2);">Meta de impacto:</span><span style="font-size:15px; color:var(--gold); font-weight:900; font-family:var(--font-head);">' + c.metaDef.toLocaleString('es-CO') + ' ' + c.unidad + '</span></div></div>';
+  const safeInfo = tooltipHtml.replace(/'/g, "\\\\\\'").replace(/"/g, "&quot;");
+
+  return `
+    <div id="comp-${c.id}" style="background:var(--bg-base);border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
+      border-radius:var(--r-md);margin-bottom:8px;overflow:hidden;
+      ${isSel ? 'box-shadow:0 0 12px rgba(212,168,67,0.1);' : ''}
+      transition:all 0.2s ease;">
+
+      <!-- Header del compromiso -->
+      <div onclick="toggleCommitmentCombined('${c.id}','${areaId}','${safeNombre}','${c.unidad}',${c.pcBase},${c.metaDef})"
+        style="display:flex;align-items:center;gap:12px;padding:14px 12px;cursor:pointer;">
+        
+        <div style="width:22px;height:22px;border-radius:4px;border:2px solid ${isSel ? 'var(--gold)' : 'var(--border)'};
+          background:${isSel ? 'var(--gold)' : 'transparent'};display:flex;align-items:center;justify-content:center;
+          font-size:12px;color:#000;font-weight:900;flex-shrink:0;">${isSel ? '✓' : ''}</div>
+        
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:700;font-size:14px;color:${isSel ? 'var(--gold)' : 'var(--text-1)'};">${c.nombre}</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Sugerido: ${c.metaDef.toLocaleString('es-CO')} ${c.unidad}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            ${isSel ? `
+              <div onclick="event.stopPropagation(); removeCommitmentIndividual('${c.id}')"
+                   style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+                          color:var(--text-3);background:rgba(255,255,255,0.08);border-radius:50%;font-size:16px;">×</div>
+            ` : ''}
+            <div onclick="event.stopPropagation(); showInteractiveModal('${safeNombre}', '${safeInfo}', '🧠')"
+                 style="color:var(--gold);font-size:13px;width:26px;height:26px;display:flex;align-items:center;
+                        justify-content:center;border-radius:50%;background:rgba(212,168,67,0.1);
+                        font-weight:900;border:1px solid rgba(212,168,67,0.3);">?</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario expandido -->
+      ${isSel ? `
+        <div style="padding:0 12px 14px;border-top:1px solid rgba(212,168,67,0.15);">
+          <div style="font-size:11px;color:var(--gold);margin:12px 0 6px;text-transform:uppercase;letter-spacing:0.1em;font-weight:800;">
+            🎯 Calibración Diaria
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+            <input type="number" id="meta-${c.id}" value="${comp ? comp.meta : c.metaDef}" min="1" inputmode="numeric"
+              oninput="updateCompromisoCombined('${c.id}','meta',this.value)"
+              style="flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border-gold);border-radius:var(--r-md);
+                     color:var(--text-1);font-size:16px;padding:10px 12px;outline:none;font-family:var(--font-head);font-weight:900;" />
+            <span style="color:var(--text-2);font-size:13px;min-width:44px;font-weight:600;">${c.unidad}</span>
+          </div>
+
+          <div style="font-size:11px;color:var(--gold);margin:0 0 6px;text-transform:uppercase;letter-spacing:0.1em;font-weight:800;">
+            ⏱️ Frecuencia
+          </div>
+          <div style="display:flex;gap:6px;">
+            ${FREQ_OPTIONS.map(f => `
+              <div onclick="updateCompromisoCombined('${c.id}','frecuencia','${f.id}')"
+                id="freq-${c.id}-${f.id}"
+                style="flex:1;padding:8px 4px;text-align:center;border-radius:var(--r-md);font-size:10px;cursor:pointer;border:1px solid;
+                  ${(comp ? comp.frecuencia : 'DIARIO') === f.id
+                    ? 'background:rgba(212,168,67,0.15);border-color:var(--gold);color:var(--gold);font-weight:700;'
+                    : 'background:rgba(0,0,0,0.3);border-color:var(--border);color:var(--text-3);'}
+                  transition:all 0.2s;">
+                <div style="font-size:14px;margin-bottom:2px;">${f.emoji}</div>
+                ${f.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// ── LOGICA DE COMPORTAMIENTO ──────────────────────────────
+function toggleObAreaExpand(areaId) {
+  if (_obExpandedArea === areaId) {
+    _obExpandedArea = null;
+  } else {
+    _obExpandedArea = areaId;
+    
+    // Si no está en caché, prefetch silencioso
+    if (!_catalogCache[areaId]) {
+      try {
+        if (typeof fetchCatalog !== 'undefined') {
+          fetchCatalog(areaId).then(data => {
+            if (data && data.length > 0) {
+              _catalogCache[areaId] = data;
+              // Re-renderizar si sigue abierta esta área
+              if (_obExpandedArea === areaId) {
+                const container = document.getElementById('onboardingContainer');
+                if (container) container.innerHTML = renderObCommitmentsCombined();
+              }
+            }
+          }).catch(() => {});
+        }
+      } catch(e) {}
+    }
+  }
+
+  // Actualizar UI
+  const container = document.getElementById('onboardingContainer');
+  if (container) container.innerHTML = renderObCommitmentsCombined();
+}
+
+function toggleCommitmentCombined(cId, areaId, nombre, unidad, pcBase, metaDef) {
   const idx = OB.compromisos.findIndex(c => c.compromisoId === cId);
   if (idx === -1) {
+    // Añadir
     OB.compromisos.push({ compromisoId: cId, areaId, nombre, unidad, pcBase, meta: metaDef, frecuencia: 'DIARIO' });
   } else {
+    // Eliminar
     OB.compromisos.splice(idx, 1);
   }
-  // Re-render solo la lista
-  const area    = AREAS_CATALOG.find(a => a.id === areaId);
-  const catalog = _catalogCache[areaId] || CATALOG_LOCAL[areaId] || [];
-  const container = document.getElementById('onboardingContainer');
-  if (container) {
-    container.innerHTML = renderObCommitments(area, catalog);
-    container.scrollTop = 0;
-  }
+  
   if (window.Telegram?.WebApp?.HapticFeedback) {
     window.Telegram.WebApp.HapticFeedback.selectionChanged();
   }
+  
+  // Re-render de toda la vista
+  const container = document.getElementById('onboardingContainer');
+  if (container) container.innerHTML = renderObCommitmentsCombined();
 }
 
-function updateCompromiso(cId, field, value) {
+// Actualizar valores de input o frecuencia
+function updateCompromisoCombined(cId, field, value) {
   const comp = OB.compromisos.find(c => c.compromisoId === cId);
   if (!comp) return;
-  if (field === 'meta') comp.meta = parseFloat(value) || 1;
-  if (field === 'frecuencia') {
+  if (field === 'meta') {
+    comp.meta = parseFloat(value) || 1;
+  } else if (field === 'frecuencia') {
     comp.frecuencia = value;
-    // Actualizar visualmente los botones de frecuencia
+    // Actualización visual directa (sin re-render global)
     FREQ_OPTIONS.forEach(f => {
       const el = document.getElementById(`freq-${cId}-${f.id}`);
       if (el) {
         const active = f.id === value;
-        el.style.background   = active ? 'rgba(212,168,67,0.15)' : 'var(--bg-base)';
-        el.style.borderColor  = active ? 'var(--gold)' : 'var(--border)';
-        el.style.color        = active ? 'var(--gold)' : 'var(--text-3)';
-        el.style.fontWeight   = active ? '700' : '400';
+        el.style.background  = active ? 'rgba(212,168,67,0.15)' : 'rgba(0,0,0,0.3)';
+        el.style.borderColor = active ? 'var(--gold)' : 'var(--border)';
+        el.style.color       = active ? 'var(--gold)' : 'var(--text-3)';
+        el.style.fontWeight  = active ? '700' : '400';
       }
     });
   }
 }
 
-function obCommitmentsProceed() {
-  const areaId = OB.areas[OB.areaIndex];
-  const tieneCompromisos = OB.compromisos.some(c => c.areaId === areaId);
+// ── FRICCIONES DE ELIMINACIÓN ─────────────────────────────
+// Acción desde el [×] individual (sin fricción fuerte, es una deselección)
+function removeCommitmentIndividual(cId) {
+  const idx = OB.compromisos.findIndex(c => c.compromisoId === cId);
+  if (idx !== -1) {
+    OB.compromisos.splice(idx, 1);
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
+    const container = document.getElementById('onboardingContainer');
+    if (container) container.innerHTML = renderObCommitmentsCombined();
+  }
+}
 
-  if (!tieneCompromisos) {
-    // Vibración de error
+// Acción desde el chip [x] del área completa: FRICCIÓN ALTA
+function requestClearArea(areaId, areaName, actCount) {
+  if (window.Telegram?.WebApp?.showPopup) {
+    window.Telegram.WebApp.showPopup({
+      title: '⚠️ ¿Borrar terreno operativo?',
+      message: `Vas a eliminar ${actCount} misión(es) activa(s) de "${areaName}".\\n\\n¿Seguro que quieres descartar esta línea táctica?`,
+      buttons: [
+        { id: 'borrar', type: 'destructive', text: 'Sí, borrar misiones' },
+        { id: 'cancelar', type: 'default',   text: 'Mantener preparadas' }
+      ]
+    }, (btnId) => {
+      if (btnId === 'borrar') clearAreaCommitments(areaId);
+    });
+  } else {
+    const ok = confirm(`Vas a eliminar ${actCount} misión(es) de "${areaName}".\\n\\n¿Borrar misiones?`);
+    if (ok) clearAreaCommitments(areaId);
+  }
+}
+
+function clearAreaCommitments(areaId) {
+  OB.compromisos = OB.compromisos.filter(c => c.areaId !== areaId);
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) {
+    window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+  }
+  
+  const container = document.getElementById('onboardingContainer');
+  if (container) container.innerHTML = renderObCommitmentsCombined();
+}
+
+// ── CONTINUAR ONBOARDING ──────────────────────────────────
+function obCommitmentsProceedCombined() {
+  if (OB.compromisos.length === 0) {
     if (window.Telegram?.WebApp?.HapticFeedback) {
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
     }
     return;
   }
-
-  if (OB.areaIndex < OB.areas.length - 1) {
-    // Siguiente área
-    OB.areaIndex++;
-    const container = document.getElementById('onboardingContainer');
-    if (container) renderObCommitmentsAsync(container);
-  } else {
-    // Todas las áreas configuradas → siguiente paso (juramento)
-    obNext();
-  }
+  
+  // Como ya no existe la pantalla "areas", derivamos OB.areas a partir de los compromisos
+  // Esto mantiene compatibilidad con la base de datos (por si se usan)
+  const areasSet = new Set(OB.compromisos.map(c => c.areaId));
+  OB.areas = Array.from(areasSet);
+  
+  // Avanzar
+  if (typeof obNext === 'function') obNext();
 }
