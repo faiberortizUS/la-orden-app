@@ -84,20 +84,37 @@ function renderReport(data, params) {
   }
 
   return `
-    <div class="view" id="view-report">
-      <div class="section-title" style="margin-bottom:4px;">Selecciona tu misión</div>
-      <p class="text-sm text-muted" style="margin-bottom:8px;">Elige qué victoria vas a registrar ahora</p>
-      <div class="commitment-selector">
+    <div class="view" id="view-report" style="padding-bottom: 32px;">
+      
+      <!-- HERO TITLE -->
+      <div style="text-align:center; padding: 30px 20px 20px;">
+        <div style="font-size:48px; margin-bottom:12px; filter:drop-shadow(0 0 10px rgba(212,168,67,0.3));">⚔️</div>
+        <div style="font-family:var(--font-head); font-size:24px; font-weight:900; color:var(--gold); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">
+          SELECCIONA TU MISIÓN
+        </div>
+        <div style="font-size:13px; color:var(--text-3); line-height:1.5; max-width:280px; margin:0 auto;">
+          ¿Qué victoria vas a sellar hoy frente al sistema?
+        </div>
+      </div>
+
+      <div style="font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.18em; font-weight:800; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
+        MISIONES PENDIENTES (${pendientes.length})
+      </div>
+
+      <div class="commitment-selector" style="display:flex; flex-direction:column; gap:8px;">
         ${pendientes.map(c => `
-          <div class="commitment-pick-item tappable" onclick="openReportInput('${c.id}')">
-            <span style="font-size:28px;">${c.emoji}</span>
-            <div style="flex:1;">
-              <div class="fw-600" style="font-size:15px;">${c.nombre}</div>
-              <div class="text-sm text-muted">Meta: ${Number(c.meta).toLocaleString('es-CO')} ${c.unidad}</div>
+          <div class="tappable" onclick="openReportInput('${c.id}')"
+               style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+            <span style="font-size:24px; filter:drop-shadow(0 0 4px rgba(0,0,0,0.5));">${c.emoji}</span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14px; font-weight:800; color:var(--text-1); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.nombre}</div>
+              <div style="font-size:11px; color:var(--text-3); display:flex; align-items:center; gap:6px;">
+                <span style="color:var(--text-2); font-weight:600;">Meta:</span> ${Number(c.meta).toLocaleString('es-CO')} ${c.unidad}
+              </div>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="badge-chip badge-chip--gold">+${c.pcBase} PC base</span>
-              <span style="font-size:18px;color:var(--text-3);">⟩</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:10px; font-weight:800; color:var(--electric); background:rgba(123,97,255,0.1); padding:4px 8px; border-radius:8px; border:1px solid rgba(123,97,255,0.2);">+${c.pcBase} PC</span>
+              <span style="font-size:16px; color:var(--gold); opacity:0.6;">⟩</span>
             </div>
           </div>
         `).join('')}
