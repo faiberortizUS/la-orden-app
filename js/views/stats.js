@@ -211,7 +211,7 @@ function _renderStatsDashboard(data) {
 
       <!-- Fila 2: Volatilidad · Regularidad · Recuperación -->
       <div class="kpi-exec-bar stagger-up stagger-1" style="margin-bottom:10px;">
-        <div class="kpi-exec-chip kpi-exec-chip--purple tappable" onclick="showInteractiveModal('Volatilidad Semanal','Desviación estándar de tu rendimiento diario. Bajo = guerrero consistente. Alto = conducta impredecible.','📉')">
+        <div class="kpi-exec-chip kpi-exec-chip--purple tappable" onclick="showInteractiveModal('Estabilidad de Esfuerzo','Mide qué tanto varía tu rendimiento día tras día.<br><br>• <b>Estable:</b> Eres una roca. Mantienes el mismo nivel siempre.<br>• <b>Variable:</b> Tu energía sube y baja según el día.<br>• <b>Caótico:</b> Eres impredecible. Un día das el 100% y al siguiente desapareces.<br><br>💡 El 1% busca Estabilidad.','📊')">
           <div class="kpi-exec-label">Volatilidad</div>
           <div class="kpi-exec-value" style="font-size:14px;color:var(--electric);">${volLbl}</div>
           <div class="kpi-exec-sub">σ=${kpiVol}%</div>
